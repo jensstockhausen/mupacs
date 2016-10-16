@@ -1,0 +1,15 @@
+{
+  "dicomConfigurationRoot" : {
+    "Unique AE Titles Registry" : "I am a cool AppEntity",
+    "dicomDevicesRoot" : {
+      "de[]viceWeirdo" : {
+        "prop1" : "aVal"
+      },
+      "device1" : {
+        "prop1" : [ 1, 2, 3 ],
+        "_prop" : "hey"
+      },
+      "device2" : [ 1, 2, 3 ]
+    }
+  }
+}

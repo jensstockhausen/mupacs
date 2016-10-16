@@ -1,0 +1,54 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
+
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <title>StudyList</title>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"/>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"/>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"/>
+    <link rel="stylesheet" href="/mupacs.css"/>
+</head>
+
+<body>
+<div class="container">
+
+    <h2>Studies</h2>
+    <table class="table table-striped table-bordered">
+        <tr>
+            <th>ID</th>
+            <th>StudyInstanceUID</th>
+            <th>#Series</th>
+        </tr>
+
+        <tr th:each="s : ${studies}">
+            <td th:text="${s.id}">pn</td>
+            <td th:text="${s.studyInstanceUID}">uid</td>
+            <td>
+                <form action="#" th:action="@{/serieslist}" method="get">
+                    <input type="hidden" name="studyId" th:value="${s.id}"/>
+                    <button type="submit" class="btn btn-default" th:id="'button_' + ${s.id}">
+                        <div th:text="${s.numberOfSeries}">details</div>
+                    </button>
+                </form>
+            </td>
+        </tr>
+
+    </table>
+</div>
+
+<!--
+<div th:include="footer :: copy">
+</div>
+-->
+
+</body>
+</html>
+
+
+
+
+
