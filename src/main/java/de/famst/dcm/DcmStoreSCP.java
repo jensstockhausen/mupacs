@@ -1,19 +1,10 @@
 package de.famst.dcm;
 
-import org.dcm4che3.conf.api.extensions.CommonAEExtension;
-import org.dcm4che3.conf.api.extensions.CommonDeviceExtension;
-import org.dcm4che3.conf.core.api.Configuration;
-import org.dcm4che3.conf.core.api.ConfigurationException;
-import org.dcm4che3.conf.core.api.internal.BeanVitalizer;
-import org.dcm4che3.conf.core.api.internal.ConfigurationManager;
-import org.dcm4che3.conf.dicom.CommonDicomConfigurationWithHL7;
-import org.dcm4che3.conf.dicom.DicomConfigurationBuilder;
 import org.dcm4che3.data.Attributes;
 import org.dcm4che3.data.Tag;
 import org.dcm4che3.io.DicomOutputStream;
 import org.dcm4che3.net.*;
 import org.dcm4che3.net.pdu.PresentationContext;
-import org.dcm4che3.net.service.BasicCEchoSCP;
 import org.dcm4che3.net.service.BasicCStoreSCP;
 import org.dcm4che3.net.service.DicomServiceException;
 import org.dcm4che3.net.service.DicomServiceRegistry;
@@ -24,7 +15,6 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
-import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -41,44 +31,17 @@ public class DcmStoreSCP extends BasicCStoreSCP
     private Device device;
     private Connection connection;
     private ApplicationEntity ae;
-    private DicomServiceRegistry dicomServiceRegistry;
 
-    public DcmStoreSCP() throws ConfigurationException
+
+    public DcmStoreSCP(DicomServiceRegistry dicomServiceRegistry)
     {
-        if (System.getProperty("org.dcm4che.conf.filename") == null)
-        {
-            System.setProperty("org.dcm4che.conf.filename",
-                    "src/main/resources/dcmconfig.json");
-        }
+        LOG.info("Creating device");
 
-        DicomConfigurationBuilder builder
-                = DicomConfigurationBuilder.newConfigurationBuilder(System.getProperties());
+        device = new Device();
 
-
-        builder.registerDeviceExtension(CommonDeviceExtension.class);
-        builder.registerAEExtension(CommonAEExtension.class);
-
-        CommonDicomConfigurationWithHL7 dicomConfigurationWithHL7 = builder.build();
-
-
-        device = new Device("store-scp");
-
-        dicomServiceRegistry = new DicomServiceRegistry();
-        dicomServiceRegistry.addDicomService(new BasicCEchoSCP());
-        dicomServiceRegistry.addDicomService(this);
-
-        device.setDimseRQHandler(dicomServiceRegistry);
-
-        connection = new Connection();
-        connection.setHostname("127.0.0.1");
-        connection.setPort(8104);
-
-        device.addConnection(connection);
-
-        ae = new ApplicationEntity("*");
-        ae.setAssociationAcceptor(true);
-        ae.addConnection(connection);
+        ae = new ApplicationEntity();
         ae.setAETitle("MUPACS");
+        ae.setAcceptedCallingAETitles();
 
         TransferCapability tc = new TransferCapability(
                 null, "*", TransferCapability.Role.SCP, "*");
@@ -86,6 +49,15 @@ public class DcmStoreSCP extends BasicCStoreSCP
         ae.addTransferCapability(tc);
 
         device.addApplicationEntity(ae);
+
+        connection = new Connection();
+        connection.setPort(8104);
+        connection.setHostname("127.0.0.1");
+
+        device.addConnection(connection);
+        ae.addConnection(connection);
+
+        device.setDimseRQHandler(dicomServiceRegistry);
 
         ExecutorService executorService = Executors.newCachedThreadPool();
         ScheduledExecutorService scheduledExecutorService =
@@ -97,18 +69,18 @@ public class DcmStoreSCP extends BasicCStoreSCP
         try
         {
             device.bindConnections();
+            LOG.info("bound to [{}:{}]", connection.getHostname(), connection.getPort());
         }
         catch (IOException | GeneralSecurityException e)
         {
             LOG.error("[{}]", e);
         }
-
     }
 
     @Override
     protected void store(Association as, PresentationContext pc, Attributes rq, PDVInputStream data, Attributes rsp) throws IOException
     {
-        //rsp.setInt(Tag.Status, VR.US, status);
+        LOG.info("C-STORE [{}]", as);
 
         String cuid = rq.getString(Tag.AffectedSOPClassUID);
         String iuid = rq.getString(Tag.AffectedSOPInstanceUID);
@@ -120,14 +92,8 @@ public class DcmStoreSCP extends BasicCStoreSCP
 
         try
         {
-            storeTo(as,
-                    as.createFileMetaInformation(iuid, cuid, tsuid),
-                    data,
-                    file);
-
-            renameTo(as,
-                    file,
-                    new File(storageDir, iuid));
+            storeTo(as, as.createFileMetaInformation(iuid, cuid, tsuid), data, file);
+            renameTo(as, file, new File(storageDir, iuid));
         }
         catch (Exception e)
         {
@@ -140,7 +106,8 @@ public class DcmStoreSCP extends BasicCStoreSCP
     private void storeTo(Association as, Attributes fmi,
                          PDVInputStream data, File file) throws IOException
     {
-        LOG.info("[{}]: M-WRITE [{}]", as, file);
+        LOG.info("[{}] writing to [{}]", as, file);
+
         file.getParentFile().mkdirs();
 
         DicomOutputStream out = new DicomOutputStream(file);
@@ -158,20 +125,20 @@ public class DcmStoreSCP extends BasicCStoreSCP
     private void renameTo(Association as, File from, File dest)
             throws IOException
     {
-        LOG.info("[{}]: M-RENAME [{}] to [{}]", as, from, dest);
+        LOG.info("[{}] renaming [{}] to [{}]", as, from, dest);
         if (!dest.getParentFile().mkdirs())
             dest.delete();
         if (!from.renameTo(dest))
-            throw new IOException("Failed to rename " + from + " to "+ dest);
+            throw new IOException("Failed to rename " + from + " to " + dest);
     }
 
 
     private void deleteFile(Association as, File file)
     {
         if (file.delete())
-            LOG.info("[{}]: M-DELETE [{}]", as, file);
+            LOG.info("[{}] deleting [{}]", as, file);
         else
-            LOG.warn("[{}]: M-DELETE [{}] failed!", as, file);
+            LOG.warn("[{}] deleting [{}] failed!", as, file);
     }
 
 }
