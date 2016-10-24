@@ -1,6 +1,5 @@
 package de.famst.dcm;
 
-import org.dcm4che3.conf.core.api.ConfigurationException;
 import org.dcm4che3.net.service.AbstractDicomService;
 import org.dcm4che3.net.service.BasicCEchoSCP;
 import org.dcm4che3.net.service.DicomServiceRegistry;

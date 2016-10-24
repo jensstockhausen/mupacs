@@ -1,5 +1,6 @@
 package de.famst.dcm;
 
+import de.famst.service.FolderImportManager;
 import org.dcm4che3.data.Attributes;
 import org.dcm4che3.data.Tag;
 import org.dcm4che3.io.DicomOutputStream;
@@ -22,6 +23,7 @@ import java.util.concurrent.ScheduledExecutorService;
 /**
  * Created by jens on 13/10/2016.
  */
+
 public class DcmStoreSCP extends BasicCStoreSCP
 {
     private static Logger LOG = LoggerFactory.getLogger(DcmStoreSCP.class);
@@ -32,9 +34,12 @@ public class DcmStoreSCP extends BasicCStoreSCP
     private Connection connection;
     private ApplicationEntity ae;
 
+    private FolderImportManager importManager;
+    private String importFolder;
 
-    public DcmStoreSCP(DicomServiceRegistry dicomServiceRegistry)
+    public DcmStoreSCP(DicomServiceRegistry dicomServiceRegistry, FolderImportManager importManager)
     {
+        this.importManager = importManager;
         LOG.info("Creating device");
 
         device = new Device();
@@ -75,6 +80,14 @@ public class DcmStoreSCP extends BasicCStoreSCP
         {
             LOG.error("[{}]", e);
         }
+
+    }
+
+    public void setImportFolder(String importFolder)
+    {
+        this.importFolder = importFolder;
+
+        LOG.info("saving to [{}]", importFolder);
     }
 
     @Override
@@ -86,14 +99,13 @@ public class DcmStoreSCP extends BasicCStoreSCP
         String iuid = rq.getString(Tag.AffectedSOPInstanceUID);
         String tsuid = pc.getTransferSyntax();
 
-        String storageDir = "./build/import";
-
-        File file = new File(storageDir, iuid + PART_EXT);
+        File file = new File(importFolder, iuid + PART_EXT);
 
         try
         {
             storeTo(as, as.createFileMetaInformation(iuid, cuid, tsuid), data, file);
-            renameTo(as, file, new File(storageDir, iuid));
+
+            renameTo(as, file, new File(importFolder, iuid));
         }
         catch (Exception e)
         {
@@ -130,6 +142,15 @@ public class DcmStoreSCP extends BasicCStoreSCP
             dest.delete();
         if (!from.renameTo(dest))
             throw new IOException("Failed to rename " + from + " to " + dest);
+
+        try
+        {
+            importManager.addImport(dest.toPath());
+        }
+        catch (InterruptedException e)
+        {
+            LOG.warn("[{}]", e);
+        }
     }
 
 
@@ -140,5 +161,6 @@ public class DcmStoreSCP extends BasicCStoreSCP
         else
             LOG.warn("[{}] deleting [{}] failed!", as, file);
     }
+
 
 }

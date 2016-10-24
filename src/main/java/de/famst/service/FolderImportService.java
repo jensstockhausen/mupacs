@@ -37,14 +37,24 @@ public class FolderImportService
 
         try
         {
-            Files.walk(rootPath)
-                    .filter(path -> !Files.isDirectory(path))
-                    .filter(path -> DcmFile.isDCMFile(path.toFile()))
-                    .forEach(path ->
-                    {
-                        //files.add(path.toAbsolutePath().toString());
-                        fi.addInfo(parse(path));
-                    });
+            if (rootPath.toFile().isFile())
+            {
+                if (DcmFile.isDCMFile(rootPath.toFile()))
+                {
+                    fi.addInfo(insertToDataBase(rootPath));
+                }
+            }
+            else
+            {
+                Files.walk(rootPath)
+                        .filter(path -> !Files.isDirectory(path))
+                        .filter(path -> DcmFile.isDCMFile(path.toFile()))
+                        .forEach(path ->
+                        {
+                            //files.add(path.toAbsolutePath().toString());
+                            fi.addInfo(insertToDataBase(path));
+                        });
+            }
         }
         catch (IOException e)
         {
@@ -56,7 +66,7 @@ public class FolderImportService
     }
 
     @Transactional
-    private String parse(Path p)
+    private String insertToDataBase(Path p)
     {
         Attributes dcm = DcmFile.readContent(p.toFile());
 

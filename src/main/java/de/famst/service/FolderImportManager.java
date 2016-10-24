@@ -31,6 +31,7 @@ public class FolderImportManager
         imports = new HashMap<>();
     }
 
+
     @Async
     public synchronized void addImport(Path rootPath) throws InterruptedException
     {
