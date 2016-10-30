@@ -30,11 +30,6 @@ public class DicomImportService
     @Inject
     private PatientRepository patientRepository;
 
-    private DicomImportService()
-    {
-
-    }
-
 
     @Transactional
     public void dicomToDatabase(Attributes dcm)
