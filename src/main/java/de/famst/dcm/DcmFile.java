@@ -7,7 +7,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 
 /**
@@ -17,37 +16,26 @@ public class DcmFile
 {
     private static Logger LOG = LoggerFactory.getLogger(DcmFile.class);
 
+    private DcmFile()
+    {
+
+    }
+
     public static Attributes readContent(File file)
     {
-        DicomInputStream dis;
         Attributes dcm;
 
-        try
+        LOG.info("opening DICOM file {}", file.getAbsolutePath());
+
+        try( DicomInputStream dis = new DicomInputStream(file); )
         {
-            LOG.info("opening file {}", file.getAbsolutePath());
-
-            dis = new DicomInputStream(file);
-        }
-        catch (IOException e)
-        {
-            LOG.error("reading dicom file {}", e.getMessage());
-
-            return null;
-        }
-
-        dis.setIncludeBulkData(DicomInputStream.IncludeBulkData.NO);
-
-        try
-        {
+            dis.setIncludeBulkData(DicomInputStream.IncludeBulkData.NO);
             dcm = dis.readDataset(-1, -1);
             dis.close();
-
-
         }
         catch (IOException e)
         {
-            LOG.error("parsing dicom file {}", e.getMessage());
-
+            LOG.error("reading DICOM file [{}]", e);
             return null;
         }
 
@@ -56,47 +44,42 @@ public class DcmFile
 
     public static boolean isDCMFile(File file)
     {
-        FileInputStream inStream;
-
-        try
+        try (FileInputStream inStream = new FileInputStream(file))
         {
-            inStream = new FileInputStream(file);
-        }
-        catch (FileNotFoundException e)
-        {
-            LOG.warn("file does not exist");
-            return false;
-        }
+            byte[] tag = new byte[]{'D', 'I', 'C', 'M'};
+            byte[] buffer = new byte[4];
 
-        byte[] tag = new byte[] { 'D', 'I', 'C', 'M'};
-        byte[] buffer = new byte[4];
+            if (128 != inStream.skip(128))
+            {
+                LOG.error("reading bytes");
+                return false;
+            }
 
-        try
-        {
-            inStream.skip(128);
-            inStream.read(buffer);
+            if (4 != inStream.read(buffer))
+            {
+                LOG.error("reading bytes");
+                return false;
+            }
+
             inStream.close();
+
+            for (int i = 0; i < 4; i++)
+            {
+                if (buffer[i] != tag[i])
+                {
+                    return false;
+                }
+            }
+
         }
         catch (IOException e)
         {
-            LOG.warn("error reading file {}", e.getMessage());
+            LOG.warn("error reading file [{}]", e);
             return false;
-        }
-
-        for (int i = 0; i<4; i++)
-        {
-            if (buffer[i] != tag[i])
-            {
-                return false;
-            }
         }
 
         return true;
     }
-
-
-
-
 
 
 }

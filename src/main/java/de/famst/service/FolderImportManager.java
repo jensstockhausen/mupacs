@@ -21,20 +21,33 @@ public class FolderImportManager
 {
     private static Logger LOG = LoggerFactory.getLogger(FolderImportManager.class);
 
-    @Inject
-    private FolderImportService importService;
+    private FolderImportService folderImportService;
 
     private Map<String, Future<FolderImportInformation>> imports;
 
-    public FolderImportManager()
+    /**
+     * @param folderImportService
+     */
+    @Inject
+    public FolderImportManager(FolderImportService folderImportService)
     {
+        this.folderImportService = folderImportService;
+
         imports = new HashMap<>();
     }
 
 
+    /**
+     * Add a folder to be parsed recursively
+     * all DICOM files found will be imported
+     * @param rootPath
+     * @throws InterruptedException
+     */
     @Async
     public synchronized void addImport(Path rootPath) throws InterruptedException
     {
+        LOG.info("adding import folder [{}]", rootPath);
+
         String key = rootPath.toAbsolutePath().toString();
 
         if (imports.containsKey(key))
@@ -44,18 +57,23 @@ public class FolderImportManager
 
         FolderImportInformation fi = new FolderImportInformation(rootPath);
 
-        Future<FolderImportInformation> ffi = importService.importInstances(fi);
+        Future<FolderImportInformation> ffi = folderImportService.importInstances(fi);
 
         imports.put(key, ffi);
     }
 
+    /**
+     * Retuns the list of all running and finished imports
+     * @return
+     */
     public synchronized List<String> runningImports()
     {
         List<String> running = new ArrayList<>();
 
-        for(String path:imports.keySet())
+        for(Map.Entry<String, Future<FolderImportInformation>> entry: imports.entrySet())
         {
-            Future<FolderImportInformation> fi = imports.get(path);
+            String path = entry.getKey();
+            Future<FolderImportInformation> fi = entry.getValue();
 
             if (!fi.isDone())
             {

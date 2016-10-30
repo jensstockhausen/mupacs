@@ -25,8 +25,13 @@ public class FolderImportService
 {
     private static Logger LOG = LoggerFactory.getLogger(FolderImportRestService.class);
 
-    @Inject
     private DicomImportService dicomImportService;
+
+    @Inject
+    public FolderImportService(DicomImportService dicomImportService)
+    {
+        this.dicomImportService = dicomImportService;
+    }
 
     @Async
     public Future<FolderImportInformation> importInstances(FolderImportInformation fi) throws InterruptedException
@@ -50,15 +55,13 @@ public class FolderImportService
                         .filter(path -> !Files.isDirectory(path))
                         .filter(path -> DcmFile.isDCMFile(path.toFile()))
                         .forEach(path ->
-                        {
-                            //files.add(path.toAbsolutePath().toString());
-                            fi.addInfo(insertToDataBase(path));
-                        });
+                            fi.addInfo(insertToDataBase(path))
+                        );
             }
         }
         catch (IOException e)
         {
-            e.printStackTrace();
+            LOG.error("accessing file [{}]", e);
             return null;
         }
 
@@ -66,7 +69,7 @@ public class FolderImportService
     }
 
     @Transactional
-    private String insertToDataBase(Path p)
+    public String insertToDataBase(Path p)
     {
         Attributes dcm = DcmFile.readContent(p.toFile());
 

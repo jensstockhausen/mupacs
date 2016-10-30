@@ -12,7 +12,10 @@ import org.dcm4che3.net.service.DicomServiceRegistry;
 import org.dcm4che3.util.SafeClose;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
+import javax.inject.Inject;
 import java.io.File;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
@@ -23,24 +26,44 @@ import java.util.concurrent.ScheduledExecutorService;
 /**
  * Created by jens on 13/10/2016.
  */
-
+@Component
 public class DcmStoreSCP extends BasicCStoreSCP
 {
     private static Logger LOG = LoggerFactory.getLogger(DcmStoreSCP.class);
 
     private static final String PART_EXT = ".part";
 
+    @Value("${mupacs.cstore.scp.import}")
+    private String importFolder;
+
+    @Value("${mupcas.cstore.scp.port}")
+    private Integer port;
+
+    @Value("${mupcas.cstore.scp.host}")
+    private String host;
+
     private Device device;
     private Connection connection;
     private ApplicationEntity ae;
 
     private FolderImportManager importManager;
-    private String importFolder;
 
-    public DcmStoreSCP(DicomServiceRegistry dicomServiceRegistry, FolderImportManager importManager)
+    private DicomServiceRegistry dicomServiceRegistry;
+
+    @Inject
+    public DcmStoreSCP(FolderImportManager importManager)
     {
         this.importManager = importManager;
-        LOG.info("Creating device");
+    }
+
+    public void setDicomServiceRegistry(DicomServiceRegistry dicomServiceRegistry)
+    {
+        this.dicomServiceRegistry = dicomServiceRegistry;
+    }
+
+    public void start()
+    {
+        LOG.info("starting C-STORE SCP device");
 
         device = new Device();
 
@@ -56,8 +79,8 @@ public class DcmStoreSCP extends BasicCStoreSCP
         device.addApplicationEntity(ae);
 
         connection = new Connection();
-        connection.setPort(8104);
-        connection.setHostname("127.0.0.1");
+        connection.setPort(port);
+        connection.setHostname(host);
 
         device.addConnection(connection);
         ae.addConnection(connection);
@@ -80,15 +103,15 @@ public class DcmStoreSCP extends BasicCStoreSCP
         {
             LOG.error("[{}]", e);
         }
-
     }
 
-    public void setImportFolder(String importFolder)
+
+    public void stop()
     {
-        this.importFolder = importFolder;
-
-        LOG.info("saving to [{}]", importFolder);
+        LOG.info("stopping C-STORE SCP device");
+        device.unbindConnections();
     }
+
 
     @Override
     protected void store(Association as, PresentationContext pc, Attributes rq, PDVInputStream data, Attributes rsp) throws IOException
@@ -104,7 +127,6 @@ public class DcmStoreSCP extends BasicCStoreSCP
         try
         {
             storeTo(as, as.createFileMetaInformation(iuid, cuid, tsuid), data, file);
-
             renameTo(as, file, new File(importFolder, iuid));
         }
         catch (Exception e)
@@ -139,10 +161,13 @@ public class DcmStoreSCP extends BasicCStoreSCP
     {
         LOG.info("[{}] renaming [{}] to [{}]", as, from, dest);
         if (!dest.getParentFile().mkdirs())
+        {
             dest.delete();
+        }
         if (!from.renameTo(dest))
+        {
             throw new IOException("Failed to rename " + from + " to " + dest);
-
+        }
         try
         {
             importManager.addImport(dest.toPath());
@@ -157,9 +182,12 @@ public class DcmStoreSCP extends BasicCStoreSCP
     private void deleteFile(Association as, File file)
     {
         if (file.delete())
+        {
             LOG.info("[{}] deleting [{}]", as, file);
-        else
+        } else
+        {
             LOG.warn("[{}] deleting [{}] failed!", as, file);
+        }
     }
 
 
