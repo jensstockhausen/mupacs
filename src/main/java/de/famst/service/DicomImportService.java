@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
+import java.nio.file.Path;
 
 /**
  * Created by jens on 08/10/2016.
@@ -37,7 +38,7 @@ public class DicomImportService
     }
 
     @Transactional
-    public void dicomToDatabase(Attributes dcm)
+    public void dicomToDatabase(Attributes dcm, Path path)
     {
         PatientEty patient;
         String patientName = dcm.getString(Tag.PatientName);
@@ -93,6 +94,7 @@ public class DicomImportService
             LOG.info("create instance [{}]", sopInstanceUID);
             instance = new InstanceEty();
             instance.setInstanceUID(sopInstanceUID);
+            instance.setPath(path.toAbsolutePath().toString());
             instance.setSeries(series);
             instanceRepository.save(instance);
 
