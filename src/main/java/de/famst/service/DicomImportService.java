@@ -18,18 +18,23 @@ public class DicomImportService
 {
     private static Logger LOG = LoggerFactory.getLogger(DicomImportService.class);
 
-    @Inject
     private InstanceRepository instanceRepository;
-
-    @Inject
     private SeriesRepository seriesRepository;
-
-    @Inject
     private StudyRepository studyRepository;
-
-    @Inject
     private PatientRepository patientRepository;
 
+    @Inject
+    public DicomImportService(
+            InstanceRepository instanceRepository,
+            SeriesRepository seriesRepository,
+            StudyRepository studyRepository,
+            PatientRepository patientRepository)
+    {
+        this.instanceRepository = instanceRepository;
+        this.seriesRepository = seriesRepository;
+        this.studyRepository = studyRepository;
+        this.patientRepository = patientRepository;
+    }
 
     @Transactional
     public void dicomToDatabase(Attributes dcm)
