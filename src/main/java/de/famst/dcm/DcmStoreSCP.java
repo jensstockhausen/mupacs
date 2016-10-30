@@ -127,6 +127,9 @@ public class DcmStoreSCP extends BasicCStoreSCP
         try
         {
             storeTo(as, as.createFileMetaInformation(iuid, cuid, tsuid), data, file);
+
+
+
             renameTo(as, file, new File(importFolder, iuid));
         }
         catch (Exception e)
