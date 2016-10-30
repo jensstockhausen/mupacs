@@ -5,7 +5,6 @@ import de.famst.service.DicomImportService;
 import org.dcm4che3.data.Attributes;
 import org.dcm4che3.data.Tag;
 import org.dcm4che3.data.VR;
-import org.hibernate.SessionFactory;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -14,6 +13,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import static de.famst.AssertException.ThrowableAssertion.assertThrown;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -57,17 +58,19 @@ public class DicomImportTest
     private void importDcm()
     {
         Attributes dcm;
+        Path path = Paths.get("./");
+
         dcm = createDcm("Doe^John", "1.2.3.4", "1", "1");
-        dicomImportService.dicomToDatabase(dcm);
+        dicomImportService.dicomToDatabase(dcm, path);
 
         dcm = createDcm("Doe^John", "1.2.3.4", "1", "2");
-        dicomImportService.dicomToDatabase(dcm);
+        dicomImportService.dicomToDatabase(dcm, path);
 
         dcm = createDcm("Doe^John", "1.2.3.4", "2", "1");
-        dicomImportService.dicomToDatabase(dcm);
+        dicomImportService.dicomToDatabase(dcm, path);
 
         dcm = createDcm("Doe^John", "1.2.3.4", "2", "2");
-        dicomImportService.dicomToDatabase(dcm);
+        dicomImportService.dicomToDatabase(dcm, path);
     }
 
     @Test

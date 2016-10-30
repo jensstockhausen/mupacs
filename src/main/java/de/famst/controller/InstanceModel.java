@@ -11,19 +11,19 @@ public class InstanceModel
     private String instanceUID;
     private String path;
 
-    public InstanceModel(long id, String instanceUID)
+    public InstanceModel(long id, String instanceUID, String path)
     {
         this.id = id;
         this.instanceUID = instanceUID;
-
-        path = "asdf";
+        this.path = path;
     }
 
     public static InstanceModel fromInstanceEty(InstanceEty instanceEty)
     {
         return new InstanceModel(
                 instanceEty.getId(),
-                instanceEty.getInstanceUID()
+                instanceEty.getInstanceUID(),
+                instanceEty.getPath()
         );
     }
 

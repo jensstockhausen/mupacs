@@ -22,12 +22,13 @@
         <tr>
             <th>ID</th>
             <th>SOPInstanceUID</th>
+            <th>Path</th>
         </tr>
 
         <tr th:each="i : ${instances}">
             <td th:text="${i.id}">pn</td>
             <td th:text="${i.instanceUID}">uid</td>
-
+            <td th:text="${i.path}">path</td>
             <!--
             <td>
                 <form action="#" th:action="@{/instancelist}" method="get">

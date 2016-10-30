@@ -21,6 +21,8 @@ public class InstanceEty
 
     private String instanceUID;
 
+    private String path;
+
     @ManyToOne
     private SeriesEty series;
 
@@ -52,5 +54,15 @@ public class InstanceEty
     public void setSeries(SeriesEty series)
     {
         this.series = series;
+    }
+
+    public String getPath()
+    {
+        return path;
+    }
+
+    public void setPath(String path)
+    {
+        this.path = path;
     }
 }

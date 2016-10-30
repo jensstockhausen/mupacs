@@ -1,7 +1,7 @@
 package de.famst.service;
 
-import de.famst.dcm.DcmFile;
 import de.famst.controller.FolderImportRestService;
+import de.famst.dcm.DcmFile;
 import org.dcm4che3.data.Attributes;
 import org.dcm4che3.data.Tag;
 import org.slf4j.Logger;
@@ -73,7 +73,7 @@ public class FolderImportService
     {
         Attributes dcm = DcmFile.readContent(p.toFile());
 
-        dicomImportService.dicomToDatabase(dcm);
+        dicomImportService.dicomToDatabase(dcm, p);
 
         return dcm.getString(Tag.SOPInstanceUID);
     }
