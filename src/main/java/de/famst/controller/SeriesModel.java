@@ -27,9 +27,6 @@ public class SeriesModel
         );
     }
 
-
-
-
     public long getId()
     {
         return id;
