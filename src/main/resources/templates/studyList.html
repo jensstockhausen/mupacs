@@ -4,7 +4,7 @@
       xmlns="http://www.w3.org/1999/xhtml">
 
 <head>
-    <title>StudyList</title>
+    <title>Studies</title>
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"/>
@@ -16,7 +16,9 @@
 <body>
 <div class="container">
 
-    <h2>Studies</h2>
+    <h2>List of Studies</h2>
+    <h4 th:text="'Patient: ' + ${patient.patientsName}">PATIENT</h4>
+
     <table class="table table-striped table-bordered">
         <tr>
             <th>ID</th>

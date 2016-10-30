@@ -2,8 +2,6 @@ package de.famst.controller;
 
 import de.famst.data.InstanceEty;
 import de.famst.data.InstanceRepository;
-import de.famst.data.SeriesEty;
-import de.famst.data.SeriesRepository;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
