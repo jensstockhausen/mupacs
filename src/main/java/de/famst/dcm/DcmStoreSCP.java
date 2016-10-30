@@ -160,14 +160,17 @@ public class DcmStoreSCP extends BasicCStoreSCP
             throws IOException
     {
         LOG.info("[{}] renaming [{}] to [{}]", as, from, dest);
-        if (!dest.getParentFile().mkdirs())
+
+        if (!dest.getParentFile().mkdirs() && !dest.delete())
         {
-            dest.delete();
+            LOG.error("creating/deleting [{}]", dest.getAbsolutePath());
         }
+
         if (!from.renameTo(dest))
         {
             throw new IOException("Failed to rename " + from + " to " + dest);
         }
+
         try
         {
             importManager.addImport(dest.toPath());
@@ -175,6 +178,7 @@ public class DcmStoreSCP extends BasicCStoreSCP
         catch (InterruptedException e)
         {
             LOG.warn("[{}]", e);
+            Thread.currentThread().interrupt();
         }
     }
 

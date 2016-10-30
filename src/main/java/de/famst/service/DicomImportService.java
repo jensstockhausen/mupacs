@@ -5,7 +5,6 @@ import org.dcm4che3.data.Attributes;
 import org.dcm4che3.data.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,9 +30,11 @@ public class DicomImportService
     @Inject
     private PatientRepository patientRepository;
 
-    public DicomImportService()
+    private DicomImportService()
     {
+
     }
+
 
     @Transactional
     public void dicomToDatabase(Attributes dcm)

@@ -1,7 +1,5 @@
 package de.famst.data;
 
-import org.springframework.boot.autoconfigure.domain.EntityScan;
-
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -59,7 +57,10 @@ public class StudyEty
 
     public void addSeries(SeriesEty seriesEty)
     {
-        if (series.contains(seriesEty)) return;
+        if (series.contains(seriesEty))
+        {
+            return;
+        }
 
         series.add(seriesEty);
     }

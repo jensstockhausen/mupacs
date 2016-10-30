@@ -11,25 +11,24 @@ public class StudyModel
     private String studyInstanceUID;
     private long numberOfSeries;
 
-    public static StudyModel fromStudyEty(StudyEty studyEty)
-    {
-        StudyModel studyModel = new StudyModel(
-                studyEty.getId(),
-                studyEty.getStudyInstanceUID(),
-                studyEty.getSeries().size()
-
-        );
-
-        return studyModel;
-    }
-
-
     public StudyModel(long id, String studyInstanceUID, long numberOfSeries)
     {
         this.id = id;
         this.studyInstanceUID = studyInstanceUID;
         this.numberOfSeries = numberOfSeries;
     }
+
+    public static StudyModel fromStudyEty(StudyEty studyEty)
+    {
+        return new StudyModel(
+                studyEty.getId(),
+                studyEty.getStudyInstanceUID(),
+                studyEty.getSeries().size()
+
+        );
+    }
+
+
 
     public long getId()
     {

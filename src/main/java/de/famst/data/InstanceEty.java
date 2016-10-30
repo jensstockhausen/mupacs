@@ -21,13 +21,13 @@ public class InstanceEty
 
     private String instanceUID;
 
+    @ManyToOne
+    private SeriesEty series;
+
     public InstanceEty()
     {
         instanceUID = "";
     }
-
-    @ManyToOne
-    private SeriesEty series;
 
     public long getId()
     {

@@ -21,6 +21,10 @@ public class SeriesListController
     @Inject
     SeriesRepository seriesRepository;
 
+    private SeriesListController()
+    {
+    }
+
     @GET
     @RequestMapping("/serieslist")
     public String getListOfSeriesForStudy(@RequestParam("studyId") long studyId, Model model)

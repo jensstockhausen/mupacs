@@ -1,9 +1,9 @@
 package de.famst.data;
 
-import org.springframework.transaction.annotation.Transactional;
-
 import javax.persistence.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * Created by jens on 05/10/2016.
@@ -58,7 +58,10 @@ public class SeriesEty
 
     public synchronized void addInstance(InstanceEty instanceEty)
     {
-        if (instances.contains(instanceEty)) return;
+        if (instances.contains(instanceEty))
+        {
+            return;
+        }
 
         instances.add(instanceEty);
     }
@@ -76,12 +79,23 @@ public class SeriesEty
     @Override
     public boolean equals(Object o)
     {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o)
+        {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass())
+        {
+            return false;
+        }
 
         SeriesEty seriesEty = (SeriesEty) o;
 
-        if (id != seriesEty.id) return false;
+        if (id != seriesEty.id)
+        {
+            return false;
+        }
+
         return seriesInstanceUID.equals(seriesEty.seriesInstanceUID);
 
     }

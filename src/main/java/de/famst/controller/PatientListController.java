@@ -20,6 +20,10 @@ public class PatientListController
     @Inject
     PatientRepository patientRepository;
 
+    private PatientListController()
+    {
+    }
+
     @GET
     @RequestMapping("/patientlist")
     public String getListOfPatients(Model model)

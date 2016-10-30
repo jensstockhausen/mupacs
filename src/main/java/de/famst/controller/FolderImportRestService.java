@@ -14,7 +14,6 @@ import javax.inject.Inject;
 import javax.servlet.http.HttpServletResponse;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
 
 /**
  * Created by jens on 03/10/2016.
@@ -27,12 +26,19 @@ public class FolderImportRestService
     @Inject
     private FolderImportManager importManager;
 
+    private FolderImportRestService()
+    {
+    }
+
     @RequestMapping(value = "/importfolder", method = RequestMethod.GET)
-    public @ResponseBody String importStudiesFromFolder(
+    @ResponseBody
+    public  String importStudiesFromFolder(
             @RequestParam(value = "folder", required = true, defaultValue = "./") String folderName,
             HttpServletResponse response) throws InterruptedException
     {
         Path rootPath = Paths.get(folderName);
+
+        LOG.info("adding import [{}]", rootPath.toAbsolutePath());
 
         importManager.addImport(rootPath);
 
@@ -42,6 +48,8 @@ public class FolderImportRestService
     @RequestMapping("/importlist")
     public  String getListOfRunningImports(Model model)
     {
+        LOG.info("listing imports");
+
         model.addAttribute("imports", importManager.runningImports());
         return "importList";
     }

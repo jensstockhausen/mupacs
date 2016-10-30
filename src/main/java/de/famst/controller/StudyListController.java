@@ -21,6 +21,10 @@ public class StudyListController
     @Inject
     StudyRepository studyRepository;
 
+    private StudyListController()
+    {
+    }
+
     @GET
     @RequestMapping("/studylist")
     public String getListOfStudiesForPatient(@RequestParam("patientId") long patientId, Model model)

@@ -11,23 +11,22 @@ public class PatientModel
     private String patientsName;
     private long numberOfStudies;
 
-    public static PatientModel fromPatientEty(PatientEty patientEty)
-    {
-        PatientModel patientModel = new PatientModel(
-                patientEty.getId(),
-                patientEty.getPatientName(),
-                patientEty.getStudies().size()
-        );
-
-        return patientModel;
-    }
-
     public PatientModel(long id, String patientsName, long numberOfStudies)
     {
         this.id = id;
         this.patientsName = patientsName;
         this.numberOfStudies = numberOfStudies;
     }
+
+    public static PatientModel fromPatientEty(PatientEty patientEty)
+    {
+        return  new PatientModel(
+                patientEty.getId(),
+                patientEty.getPatientName(),
+                patientEty.getStudies().size()
+        );
+    }
+
 
     public long getId()
     {

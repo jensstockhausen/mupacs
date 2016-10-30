@@ -26,6 +26,10 @@ public class CommandLineHandler implements CommandLineRunner
     @Inject
     private FolderImportManager importManager;
 
+    private  CommandLineHandler()
+    {
+    }
+
     @Override
     public void run(String... args) throws Exception
     {

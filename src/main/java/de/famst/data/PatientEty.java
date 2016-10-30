@@ -54,7 +54,10 @@ public class PatientEty
 
     public void addStudy(StudyEty study)
     {
-        if (studies.contains(study)) return;
+        if (studies.contains(study))
+        {
+            return;
+        }
 
         studies.add(study);
     }

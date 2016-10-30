@@ -11,24 +11,23 @@ public class SeriesModel
     private String seriesInstanceUID;
     private long numberOfInstances;
 
-    public static SeriesModel fromSeriesEty(SeriesEty seriesEty)
-    {
-        SeriesModel seriesModel = new SeriesModel(
-                seriesEty.getId(),
-                seriesEty.getSeriesInstanceUID(),
-                seriesEty.getInstances().size()
-        );
-
-        return seriesModel;
-    }
-
-
     public SeriesModel(long id, String seriesInstanceUID, long numberOfInstances)
     {
         this.id = id;
         this.seriesInstanceUID = seriesInstanceUID;
         this.numberOfInstances = numberOfInstances;
     }
+
+    public static SeriesModel fromSeriesEty(SeriesEty seriesEty)
+    {
+        return new SeriesModel(
+                seriesEty.getId(),
+                seriesEty.getSeriesInstanceUID(),
+                seriesEty.getInstances().size()
+        );
+    }
+
+
 
 
     public long getId()
