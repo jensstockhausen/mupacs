@@ -128,9 +128,14 @@ public class DcmStoreSCP extends BasicCStoreSCP
         {
             storeTo(as, as.createFileMetaInformation(iuid, cuid, tsuid), data, file);
 
+            Attributes part = DcmFile.readContent(file);
 
+            String path = part.getString(Tag.PatientID);
+            path += "/" + part.getString(Tag.StudyInstanceUID);
+            path += "/" + part.getString(Tag.SeriesInstanceUID);
+            path += "/";
 
-            renameTo(as, file, new File(importFolder, iuid));
+            renameTo(as, file, new File(importFolder, path + iuid));
         }
         catch (Exception e)
         {
