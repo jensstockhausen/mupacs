@@ -24,9 +24,9 @@ import java.util.List;
  */
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-public class DcmPatientQueryTask extends BasicQueryTask
+public class DcmStudyQueryTask extends BasicQueryTask
 {
-    private static Logger LOG = LoggerFactory.getLogger(DcmPatientQueryTask.class);
+    private static Logger LOG = LoggerFactory.getLogger(DcmStudyQueryTask.class);
 
     @Inject
     @SuppressWarnings("squid:S3306") // Use constructor injection for this field.
@@ -37,7 +37,7 @@ public class DcmPatientQueryTask extends BasicQueryTask
 
     private String queryLevel;
 
-    public DcmPatientQueryTask(
+    public DcmStudyQueryTask(
             Association as, PresentationContext pc,
             Attributes rq, Attributes keys)
     {

@@ -61,7 +61,7 @@ public class DcmFindSCP extends BasicCFindSCP implements ApplicationContextAware
             */
             case "STUDY":
             {
-                queryTask = applicationContext.getBean(DcmPatientQueryTask.class, as, pc, rq, keys);
+                queryTask = applicationContext.getBean(DcmStudyQueryTask.class, as, pc, rq, keys);
                 break;
             }
             case "SERIES":
