@@ -50,6 +50,7 @@ public class DicomImportService
 
             patient = new PatientEty();
             patient.setPatientName(patientName);
+            patient.setPatientId(dcm.getString(Tag.PatientID));
             patientRepository.save(patient);
         }
         StudyEty study;

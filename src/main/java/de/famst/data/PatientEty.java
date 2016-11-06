@@ -27,6 +27,8 @@ public class PatientEty
 
     private String patientName;
 
+    private String patientId;
+
     public PatientEty()
     {
         studies = new ArrayList<>();
@@ -62,4 +64,13 @@ public class PatientEty
         studies.add(study);
     }
 
+    public String getPatientId()
+    {
+        return patientId;
+    }
+
+    public void setPatientId(String patientId)
+    {
+        this.patientId = patientId;
+    }
 }

@@ -19,20 +19,27 @@ public class DcmServiceRegisty
     private DicomServiceRegistry dicomServiceRegistry;
 
     private DcmStoreSCP dcmStoreSCP;
+    private DcmFindSCP dcmFindSCP;
+
 
     @Inject
-    public DcmServiceRegisty(DcmStoreSCP dcmStoreSCP)
+    public DcmServiceRegisty(
+            DcmStoreSCP dcmStoreSCP,
+            DcmFindSCP dcmFindSCP)
     {
         LOG.info("initializing");
 
         this.dcmStoreSCP = dcmStoreSCP;
+        this.dcmFindSCP = dcmFindSCP;
 
         dicomServiceRegistry = new DicomServiceRegistry();
 
-        dcmStoreSCP.setDicomServiceRegistry(dicomServiceRegistry);
-
         dicomServiceRegistry.addDicomService(new BasicCEchoSCP());
+
+        dcmStoreSCP.setDicomServiceRegistry(dicomServiceRegistry);
         dicomServiceRegistry.addDicomService(dcmStoreSCP);
+
+        dicomServiceRegistry.addDicomService(dcmFindSCP);
     }
 
     public void start()

@@ -16,6 +16,8 @@ buildscript {
 
 apply plugin: 'java'
 apply plugin: 'spring-boot'
+
+apply plugin: "jacoco"
 apply plugin: 'org.sonarqube'
 
 jar {
@@ -34,9 +36,18 @@ repositories {
     }
 }
 
+jacocoTestReport {
+    reports {
+        xml.enabled false
+        csv.enabled false
+        html.destination "${buildDir}/reports/covarage"
+    }
+}
+
 sonarqube {
     properties {
         property "sonar.projectName", "MuPACS"
+        property "sonar.cobertura.reportPath", ""
     }
 }
 
