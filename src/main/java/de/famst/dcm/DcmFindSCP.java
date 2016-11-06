@@ -1,6 +1,7 @@
 package de.famst.dcm;
 
 import org.dcm4che3.data.Attributes;
+import org.dcm4che3.data.Tag;
 import org.dcm4che3.data.UID;
 import org.dcm4che3.net.Association;
 import org.dcm4che3.net.pdu.PresentationContext;
@@ -43,12 +44,38 @@ public class DcmFindSCP extends BasicCFindSCP implements ApplicationContextAware
         LOG.info("C-FIND request  \n{}", rq);
         LOG.info("C-FIND keys     \n{}", keys);
 
-        DcmPatientQueryTask dcmPatientQueryTask =
-                applicationContext.getBean(DcmPatientQueryTask.class, as, pc, rq, keys);
+        String queryLevel = keys.getString(Tag.QueryRetrieveLevel);
 
-        LOG.info("query found matches [{}]", dcmPatientQueryTask.hasMoreMatches());
+        LOG.info("C-FIND level [{}]", queryLevel);
 
-        return dcmPatientQueryTask;
+        QueryTask queryTask = null;
+
+        switch (queryLevel)
+        {
+            /*
+            case "PATIENT":
+            {
+                queryTask = applicationContext.getBean(DcmPatientQueryTask.class, as, pc, rq, keys);
+                break;
+            }
+            */
+            case "STUDY":
+            {
+                queryTask = applicationContext.getBean(DcmPatientQueryTask.class, as, pc, rq, keys);
+                break;
+            }
+            case "SERIES":
+            {
+                queryTask = applicationContext.getBean(DcmSeriesQueryTask.class, as, pc, rq, keys);
+                break;
+            }
+            default:
+            {
+                // nop
+            }
+        }
+
+        return queryTask;
     }
 
 

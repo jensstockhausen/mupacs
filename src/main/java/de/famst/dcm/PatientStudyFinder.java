@@ -1,9 +1,6 @@
 package de.famst.dcm;
 
-import de.famst.data.PatientEty;
-import de.famst.data.PatientRepository;
-import de.famst.data.StudyEty;
-import de.famst.data.StudyRepository;
+import de.famst.data.*;
 import org.dcm4che3.data.Attributes;
 import org.dcm4che3.data.Tag;
 import org.slf4j.Logger;
@@ -27,13 +24,16 @@ public class PatientStudyFinder
 
     private PatientRepository patientRepository;
     private StudyRepository studyRepository;
+    private SeriesRepository seriesRepository;
 
     @Inject
     public PatientStudyFinder(PatientRepository patientRepository,
-                              StudyRepository studyRepository)
+                              StudyRepository studyRepository,
+                              SeriesRepository seriesRepository)
     {
         this.patientRepository = patientRepository;
         this.studyRepository = studyRepository;
+        this.seriesRepository = seriesRepository;
 
         LOG.info("PatientStudyFinder created");
     }
@@ -58,7 +58,28 @@ public class PatientStudyFinder
 
 
     @Transactional
-    public List<StudyEty> findStudies(List<PatientEty> patientEtyList)
+    public List<SeriesEty> findSeries(Attributes keys)
+    {
+        List<SeriesEty> seriesEtyList = null;
+
+        String studyInstanceUID = keys.getString(Tag.StudyInstanceUID);
+
+        if (null != studyInstanceUID)
+        {
+            StudyEty studyEty = studyRepository.findByStudyInstanceUID(studyInstanceUID);
+
+            if (null != studyEty)
+            {
+                seriesEtyList = seriesRepository.findByStudyId(studyEty.getId());
+            }
+        }
+
+        return seriesEtyList;
+    }
+
+
+    @Transactional
+    public List<StudyEty> getStudiesForPatient(List<PatientEty> patientEtyList)
     {
         List<StudyEty> studyEtyList = new ArrayList<>();
 
@@ -81,4 +102,5 @@ public class PatientStudyFinder
 
         return studyEtyList;
     }
+
 }

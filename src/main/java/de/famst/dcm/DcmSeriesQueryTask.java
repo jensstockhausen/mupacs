@@ -1,7 +1,6 @@
 package de.famst.dcm;
 
-import de.famst.data.PatientEty;
-import de.famst.data.StudyEty;
+import de.famst.data.SeriesEty;
 import org.dcm4che3.data.Attributes;
 import org.dcm4che3.data.Tag;
 import org.dcm4che3.data.VR;
@@ -24,20 +23,18 @@ import java.util.List;
  */
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-public class DcmPatientQueryTask extends BasicQueryTask
+public class DcmSeriesQueryTask extends BasicQueryTask
 {
-    private static Logger LOG = LoggerFactory.getLogger(DcmPatientQueryTask.class);
+    private static Logger LOG = LoggerFactory.getLogger(DcmSeriesQueryTask.class);
 
     @Inject
     @SuppressWarnings("squid:S3306") // Use constructor injection for this field.
     private PatientStudyFinder patientStudyFinder;
 
-    private List<StudyEty> currentStudies;
+    private List<SeriesEty> currentSeries;
     private int currentIndex;
 
-    private String queryLevel;
-
-    public DcmPatientQueryTask(
+    public DcmSeriesQueryTask(
             Association as, PresentationContext pc,
             Attributes rq, Attributes keys)
     {
@@ -47,20 +44,15 @@ public class DcmPatientQueryTask extends BasicQueryTask
     @PostConstruct
     public void postConstructor()
     {
-        queryLevel = keys.getString(Tag.QueryRetrieveLevel);
-
-        LOG.info("Query level [{}]", queryLevel);
-
-        List<PatientEty> patientEtyList = patientStudyFinder.findPatients(keys);
-        currentStudies = patientStudyFinder.getStudiesForPatient(patientEtyList);
+        List<SeriesEty> seriesEtyList = patientStudyFinder.findSeries(keys);
+        currentSeries = seriesEtyList;
         currentIndex = 0;
     }
-
 
     @Override
     protected boolean hasMoreMatches() throws DicomServiceException
     {
-        return currentIndex < currentStudies.size();
+        return currentIndex < currentSeries.size();
     }
 
     @Override
@@ -70,11 +62,11 @@ public class DcmPatientQueryTask extends BasicQueryTask
 
         nextMatch.addAll(keys);
 
-        StudyEty studyEty = currentStudies.get(currentIndex);
-        PatientEty patientEty = studyEty.getPatient();
+        SeriesEty seriesEty = currentSeries.get(currentIndex);
 
-        nextMatch.setString(Tag.PatientName, VR.PN, patientEty.getPatientName());
-        nextMatch.setString(Tag.StudyInstanceUID, VR.UI, studyEty.getStudyInstanceUID());
+        nextMatch.setString(Tag.SeriesInstanceUID, VR.UI, seriesEty.getSeriesInstanceUID());
+        nextMatch.setString(Tag.Modality, VR.CS, "US");
+        nextMatch.setInt(Tag.SeriesNumber, VR.IS, 0);
 
         currentIndex = currentIndex + 1;
 

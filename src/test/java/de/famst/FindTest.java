@@ -1,10 +1,10 @@
 package de.famst;
 
 import de.famst.data.PatientEty;
-import de.famst.data.PatientRepository;
+import de.famst.data.SeriesEty;
 import de.famst.data.StudyEty;
-import de.famst.data.StudyRepository;
 import de.famst.dcm.PatientStudyFinder;
+import de.famst.util.DBFiller;
 import org.dcm4che3.data.Attributes;
 import org.dcm4che3.data.Tag;
 import org.dcm4che3.data.VR;
@@ -12,6 +12,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.inject.Inject;
@@ -27,13 +28,11 @@ import static org.hamcrest.Matchers.hasSize;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class FindTest
 {
     @Inject
-    PatientRepository patientRepository;
-
-    @Inject
-    StudyRepository studyRepository;
+    DBFiller dbFiller;
 
     @Inject
     PatientStudyFinder finder;
@@ -41,54 +40,10 @@ public class FindTest
     @Before
     public void addData()
     {
-        for (int patIdx = 0; patIdx<10; patIdx++)
-        {
-            PatientEty patientEty = new PatientEty();
-
-            patientEty.setPatientId(String.format("PID_%03d", patIdx));
-            patientEty.setPatientName(String.format("Demo_%03d", patIdx));
-
-            patientRepository.save(patientEty);
-
-            for (int stuIdx= 0; stuIdx < 3; stuIdx ++)
-            {
-                StudyEty studyEty = new StudyEty();
-
-                studyEty.setStudyInstanceUID(String.format("1.2.48.2.3.4.%02d.%02d", patIdx, stuIdx));
-                studyEty.setPatient(patientEty);
-
-                studyRepository.save(studyEty);
-
-                patientEty.addStudy(studyEty);
-                patientRepository.save(patientEty);
-            }
-
-        }
+        dbFiller.fillDB();
     }
 
-
-    /*
-        (0008,0005) CS [ISO_IR 100] SpecificCharacterSet
-        (0008,0020) DA [] StudyDate
-        (0008,0030) TM [] StudyTime
-        (0008,0050) SH [] AccessionNumber
-        (0008,0052) CS [STUDY] QueryRetrieveLevel
-        (0008,0061) CS [] ModalitiesInStudy
-        (0008,0080) LO [] InstitutionName
-        (0008,0090) PN [] ReferringPhysicianName
-        (0008,1030) LO [] StudyDescription
-        (0008,1050) PN [] PerformingPhysicianName
-        (0010,0010) PN [DEMO*] PatientName
-        (0010,0020) LO [] PatientID
-        (0010,0030) DA [] PatientBirthDate
-        (0020,000D) UI [] StudyInstanceUID
-        (0020,0010) SH [] StudyID
-        (0020,1208) IS [] NumberOfStudyRelatedInstances
-        (0032,4000) LT [] StudyComments
-        (4008,0212) CS [] InterpretationStatusID
-    */
-
-    public Attributes createKeys()
+    public Attributes keysStudyByPatientName()
     {
         Attributes keys = new Attributes();
 
@@ -100,12 +55,59 @@ public class FindTest
         return keys;
     }
 
+    public Attributes keysSeriesByStudyInstance()
+    {
+        Attributes keys = new Attributes();
+
+        keys.setSpecificCharacterSet("ISO_IR 100");
+        keys.setString(Tag.QueryRetrieveLevel, VR.CS, "SERIES");
+        keys.setString(Tag.StudyInstanceUID, VR.UI, "1.2.48.1.1");
+        keys.setString(Tag.SeriesInstanceUID, VR.UI, "");
+
+        return keys;
+    }
+
+
+
+    /*
+    (0008,0005) CS [ISO_IR 100] SpecificCharacterSet
+    (0008,0021) DA [] SeriesDate
+    (0008,0031) TM [] SeriesTime
+    (0008,0052) CS [SERIES] QueryRetrieveLevel
+    (0008,0060) CS [] Modality
+    (0008,0080) LO [] InstitutionName
+    (0008,0090) PN [] ReferringPhysicianName
+    (0008,103E) LO [] SeriesDescription
+    (0008,1050) PN [] PerformingPhysicianName
+    (0020,000D) UI [] StudyInstanceUID
+    (0020,000E) UI [] SeriesInstanceUID
+    (0020,0011) IS [] SeriesNumber
+    (0020,1209) IS [] NumberOfSeriesRelatedInstances
+    (0032,4000) LT [] StudyComments
+    (4008,0212) CS [] InterpretationStatusID
+     */
+
+
+    /*
+    public Attributes keysStudyByPatientName()
+    {
+        Attributes keys = new Attributes();
+
+        keys.setSpecificCharacterSet("ISO_IR 100");
+        keys.setString(Tag.QueryRetrieveLevel, VR.CS, "STUDY");
+        keys.setString(Tag.PatientName, VR.PN, "Demo*");
+        keys.setString(Tag.StudyInstanceUID, VR.UI, "");
+
+        return keys;
+    }
+    */
+
 
     @Test
     @Transactional
     public void can_find_patient() throws Exception
     {
-        List<PatientEty> patients = finder.findPatients(createKeys());
+        List<PatientEty> patients = finder.findPatients(keysStudyByPatientName());
 
         assertThat(patients, hasSize(10));
     }
@@ -114,10 +116,17 @@ public class FindTest
     @Transactional
     public void can_find_studies_for_patient() throws Exception
     {
-        List<PatientEty> patients = finder.findPatients(createKeys());
-        List<StudyEty> studies = finder.findStudies(patients);
+        List<PatientEty> patients = finder.findPatients(keysStudyByPatientName());
+        List<StudyEty> studies = finder.getStudiesForPatient(patients);
 
         assertThat(studies, hasSize(30));
+    }
 
+    @Test
+    public void can_get_series() throws Exception
+    {
+        List<SeriesEty> series = finder.findSeries(keysSeriesByStudyInstance());
+
+        assertThat(series, hasSize(2));
     }
 }
