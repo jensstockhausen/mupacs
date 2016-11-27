@@ -51,6 +51,8 @@ sonarqube {
 }
 
 test {
+    maxParallelForks = 1
+
     testLogging {
         exceptionFormat = "short"
         showStandardStreams = true

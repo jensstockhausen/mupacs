@@ -59,4 +59,7 @@ public class StudyListController
         return "studyList";
     }
 
+
+
+
 }

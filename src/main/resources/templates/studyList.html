@@ -22,21 +22,43 @@
     <table class="table table-striped table-bordered">
         <tr>
             <th>ID</th>
+
             <th>StudyInstanceUID</th>
+            <th>StudyDescription</th>
+            <th>StudyID</th>
+            <th>StudyDate</th>
+            <th>StudyTime</th>
+            <th>AccessionNumber</th>
+            <th>ModalitiesInStudy</th>
+            <th>ReferringPhysicianName</th>
+            <th>StudyInstanceUID</th>
+
             <th>#Series</th>
         </tr>
 
         <tr th:each="s : ${studies}">
-            <td th:text="${s.id}">pn</td>
-            <td th:text="${s.studyInstanceUID}">uid</td>
+
+            <td th:text="${s.id}" />
+
+            <td th:text="${s.ety().studyInstanceUID}" />
+            <td th:text="${s.ety().studyDescription}" />
+            <td th:text="${s.ety().studyID}" />
+            <td th:text="${s.ety().studyDate}" />
+            <td th:text="${s.ety().studyTime}"/>
+            <td th:text="${s.ety().accessionNumber}" />
+            <td th:text="${s.ety().modalitiesInStudy}" />
+            <td th:text="${s.ety().referringPhysicianName}" />
+            <td th:text="${s.ety().sudyInstanceUID}" />
+
             <td>
                 <form action="#" th:action="@{/serieslist}" method="get">
                     <input type="hidden" name="studyId" th:value="${s.id}"/>
                     <button type="submit" class="btn btn-default" th:id="'button_' + ${s.id}">
-                        <div th:text="${s.numberOfSeries}">details</div>
+                        <div th:text="${s.numberOfSeries}"></div>
                     </button>
                 </form>
             </td>
+
         </tr>
 
     </table>

@@ -11,6 +11,13 @@ public class PatientModel
     private String patientsName;
     private long numberOfStudies;
 
+    public PatientModel()
+    {
+        id = -1;
+        patientsName = "";
+        numberOfStudies = 0;
+    }
+
     public PatientModel(long id, String patientsName, long numberOfStudies)
     {
         this.id = id;
@@ -20,6 +27,11 @@ public class PatientModel
 
     public static PatientModel fromPatientEty(PatientEty patientEty)
     {
+        if (null == patientEty)
+        {
+            return new PatientModel();
+        }
+
         return  new PatientModel(
                 patientEty.getId(),
                 patientEty.getPatientName(),

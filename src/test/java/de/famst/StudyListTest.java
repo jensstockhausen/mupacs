@@ -2,7 +2,6 @@ package de.famst;
 
 import de.famst.controller.StudyListController;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -11,6 +10,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 
 import javax.inject.Inject;
 
@@ -31,26 +31,24 @@ public class StudyListTest
     @Inject
     private StudyListController studyListController;
 
+    @Inject
+    WebApplicationContext wac;
+
     @Before
     public void setup()
     {
         mockMvc = MockMvcBuilders.standaloneSetup(studyListController).build();
     }
 
-    @Ignore
     @Test
     public void test_study_list() throws Exception
     {
-        MvcResult result = mockMvc.perform(get("/studylist"))
-                .andExpect(status().isOk())
-                .andExpect(model().size(1))
-                .andExpect(view().name("studyList"))
-                .andDo(MockMvcResultHandlers.print())
-                //.andExpect(xpath("//tr[@id = 'studies.table.header']").nodeCount(1))
-                .andReturn();
-                //.andExpect(content().xml())
-
-        String content = result.getResponse().getContentAsString();
+        MvcResult mvcResult = mockMvc.perform(get("/studylist?patientId=1"))
+            .andExpect(status().isOk())
+            .andExpect(model().size(2))
+            .andExpect(view().name("studyList"))
+            .andDo(MockMvcResultHandlers.print())
+            .andReturn();
 
     }
 }
