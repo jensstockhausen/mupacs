@@ -47,7 +47,6 @@ jacocoTestReport {
 sonarqube {
     properties {
         property "sonar.projectName", "MuPACS"
-        property "sonar.cobertura.reportPath", ""
     }
 }
 

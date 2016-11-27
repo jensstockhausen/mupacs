@@ -119,7 +119,7 @@ public class FindTest
         List<PatientEty> patients = finder.findPatients(keysStudyByPatientName());
         List<StudyEty> studies = finder.getStudiesForPatient(patients);
 
-        assertThat(studies, hasSize(30));
+        assertThat(studies, hasSize(20));
     }
 
     @Test
