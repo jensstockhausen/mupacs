@@ -51,14 +51,13 @@ sonarqube {
 }
 
 test {
-    maxParallelForks = 1
 
-    testLogging {
-        exceptionFormat = "short"
-        showStandardStreams = true
+
+    reports {
+        junitXml.enabled = false
+        html.enabled = true
     }
 }
-
 
 dependencies {
     compile('org.springframework.boot:spring-boot-devtools')
@@ -90,6 +89,10 @@ dependencies {
     }
 
     compile('org.dcm4che:dcm4che-net:3.3.7'){
+        exclude  module: 'slf4j-log4j12'
+    }
+
+    compile('org.dcm4che:dcm4che-json:3.3.7'){
         exclude  module: 'slf4j-log4j12'
     }
 

@@ -31,7 +31,6 @@
             <th>AccessionNumber</th>
             <th>ModalitiesInStudy</th>
             <th>ReferringPhysicianName</th>
-            <th>StudyInstanceUID</th>
 
             <th>#Series</th>
         </tr>
@@ -42,13 +41,12 @@
 
             <td th:text="${s.ety().studyInstanceUID}" />
             <td th:text="${s.ety().studyDescription}" />
-            <td th:text="${s.ety().studyID}" />
+            <td th:text="${s.ety().studyId}" />
             <td th:text="${s.ety().studyDate}" />
             <td th:text="${s.ety().studyTime}"/>
             <td th:text="${s.ety().accessionNumber}" />
             <td th:text="${s.ety().modalitiesInStudy}" />
             <td th:text="${s.ety().referringPhysicianName}" />
-            <td th:text="${s.ety().sudyInstanceUID}" />
 
             <td>
                 <form action="#" th:action="@{/serieslist}" method="get">
