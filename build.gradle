@@ -40,7 +40,7 @@ jacocoTestReport {
     reports {
         xml.enabled false
         csv.enabled false
-        html.destination "${buildDir}/reports/covarage"
+        html.destination "${buildDir}/reports/coverage"
     }
 }
 
@@ -49,6 +49,14 @@ sonarqube {
         property "sonar.projectName", "MuPACS"
     }
 }
+
+test {
+    testLogging {
+        exceptionFormat = "short"
+        showStandardStreams = true
+    }
+}
+
 
 dependencies {
     compile('org.springframework.boot:spring-boot-devtools')
