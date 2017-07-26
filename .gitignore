@@ -1,9 +1,6 @@
 .gradle
 .travis.yml
 /build/
-/gradle/
-/gradlew
-/gradlew.bat
 /import
 /H2
 

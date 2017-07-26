@@ -6,6 +6,8 @@
     <logger name="org.springframework.web" level="DEBUG"/>
     -->
 
+    <!--
     <logger name="org.thymeleaf" level="DEBUG"/>
+    -->
 
 </configuration>
