@@ -1,6 +1,6 @@
 # mupacs
-[![Build Status](https://travis-ci.org/jensstockhausen/mupacs.svg?branch=master)](https://travis-ci.org/jensstockhausen/mupacs) [![Dependency Status](https://www.versioneye.com/user/projects/58d407106893fd003facc191/badge.svg?style=flat-square)](https://www.versioneye.com/user/projects/58d407106893fd003facc191)
-
+[![Build Status](https://travis-ci.org/jensstockhausen/mupacs.svg?branch=master)](https://travis-ci.org/jensstockhausen/mupacs) 
+[![Known Vulnerabilities](https://snyk.io/test/github/jensstockhausen/mupacs/badge.svg)](https://snyk.io/test/github/jensstockhausen/mupacs)
 
 ## Travis Builds 
 
