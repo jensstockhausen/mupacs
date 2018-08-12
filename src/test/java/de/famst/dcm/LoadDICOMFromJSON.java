@@ -11,18 +11,18 @@ import java.io.InputStream;
  */
 public class LoadDICOMFromJSON
 {
-    public LoadDICOMFromJSON()
-    {
-    }
+  public LoadDICOMFromJSON()
+  {
+  }
 
-    public Attributes fromResource(String resource)
-    {
-        ClassLoader classLoader = getClass().getClassLoader();
-        InputStream inputStream = classLoader.getResourceAsStream(resource);
+  public Attributes fromResource(String resource)
+  {
+    ClassLoader classLoader = getClass().getClassLoader();
+    InputStream inputStream = classLoader.getResourceAsStream(resource);
 
-        JSONReader reader = new JSONReader(Json.createParser(inputStream));
+    JSONReader reader = new JSONReader(Json.createParser(inputStream));
 
-        return reader.readDataset(null);
-    }
+    return reader.readDataset(null);
+  }
 
 }

@@ -1,6 +1,14 @@
 package de.famst.data;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -12,145 +20,146 @@ import java.util.List;
  */
 @Entity
 @Table(
-        name = "STUDY",
-        uniqueConstraints = {
-                @UniqueConstraint(
-                        name = "AK_STUDYUID",
-                        columnNames = {"studyInstanceUID"})
-        })
+  name = "STUDY",
+  uniqueConstraints = {
+    @UniqueConstraint(
+      name = "AK_STUDYUID",
+      columnNames = {"studyInstanceUID"})
+  })
 public class StudyEty
 {
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.AUTO)
+  private long id;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "study")
-    private List<SeriesEty> series;
+  @OneToMany(fetch = FetchType.LAZY, mappedBy = "study")
+  private List<SeriesEty> series;
 
-    @ManyToOne
-    private PatientEty patient;
+  @ManyToOne
+  private PatientEty patient;
 
-    private String studyInstanceUID;
-    private String studyId;
-    private String studyDescription;
-    private LocalDate studyDate;
-    private LocalTime studyTime;
-    private String accessionNumber;
-    private String modalitiesInStudy;
-    private String referringPhysicianName;
+  private String studyInstanceUID;
+  private String studyId;
+  private String studyDescription;
+  private LocalDate studyDate;
+  private LocalTime studyTime;
+  private String accessionNumber;
+  private String modalitiesInStudy;
+  private String referringPhysicianName;
 
-    public StudyEty()
+  public StudyEty()
+  {
+    series = new ArrayList<>();
+  }
+
+  public long getId()
+  {
+    return id;
+  }
+
+  public String getStudyInstanceUID()
+  {
+    return studyInstanceUID;
+  }
+
+  public void setStudyInstanceUID(String studyInstanceUID)
+  {
+    this.studyInstanceUID = studyInstanceUID;
+  }
+
+  public Collection<SeriesEty> getSeries()
+  {
+    return series;
+  }
+
+  public void addSeries(SeriesEty seriesEty)
+  {
+    if (series.contains(seriesEty))
     {
-        series = new ArrayList<>();
+      return;
     }
 
-    public long getId()
-    {
-        return id;
-    }
+    series.add(seriesEty);
+  }
 
-    public String getStudyInstanceUID()
-    {
-        return studyInstanceUID;
-    }
+  public PatientEty getPatient()
+  {
+    return patient;
+  }
 
-    public void setStudyInstanceUID(String studyInstanceUID)
-    {
-        this.studyInstanceUID = studyInstanceUID;
-    }
+  public void setPatient(PatientEty patient)
+  {
+    this.patient = patient;
+  }
 
-    public Collection<SeriesEty> getSeries()
-    {
-        return series;
-    }
+  public LocalDate getStudyDate()
+  {
+    return studyDate;
+  }
 
-    public void addSeries(SeriesEty seriesEty)
-    {
-        if (series.contains(seriesEty))
-        {
-            return;
-        }
+  public void setStudyDate(LocalDate studyDate)
+  {
+    this.studyDate = studyDate;
+  }
 
-        series.add(seriesEty);
-    }
+  public LocalTime getStudyTime()
+  {
+    return studyTime;
+  }
 
-    public PatientEty getPatient()
-    {
-        return patient;
-    }
+  public void setStudyTime(LocalTime studyTime)
+  {
+    this.studyTime = studyTime;
+  }
 
-    public void setPatient(PatientEty patient)
-    {
-        this.patient = patient;
-    }
+  public String getAccessionNumber()
+  {
+    return accessionNumber;
+  }
 
-    public LocalDate getStudyDate()
-    {
-        return studyDate;
-    }
+  public void setAccessionNumber(String accessionNumber)
+  {
+    this.accessionNumber = accessionNumber;
+  }
 
-    public void setStudyDate(LocalDate studyDate)
-    {
-        this.studyDate = studyDate;
-    }
+  public String getModalitiesInStudy()
+  {
+    return modalitiesInStudy;
+  }
 
-    public LocalTime getStudyTime()
-    {
-        return studyTime;
-    }
+  public void setModalitiesInStudy(String modalitiesInStudy)
+  {
+    this.modalitiesInStudy = modalitiesInStudy;
+  }
 
-    public void setStudyTime(LocalTime studyTime)
-    {
-        this.studyTime = studyTime;
-    }
+  public String getReferringPhysicianName()
+  {
+    return referringPhysicianName;
+  }
 
-    public String getAccessionNumber()
-    {
-        return accessionNumber;
-    }
+  public void setReferringPhysicianName(String referringPhysicianName)
+  {
+    this.referringPhysicianName = referringPhysicianName;
+  }
 
-    public void setAccessionNumber(String accessionNumber)
-    {
-        this.accessionNumber = accessionNumber;
-    }
+  public String getStudyId()
+  {
+    return studyId;
+  }
 
-    public String getModalitiesInStudy()
-    {
-        return modalitiesInStudy;
-    }
+  public void setStudyId(String studyId)
+  {
+    this.studyId = studyId;
+  }
 
-    public void setModalitiesInStudy(String modalitiesInStudy)
-    {
-        this.modalitiesInStudy = modalitiesInStudy;
-    }
+  public void setStudyDescription(String studyDescription)
+  {
+    this.studyDescription = studyDescription;
+  }
 
-    public String getReferringPhysicianName()
-    {
-        return referringPhysicianName;
-    }
+  public String getStudyDescription()
+  {
+    return studyDescription;
+  }
 
-    public void setReferringPhysicianName(String referringPhysicianName)
-    {
-        this.referringPhysicianName = referringPhysicianName;
-    }
-
-    public String getStudyId()
-    {
-        return studyId;
-    }
-
-    public void setStudyId(String studyId)
-    {
-        this.studyId = studyId;
-    }
-
-    public void setStudyDescription(String studyDescription)
-    {
-        this.studyDescription = studyDescription;
-    }
-
-    public String getStudyDescription()
-    {
-        return studyDescription;
-    }
 }
