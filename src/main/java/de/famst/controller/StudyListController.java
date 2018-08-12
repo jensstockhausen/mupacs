@@ -11,7 +11,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import javax.inject.Inject;
 import javax.ws.rs.GET;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,44 +21,41 @@ import java.util.List;
 @Controller
 public class StudyListController
 {
-    private static Logger LOG = LoggerFactory.getLogger(StudyListController.class);
+  private static Logger LOG = LoggerFactory.getLogger(StudyListController.class);
 
-    @Inject
-    StudyRepository studyRepository;
+  StudyRepository studyRepository;
+  PatientRepository patientRepository;
 
-    @Inject
-    PatientRepository patientRepository;
+  private StudyListController(StudyRepository studyRepository, PatientRepository patientRepository)
+  {
+    this.studyRepository = studyRepository;
+    this.patientRepository = patientRepository;
+  }
 
-    private StudyListController()
-    {
-    }
+  @GET
+  @RequestMapping("/studylist")
+  public String getListOfStudiesForPatient(@RequestParam("patientId") long patientId, Model model)
+  {
+    LOG.info("list of studies for patientId [{}]", patientId);
 
-    @GET
-    @RequestMapping("/studylist")
-    public String getListOfStudiesForPatient(@RequestParam("patientId") long patientId, Model model)
-    {
-        LOG.info("list of studies for patientId [{}]", patientId);
+    List<StudyEty> studyEtyList;
 
-        List<StudyEty> studyEtyList;
+    studyEtyList = studyRepository.findByPatientId(patientId);
 
-        studyEtyList = studyRepository.findByPatientId(patientId);
+    List<StudyModel> studies = new ArrayList<>();
 
-        List<StudyModel> studies = new ArrayList<>();
+    studyEtyList.forEach(studyEty ->
+      studies.add(StudyModel.fromStudyEty(studyEty))
+    );
 
-        studyEtyList.forEach(studyEty ->
-                studies.add(StudyModel.fromStudyEty(studyEty))
-        );
+    PatientEty patientEty = patientRepository.findOne(patientId);
+    PatientModel patientModel = PatientModel.fromPatientEty(patientEty);
 
-        PatientEty patientEty = patientRepository.findOne(patientId);
-        PatientModel patientModel = PatientModel.fromPatientEty(patientEty);
+    model.addAttribute("studies", studies);
+    model.addAttribute("patient", patientModel);
 
-        model.addAttribute("studies", studies);
-        model.addAttribute("patient", patientModel);
-
-        return "studyList";
-    }
-
-
+    return "studyList";
+  }
 
 
 }
