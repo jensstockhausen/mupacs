@@ -9,37 +9,35 @@ import de.famst.data.SeriesEty;
 import de.famst.data.SeriesRepository;
 import de.famst.data.StudyEty;
 import de.famst.data.StudyRepository;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.anyLong;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@RunWith(SpringRunner.class)
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.BDDMockito.given;
+
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 public class FrontEndRenderTest
 {
-  @MockBean
+  @MockitoBean
   private PatientRepository patientRepository;
 
-  @MockBean
+  @MockitoBean
   private StudyRepository studyRepository;
 
-  @MockBean
+  @MockitoBean
   private SeriesRepository seriesRepository;
 
-  @MockBean
+  @MockitoBean
   private InstanceRepository instanceRepository;
 
   @Autowired

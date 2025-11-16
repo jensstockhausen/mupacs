@@ -27,9 +27,8 @@ public class DcmFindSCP extends BasicCFindSCP implements ApplicationContextAware
 
     public DcmFindSCP()
     {
-        super(UID.PatientRootQueryRetrieveInformationModelFIND,
-                UID.StudyRootQueryRetrieveInformationModelFIND,
-                UID.PatientStudyOnlyQueryRetrieveInformationModelFINDRetired);
+        super(UID.PatientRootQueryRetrieveInformationModelFind,
+                UID.StudyRootQueryRetrieveInformationModelFind);
     }
 
     @Override

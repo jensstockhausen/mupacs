@@ -1,12 +1,11 @@
 package de.famst.dcm;
 
+import jakarta.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
-
-import javax.inject.Inject;
 
 /**
  * Created by jens on 13/10/2016.

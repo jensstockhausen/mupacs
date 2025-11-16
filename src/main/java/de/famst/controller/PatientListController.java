@@ -6,7 +6,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import javax.ws.rs.GET;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,7 +22,7 @@ public class PatientListController
     this.patientRepository = patientRepository;
   }
 
-  @GET
+
   @RequestMapping("/patientlist")
   public String getListOfPatients(Model model)
   {

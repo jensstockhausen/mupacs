@@ -1,14 +1,19 @@
 package de.famst.dcm;
 
-import de.famst.data.*;
+import de.famst.data.PatientEty;
+import de.famst.data.PatientRepository;
+import de.famst.data.SeriesEty;
+import de.famst.data.SeriesRepository;
+import de.famst.data.StudyEty;
+import de.famst.data.StudyRepository;
 import org.dcm4che3.data.Attributes;
 import org.dcm4che3.data.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.inject.Inject;
-import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,12 +26,11 @@ public class PatientStudyFinder
 {
     private static Logger LOG = LoggerFactory.getLogger(PatientStudyFinder.class);
 
-
     private PatientRepository patientRepository;
     private StudyRepository studyRepository;
     private SeriesRepository seriesRepository;
 
-    @Inject
+    @Autowired
     public PatientStudyFinder(PatientRepository patientRepository,
                               StudyRepository studyRepository,
                               SeriesRepository seriesRepository)

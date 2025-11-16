@@ -2,6 +2,7 @@ package de.famst.service;
 
 import de.famst.controller.FolderImportRestService;
 import de.famst.dcm.DcmFile;
+import jakarta.inject.Inject;
 import org.dcm4che3.data.Attributes;
 import org.dcm4che3.data.Tag;
 import org.slf4j.Logger;
@@ -11,7 +12,6 @@ import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.inject.Inject;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;

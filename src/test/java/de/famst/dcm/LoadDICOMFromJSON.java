@@ -1,9 +1,9 @@
 package de.famst.dcm;
 
+import jakarta.json.Json;
 import org.dcm4che3.data.Attributes;
 import org.dcm4che3.json.JSONReader;
 
-import javax.json.Json;
 import java.io.InputStream;
 
 /**

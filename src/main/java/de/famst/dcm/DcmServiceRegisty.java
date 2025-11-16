@@ -4,9 +4,9 @@ import org.dcm4che3.net.service.BasicCEchoSCP;
 import org.dcm4che3.net.service.DicomServiceRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.inject.Inject;
 
 /**
  * Created by jens on 30/10/2016.
@@ -22,7 +22,7 @@ public class DcmServiceRegisty
     private DcmFindSCP dcmFindSCP;
 
 
-    @Inject
+    @Autowired
     public DcmServiceRegisty(
             DcmStoreSCP dcmStoreSCP,
             DcmFindSCP dcmFindSCP)

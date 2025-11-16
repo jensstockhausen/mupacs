@@ -2,13 +2,13 @@ package de.famst.controller;
 
 import de.famst.data.SeriesEty;
 import de.famst.data.SeriesRepository;
+import jakarta.inject.Inject;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import javax.inject.Inject;
-import javax.ws.rs.GET;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,8 +25,7 @@ public class SeriesListController
     {
     }
 
-    @GET
-    @RequestMapping("/serieslist")
+    @RequestMapping(value = "/serieslist", method = RequestMethod.GET)
     public String getListOfSeriesForStudy(@RequestParam("studyId") long studyId, Model model)
     {
         List<SeriesEty> seriesEtyList = seriesRepository.findByStudyId(studyId);

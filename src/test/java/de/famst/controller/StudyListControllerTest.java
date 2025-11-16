@@ -4,56 +4,54 @@ import de.famst.data.PatientEty;
 import de.famst.data.PatientRepository;
 import de.famst.data.StudyEty;
 import de.famst.data.StudyRepository;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.isA;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyInt;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
-
-import java.util.ArrayList;
-import java.util.List;
 
 
 /**
  * Created by jens on 09/10/2016.
  */
-@RunWith(SpringJUnit4ClassRunner.class)
 @WebMvcTest(StudyListController.class)
 public class StudyListControllerTest
 {
   @Autowired
   private MockMvc mockMvc;
 
-  @MockBean
+  @MockitoBean
   private PatientRepository patientRepository;
 
-  @MockBean
+  @MockitoBean
   private StudyRepository studyRepository;
 
   @Test
   public void test_study_list() throws Exception
   {
     PatientEty patient = new PatientEty("NAME", "ID");
-    given(patientRepository.findOne(any())).willReturn(patient);
+    given(patientRepository.findById(any())).willReturn(java.util.Optional.of(patient));
 
     List<StudyEty> studies = new ArrayList<>();
     studies.add(new StudyEty());
 
-    given(studyRepository.findByPatientId(anyInt())).willReturn(studies);
+    given(studyRepository.findByPatientId(anyLong())).willReturn(studies);
 
 
     mockMvc.perform(MockMvcRequestBuilders.get("/studylist?patientId=1"))

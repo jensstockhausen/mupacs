@@ -2,13 +2,12 @@ package de.famst.controller;
 
 import de.famst.data.InstanceEty;
 import de.famst.data.InstanceRepository;
+import jakarta.inject.Inject;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import javax.inject.Inject;
-import javax.ws.rs.GET;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,7 +24,6 @@ public class InstanceListController
     {
     }
 
-    @GET
     @RequestMapping("/instancelist")
     public String getListOfSeriesForStudy(@RequestParam("seriesId") long seriesId, Model model)
     {

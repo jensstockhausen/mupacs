@@ -1,7 +1,7 @@
 package de.famst.AssertException;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
-import org.junit.Assert;
 
 public class ThrowableAssertion
 {
@@ -28,26 +28,26 @@ public class ThrowableAssertion
 
     public ThrowableAssertion isInstanceOf(Class<? extends Throwable> exceptionClass)
     {
-        Assert.assertThat(caught, Matchers.isA((Class<Throwable>) exceptionClass));
+        MatcherAssert.assertThat(caught, Matchers.isA((Class<Throwable>) exceptionClass));
         return this;
     }
 
     public ThrowableAssertion hasMessage(String expectedMessage)
     {
-        Assert.assertThat(caught.getMessage(), Matchers.equalTo(expectedMessage));
+        MatcherAssert.assertThat(caught.getMessage(), Matchers.equalTo(expectedMessage));
         return this;
     }
 
     public ThrowableAssertion hasNoCause()
     {
-        Assert.assertThat(caught.getCause(), Matchers.nullValue());
+        MatcherAssert.assertThat(caught.getCause(), Matchers.nullValue());
         return this;
     }
 
     public ThrowableAssertion hasCauseInstanceOf(Class<? extends Throwable> exceptionClass)
     {
-        Assert.assertThat(caught.getCause(), Matchers.notNullValue());
-        Assert.assertThat(caught.getCause(), Matchers.isA((Class<Throwable>) exceptionClass));
+        MatcherAssert.assertThat(caught.getCause(), Matchers.notNullValue());
+        MatcherAssert.assertThat(caught.getCause(), Matchers.isA((Class<Throwable>) exceptionClass));
         return this;
     }
 }

@@ -1,19 +1,12 @@
 package de.famst.controller;
 
 import de.famst.service.FolderImportManager;
+import jakarta.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-
-import javax.inject.Inject;
-import javax.servlet.http.HttpServletResponse;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 /**
  * Created by jens on 03/10/2016.
@@ -30,6 +23,7 @@ public class FolderImportRestService
     {
     }
 
+    /*
     @RequestMapping(value = "/importfolder", method = RequestMethod.GET)
     @ResponseBody
     public  String importStudiesFromFolder(
@@ -44,6 +38,7 @@ public class FolderImportRestService
 
         return "Importing " + rootPath.toAbsolutePath().toString();
     }
+    */
 
     @RequestMapping("/importlist")
     public  String getListOfRunningImports(Model model)

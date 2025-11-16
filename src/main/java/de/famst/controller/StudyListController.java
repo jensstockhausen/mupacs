@@ -11,7 +11,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import javax.ws.rs.GET;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,7 +31,6 @@ public class StudyListController
     this.patientRepository = patientRepository;
   }
 
-  @GET
   @RequestMapping("/studylist")
   public String getListOfStudiesForPatient(@RequestParam("patientId") long patientId, Model model)
   {
@@ -48,7 +46,7 @@ public class StudyListController
       studies.add(StudyModel.fromStudyEty(studyEty))
     );
 
-    PatientEty patientEty = patientRepository.findOne(patientId);
+    PatientEty patientEty = patientRepository.findById(patientId).orElse(null);
     PatientModel patientModel = PatientModel.fromPatientEty(patientEty);
 
     model.addAttribute("studies", studies);

@@ -9,6 +9,7 @@ import de.famst.data.SeriesRepository;
 import de.famst.data.StudyEty;
 import de.famst.data.StudyRepository;
 import de.famst.dcm.DicomReader;
+import jakarta.inject.Inject;
 import org.dcm4che3.data.Attributes;
 import org.dcm4che3.data.Tag;
 import org.slf4j.Logger;
@@ -16,7 +17,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.inject.Inject;
 import java.nio.file.Path;
 
 /**

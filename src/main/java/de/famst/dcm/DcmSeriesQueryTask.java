@@ -1,6 +1,8 @@
 package de.famst.dcm;
 
 import de.famst.data.SeriesEty;
+import jakarta.annotation.PostConstruct;
+import jakarta.inject.Inject;
 import org.dcm4che3.data.Attributes;
 import org.dcm4che3.data.Tag;
 import org.dcm4che3.data.VR;
@@ -14,8 +16,6 @@ import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
 import java.util.List;
 
 /**

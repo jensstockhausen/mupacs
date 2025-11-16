@@ -1,6 +1,15 @@
 package de.famst.data;
 
-import javax.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -103,7 +112,7 @@ public class SeriesEty
     @Override
     public int hashCode()
     {
-        int result = (int) (id ^ (id >>> 32));
+        int result = Long.hashCode(id);
         result = 31 * result + seriesInstanceUID.hashCode();
         return result;
     }
