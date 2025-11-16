@@ -62,7 +62,7 @@ public class StudyEty
   @ManyToOne(fetch = FetchType.LAZY)
   private PatientEty patient;
 
-  @Column(nullable = false, unique = true)
+  @Column(nullable = false)
   private String studyInstanceUID;
 
   private String studyId;

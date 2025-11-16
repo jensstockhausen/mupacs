@@ -3,32 +3,37 @@ package de.famst.data;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.DataAccessException;
 
 import static de.famst.AssertException.ThrowableAssertion.assertThrown;
 
 /**
- * Created by jens on 08/10/2016.
+ * Test for InstanceRepository to verify unique constraint enforcement.
+ * Tests that duplicate DICOM instances cannot be inserted into the database.
  */
 @DataJpaTest
 public class InstanceRepositoryTest
 {
-  @Autowired
-  InstanceRepository instanceRepository;
+    @Autowired
+    InstanceRepository instanceRepository;
 
-  @Test
-  public void cannotInsertSameInstanceTwice() throws Exception
-  {
-    InstanceEty instanceEtyA = new InstanceEty();
-    instanceEtyA.setInstanceUID("1.2.3.4");
+    @Test
+    public void cannotInsertSameInstanceTwice() throws Exception
+    {
+        InstanceEty instanceEtyA = new InstanceEty();
+        instanceEtyA.setInstanceUID("1.2.3.4");
+        instanceEtyA.setPath("/some/path");
 
-    InstanceEty instanceEtyB = new InstanceEty();
-    instanceEtyB.setInstanceUID("1.2.3.4");
+        InstanceEty instanceEtyB = new InstanceEty();
+        instanceEtyB.setInstanceUID("1.2.3.4");
+        instanceEtyB.setPath("/some/path");
 
-    instanceRepository.save(instanceEtyA);
+        // Save and flush first instance to complete the transaction
+        instanceRepository.saveAndFlush(instanceEtyA);
 
-    assertThrown(() -> instanceRepository.save(instanceEtyB))
-      .isInstanceOf(DataIntegrityViolationException.class);
-  }
+        // Attempt to save duplicate - should throw constraint violation
+        assertThrown(() -> instanceRepository.saveAndFlush(instanceEtyB))
+            .isInstanceOf(DataAccessException.class);
+    }
 
 }

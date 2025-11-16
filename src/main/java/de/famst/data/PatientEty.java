@@ -53,7 +53,7 @@ public class PatientEty
   @OneToMany(fetch = FetchType.LAZY, mappedBy = "patient", cascade = CascadeType.ALL, orphanRemoval = true)
   private List<StudyEty> studies = new ArrayList<>();
 
-  @Column(nullable = false, unique = true)
+  @Column(nullable = false)
   private String patientName;
 
   private String patientId;

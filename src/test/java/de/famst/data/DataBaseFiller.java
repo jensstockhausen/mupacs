@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class DataBaseFiller
 {
-  private static Logger LOG = LoggerFactory.getLogger(DataBaseFiller.class);
+  private static final Logger LOG = LoggerFactory.getLogger(DataBaseFiller.class);
 
   private TestEntityManager entityManager;
 
@@ -43,7 +43,7 @@ public class DataBaseFiller
 
           for (int insIdx = 0; insIdx < 2; insIdx++)
           {
-            InstanceEty instanceEty = createInstance(seriesEty, insIdx);
+            createInstance(seriesEty, insIdx);
           }
         }
       }

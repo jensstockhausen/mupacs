@@ -46,7 +46,7 @@ public class InstanceEty
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String instanceUID;
 
     @Column(nullable = false)

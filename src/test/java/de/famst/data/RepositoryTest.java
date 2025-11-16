@@ -1,9 +1,11 @@
 package de.famst.data;
 
+import de.famst.MuPACSApplication;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.context.annotation.ComponentScan;
@@ -20,10 +22,12 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 
 /**
- * Created by jens on 31/10/2016.
+ * Repository integration tests.
+ * Tests CRUD operations and custom queries for all repository interfaces.
  */
 @DataJpaTest
-@ContextConfiguration
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@ContextConfiguration(classes = {MuPACSApplication.class, RepositoryTest.SpringConfig.class})
 public class RepositoryTest
 {
 
@@ -61,7 +65,7 @@ public class RepositoryTest
   // Patient
 
   @Test
-  public void canFindPatientByExactName() throws Exception
+  public void canFindPatientByExactName()
   {
     PatientEty patientEty = patientRepository.findByPatientName("Demo_005");
 
@@ -142,7 +146,7 @@ public class RepositoryTest
   // Instance
 
   @Test
-  public void canGetInstanceByInstanceUID() throws Exception
+  public void canGetInstanceByInstanceUID()
   {
     InstanceEty instanceEty = instanceRepository.findByInstanceUID("1.2.48.3.0.0.0");
 

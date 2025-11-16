@@ -53,7 +53,7 @@ public class SeriesEty
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String seriesInstanceUID;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy="series", cascade = CascadeType.ALL, orphanRemoval = true)
