@@ -2,6 +2,7 @@
 .travis.yml
 /build/
 /import
+/archive
 /H2
 
 

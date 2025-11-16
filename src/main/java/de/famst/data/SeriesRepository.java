@@ -11,7 +11,8 @@ import java.util.List;
  * Created by jens on 05/10/2016.
  */
 @RepositoryRestResource(collectionResourceRel = "series", path = "series")
-public interface SeriesRepository extends ListCrudRepository<SeriesEty, Long>, PagingAndSortingRepository<SeriesEty, Long>
+public interface SeriesRepository
+    extends ListCrudRepository<SeriesEty, Long>, PagingAndSortingRepository<SeriesEty, Long>
 {
     SeriesEty findBySeriesInstanceUID(@Param("seriesinstanceuid") String seriesInstanceUID);
 

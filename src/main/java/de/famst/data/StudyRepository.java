@@ -12,7 +12,8 @@ import java.util.List;
  */
 
 @RepositoryRestResource(collectionResourceRel = "studies", path = "studies")
-public interface StudyRepository extends ListCrudRepository<StudyEty, Long>, PagingAndSortingRepository<StudyEty, Long>
+public interface StudyRepository
+    extends ListCrudRepository<StudyEty, Long>, PagingAndSortingRepository<StudyEty, Long>
 {
     StudyEty findByStudyInstanceUID(@Param("studyinstanceuid") String studyInstanceUID);
 

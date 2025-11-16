@@ -11,7 +11,8 @@ import java.util.List;
  * Created by jens on 05/10/2016.
  */
 @RepositoryRestResource(collectionResourceRel = "patients", path = "patients")
-public interface PatientRepository extends ListCrudRepository<PatientEty, Long>, PagingAndSortingRepository<PatientEty, Long>
+public interface PatientRepository
+    extends ListCrudRepository<PatientEty, Long>, PagingAndSortingRepository<PatientEty, Long>
 {
     PatientEty findByPatientName(@Param("patientname") String patientName);
 

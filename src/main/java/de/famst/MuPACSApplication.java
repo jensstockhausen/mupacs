@@ -4,7 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.scheduling.annotation.AsyncConfigurerSupport;
+import org.springframework.scheduling.annotation.AsyncConfigurer;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
@@ -14,11 +14,10 @@ import java.util.concurrent.Executor;
 @SpringBootApplication
 @EnableAsync
 @EnableTransactionManagement
-public class MuPACSApplication extends AsyncConfigurerSupport
+public class MuPACSApplication implements AsyncConfigurer
 {
-    private static Logger LOG = LoggerFactory.getLogger(MuPACSApplication.class);
+    private static final Logger LOG = LoggerFactory.getLogger(MuPACSApplication.class);
 
-    @SuppressWarnings("squid:S2095") // close context of spring application
     public static void main(String[] args)
     {
         LOG.info("starting application");
