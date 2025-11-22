@@ -1,9 +1,11 @@
 .gradle
 .travis.yml
 /build/
+
+### application folders ###
 /import
 /archive
-/H2
+/database
 
 
 ### IntelliJ IDEA ###

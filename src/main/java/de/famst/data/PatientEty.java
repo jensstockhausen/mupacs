@@ -38,194 +38,194 @@ import java.util.Objects;
  */
 @Entity
 @Table(
-  name = "PATIENT",
-  uniqueConstraints = {
-    @UniqueConstraint(
-      name = "AK_PATIENTNAME",
-      columnNames = {"patientName"})
-  })
+    name = "PATIENT",
+    uniqueConstraints = {
+        @UniqueConstraint(
+            name = "AK_PATIENTNAME",
+            columnNames = {"patientName"})
+    })
 public class PatientEty
 {
-  @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
-  private long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private long id;
 
-  @OneToMany(fetch = FetchType.LAZY, mappedBy = "patient", cascade = CascadeType.ALL, orphanRemoval = true)
-  private List<StudyEty> studies = new ArrayList<>();
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "patient", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<StudyEty> studies = new ArrayList<>();
 
-  @Column(nullable = false)
-  private String patientName;
+    @Column(nullable = false, unique = true)
+    private String patientName;
 
-  private String patientId;
+    private String patientId;
 
-  /**
-   * Default constructor required by JPA.
-   */
-  public PatientEty()
-  {
-    // Required by JPA
-  }
-
-  /**
-   * Constructor with required fields.
-   *
-   * @param patientName the patient name
-   * @param patientId the patient ID
-   * @throws IllegalArgumentException if patientName is null or empty
-   */
-  public PatientEty(String patientName, String patientId)
-  {
-    setPatientName(patientName);
-    this.patientId = patientId;
-  }
-
-  /**
-   * Returns the database primary key.
-   *
-   * @return the entity ID
-   */
-  public long getId()
-  {
-    return id;
-  }
-
-  /**
-   * Returns the patient name.
-   * This is the unique identifier for the patient in this system.
-   *
-   * @return the patient name, may be null if not set
-   */
-  public String getPatientName()
-  {
-    return patientName;
-  }
-
-  /**
-   * Sets the patient name.
-   *
-   * @param patientName the patient name to set
-   * @throws IllegalArgumentException if patientName is null or empty
-   */
-  public void setPatientName(String patientName)
-  {
-    if (patientName == null || patientName.trim().isEmpty())
+    /**
+     * Default constructor required by JPA.
+     */
+    public PatientEty()
     {
-      throw new IllegalArgumentException("Patient name cannot be null or empty");
-    }
-    this.patientName = patientName;
-  }
-
-  /**
-   * Returns an unmodifiable view of the studies collection.
-   *
-   * @return unmodifiable collection of studies, never null
-   */
-  public Collection<StudyEty> getStudies()
-  {
-    return Collections.unmodifiableList(studies);
-  }
-
-  /**
-   * Adds a study to this patient.
-   * This method ensures bidirectional relationship consistency.
-   *
-   * @param study the study to add
-   * @throws IllegalArgumentException if study is null
-   */
-  public void addStudy(StudyEty study)
-  {
-    if (study == null)
-    {
-      throw new IllegalArgumentException("Study cannot be null");
+        // Required by JPA
     }
 
-    if (studies.contains(study))
+    /**
+     * Constructor with required fields.
+     *
+     * @param patientName the patient name
+     * @param patientId   the patient ID
+     * @throws IllegalArgumentException if patientName is null or empty
+     */
+    public PatientEty(String patientName, String patientId)
     {
-      return;
+        setPatientName(patientName);
+        this.patientId = patientId;
     }
 
-    studies.add(study);
-    study.setPatient(this);
-  }
-
-  /**
-   * Removes a study from this patient.
-   *
-   * @param study the study to remove
-   */
-  public void removeStudy(StudyEty study)
-  {
-    if (study != null)
+    /**
+     * Returns the database primary key.
+     *
+     * @return the entity ID
+     */
+    public long getId()
     {
-      studies.remove(study);
-      study.setPatient(null);
+        return id;
     }
-  }
 
-  /**
-   * Returns the number of studies for this patient.
-   *
-   * @return the count of studies
-   */
-  public int getStudyCount()
-  {
-    return studies.size();
-  }
+    /**
+     * Returns the patient name.
+     * This is the unique identifier for the patient in this system.
+     *
+     * @return the patient name, may be null if not set
+     */
+    public String getPatientName()
+    {
+        return patientName;
+    }
 
-  /**
-   * Returns the patient ID from the ordering system.
-   *
-   * @return the patient ID, may be null
-   */
-  public String getPatientId()
-  {
-    return patientId;
-  }
+    /**
+     * Sets the patient name.
+     *
+     * @param patientName the patient name to set
+     * @throws IllegalArgumentException if patientName is null or empty
+     */
+    public void setPatientName(String patientName)
+    {
+        if (patientName == null || patientName.trim().isEmpty())
+        {
+            throw new IllegalArgumentException("Patient name cannot be null or empty");
+        }
+        this.patientName = patientName;
+    }
 
-  /**
-   * Sets the patient ID.
-   *
-   * @param patientId the patient ID to set
-   */
-  public void setPatientId(String patientId)
-  {
-    this.patientId = patientId;
-  }
+    /**
+     * Returns an unmodifiable view of the studies collection.
+     *
+     * @return unmodifiable collection of studies, never null
+     */
+    public Collection<StudyEty> getStudies()
+    {
+        return Collections.unmodifiableList(studies);
+    }
 
-  /**
-   * Checks if this patient has any studies.
-   *
-   * @return true if at least one study exists, false otherwise
-   */
-  public boolean hasStudies()
-  {
-    return !studies.isEmpty();
-  }
+    /**
+     * Adds a study to this patient.
+     * This method ensures bidirectional relationship consistency.
+     *
+     * @param study the study to add
+     * @throws IllegalArgumentException if study is null
+     */
+    public void addStudy(StudyEty study)
+    {
+        if (study == null)
+        {
+            throw new IllegalArgumentException("Study cannot be null");
+        }
 
-  @Override
-  public boolean equals(Object o)
-  {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
-    PatientEty that = (PatientEty) o;
-    return patientName != null && Objects.equals(patientName, that.patientName);
-  }
+        if (studies.contains(study))
+        {
+            return;
+        }
 
-  @Override
-  public int hashCode()
-  {
-    return Objects.hashCode(patientName);
-  }
+        studies.add(study);
+        study.setPatient(this);
+    }
 
-  @Override
-  public String toString()
-  {
-    return "PatientEty{" +
+    /**
+     * Removes a study from this patient.
+     *
+     * @param study the study to remove
+     */
+    public void removeStudy(StudyEty study)
+    {
+        if (study != null)
+        {
+            studies.remove(study);
+            study.setPatient(null);
+        }
+    }
+
+    /**
+     * Returns the number of studies for this patient.
+     *
+     * @return the count of studies
+     */
+    public int getStudyCount()
+    {
+        return studies.size();
+    }
+
+    /**
+     * Returns the patient ID from the ordering system.
+     *
+     * @return the patient ID, may be null
+     */
+    public String getPatientId()
+    {
+        return patientId;
+    }
+
+    /**
+     * Sets the patient ID.
+     *
+     * @param patientId the patient ID to set
+     */
+    public void setPatientId(String patientId)
+    {
+        this.patientId = patientId;
+    }
+
+    /**
+     * Checks if this patient has any studies.
+     *
+     * @return true if at least one study exists, false otherwise
+     */
+    public boolean hasStudies()
+    {
+        return !studies.isEmpty();
+    }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        PatientEty that = (PatientEty) o;
+        return patientName != null && Objects.equals(patientName, that.patientName);
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return Objects.hashCode(patientName);
+    }
+
+    @Override
+    public String toString()
+    {
+        return "PatientEty{" +
             "id=" + id +
             ", patientName='" + patientName + '\'' +
             ", patientId='" + patientId + '\'' +
             ", studyCount=" + studies.size() +
             '}';
-  }
+    }
 }
 

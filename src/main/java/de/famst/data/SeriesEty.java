@@ -41,23 +41,24 @@ import java.util.Objects;
  */
 @Entity
 @Table(
-        name = "SERIES",
-        uniqueConstraints={
-                @UniqueConstraint(
-                        name="AK_SERIESUID",
-                        columnNames={"seriesInstanceUID"})
-        })
+    name = "SERIES",
+    uniqueConstraints = {
+        @UniqueConstraint(
+            name = "AK_SERIESUID",
+            columnNames = {"seriesInstanceUID"})
+    })
 public class SeriesEty
 {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String seriesInstanceUID;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy="series", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "series", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<InstanceEty> instances = new ArrayList<>();
+
 
     @ManyToOne(fetch = FetchType.LAZY)
     private StudyEty study;
@@ -234,11 +235,11 @@ public class SeriesEty
     public String toString()
     {
         return "SeriesEty{" +
-                "id=" + id +
-                ", seriesInstanceUID='" + seriesInstanceUID + '\'' +
-                ", instanceCount=" + instances.size() +
-                ", studyUID=" + (study != null ? study.getStudyInstanceUID() : "null") +
-                '}';
+            "id=" + id +
+            ", seriesInstanceUID='" + seriesInstanceUID + '\'' +
+            ", instanceCount=" + instances.size() +
+            ", studyUID=" + (study != null ? study.getStudyInstanceUID() : "null") +
+            '}';
     }
 }
 

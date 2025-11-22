@@ -2,9 +2,14 @@
 <configuration>
 
     <include resource="org/springframework/boot/logging/logback/base.xml"/>
+
+    <logger name="ROOT" level="INFO"/>
+
     <!--
     <logger name="org.springframework.web" level="DEBUG"/>
     -->
+    <!--
     <logger name="org.thymeleaf" level="DEBUG"/>
+    -->
 
 </configuration>

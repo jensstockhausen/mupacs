@@ -54,7 +54,7 @@ public class DataBaseFiller
    * <p>Creates a complete DICOM hierarchy with patients, studies, series, and instances.
    * All entities are persisted and flushed to ensure they're available for queries.
    *
-   * @param entityManager the test entity manager to use for persistence
+   * @param entityManager the entity manager to use for persistence
    * @throws IllegalArgumentException if entityManager is null
    */
   public void fillDB(TestEntityManager entityManager)
@@ -65,6 +65,8 @@ public class DataBaseFiller
     }
 
     LOG.info("Starting to fill database with test data");
+    LOG.debug("Configuration: {} patients, {} studies per patient, {} series per study, {} instances per series",
+              PATIENT_COUNT, STUDIES_PER_PATIENT, SERIES_PER_STUDY, INSTANCES_PER_SERIES);
     this.entityManager = entityManager;
 
     int totalPatients = 0;
@@ -72,32 +74,45 @@ public class DataBaseFiller
     int totalSeries = 0;
     int totalInstances = 0;
 
-    for (int patientIndex = 0; patientIndex < PATIENT_COUNT; patientIndex++)
+    try
     {
-      PatientEty patient = createPatient(patientIndex);
-      totalPatients++;
-
-      for (int studyIndex = 0; studyIndex < STUDIES_PER_PATIENT; studyIndex++)
+      for (int patientIndex = 0; patientIndex < PATIENT_COUNT; patientIndex++)
       {
-        StudyEty study = createStudy(patient, studyIndex);
-        totalStudies++;
+        LOG.debug("Creating patient {}/{}", patientIndex + 1, PATIENT_COUNT);
+        PatientEty patient = createPatient(patientIndex);
+        totalPatients++;
 
-        for (int seriesIndex = 0; seriesIndex < SERIES_PER_STUDY; seriesIndex++)
+        for (int studyIndex = 0; studyIndex < STUDIES_PER_PATIENT; studyIndex++)
         {
-          SeriesEty series = createSeries(study, seriesIndex);
-          totalSeries++;
+          LOG.trace("Creating study {}/{} for patient {}", studyIndex + 1, STUDIES_PER_PATIENT, patient.getPatientId());
+          StudyEty study = createStudy(patient, studyIndex);
+          totalStudies++;
 
-          for (int instanceIndex = 0; instanceIndex < INSTANCES_PER_SERIES; instanceIndex++)
+          for (int seriesIndex = 0; seriesIndex < SERIES_PER_STUDY; seriesIndex++)
           {
-            createInstance(series, instanceIndex);
-            totalInstances++;
+            LOG.trace("Creating series {}/{} for study {}", seriesIndex + 1, SERIES_PER_STUDY, study.getStudyInstanceUID());
+            SeriesEty series = createSeries(study, seriesIndex);
+            totalSeries++;
+
+            for (int instanceIndex = 0; instanceIndex < INSTANCES_PER_SERIES; instanceIndex++)
+            {
+              LOG.trace("Creating instance {}/{} for series {}", instanceIndex + 1, INSTANCES_PER_SERIES, series.getSeriesInstanceUID());
+              createInstance(series, instanceIndex);
+              totalInstances++;
+            }
           }
         }
       }
-    }
 
-    LOG.info("Database filled successfully: {} patients, {} studies, {} series, {} instances",
-             totalPatients, totalStudies, totalSeries, totalInstances);
+      LOG.info("Database filled successfully: {} patients, {} studies, {} series, {} instances",
+               totalPatients, totalStudies, totalSeries, totalInstances);
+    }
+    catch (Exception e)
+    {
+      LOG.error("Failed to fill database. Created {} patients, {} studies, {} series, {} instances before failure",
+                totalPatients, totalStudies, totalSeries, totalInstances, e);
+      throw new RuntimeException("Database filling failed", e);
+    }
   }
 
   /**
@@ -111,14 +126,19 @@ public class DataBaseFiller
     String patientId = String.format("%s.%d", UID_PREFIX, patientIndex);
     String patientName = String.format("%s%03d", PATIENT_NAME_PREFIX, patientIndex);
 
+    LOG.trace("Creating patient entity with ID: {} and Name: {}", patientId, patientName);
     PatientEty patient = new PatientEty();
     patient.setPatientId(patientId);
     patient.setPatientName(patientName);
 
-    PatientEty persistedPatient = entityManager.persistFlushFind(patient);
-    LOG.debug("Created patient: {} (ID: {})", patientName, patientId);
+    LOG.trace("Persisting patient: {}", patientId);
+    entityManager.persist(patient);
+    LOG.trace("Flushing patient: {}", patientId);
+    entityManager.flush();
+    LOG.debug("Successfully created and persisted patient: {} (ID: {}, DB ID: {})",
+              patientName, patientId, patient.getId());
 
-    return persistedPatient;
+    return patient;
   }
 
   /**
@@ -133,15 +153,21 @@ public class DataBaseFiller
     String studyInstanceUID = String.format("%s.%d", patient.getPatientId(), studyIndex);
     String accessionNumber = String.format("%d%d%d", studyIndex, studyIndex, studyIndex);
 
+    LOG.trace("Creating study entity with UID: {} for patient DB ID: {}", studyInstanceUID, patient.getId());
     StudyEty study = new StudyEty();
     study.setStudyInstanceUID(studyInstanceUID);
     study.setAccessionNumber(accessionNumber);
-    study.setPatient(patient);
 
-    StudyEty persistedStudy = entityManager.persistFlushFind(study);
-    LOG.debug("Created study: {} for patient: {}", studyInstanceUID, patient.getPatientName());
+    patient.addStudy(study);
 
-    return persistedStudy;
+    LOG.trace("Persisting study: {}", studyInstanceUID);
+    entityManager.persist(study);
+    LOG.trace("Flushing study: {}", studyInstanceUID);
+    entityManager.flush();
+    LOG.debug("Successfully created study: {} (Accession: {}, DB ID: {}) for patient: {}",
+              studyInstanceUID, accessionNumber, study.getId(), patient.getPatientName());
+
+    return study;
   }
 
   /**
@@ -155,14 +181,19 @@ public class DataBaseFiller
   {
     String seriesInstanceUID = String.format("%s.%d", study.getStudyInstanceUID(), seriesIndex);
 
+    LOG.trace("Creating series entity with UID: {} for study DB ID: {}", seriesInstanceUID, study.getId());
     SeriesEty series = new SeriesEty();
     series.setSeriesInstanceUID(seriesInstanceUID);
-    series.setStudy(study);
+    study.addSeries(series);
 
-    SeriesEty persistedSeries = entityManager.persistFlushFind(series);
-    LOG.debug("Created series: {} for study: {}", seriesInstanceUID, study.getStudyInstanceUID());
+    LOG.trace("Persisting series: {}", seriesInstanceUID);
+    entityManager.persist(series);
+    LOG.trace("Flushing series: {}", seriesInstanceUID);
+    entityManager.flush();
+    LOG.debug("Successfully created series: {} (DB ID: {}) for study: {}",
+              seriesInstanceUID, series.getId(), study.getStudyInstanceUID());
 
-    return persistedSeries;
+    return series;
   }
 
   /**
@@ -177,15 +208,22 @@ public class DataBaseFiller
     String instanceUID = String.format("%s.%d", series.getSeriesInstanceUID(), instanceIndex);
     String instancePath = String.format("%s%d", INSTANCE_PATH_PREFIX, instanceIndex);
 
+    LOG.trace("Creating instance entity with UID: {} and path: {} for series DB ID: {}",
+              instanceUID, instancePath, series.getId());
     InstanceEty instance = new InstanceEty();
     instance.setInstanceUID(instanceUID);
     instance.setPath(instancePath);
-    instance.setSeries(series);
 
-    InstanceEty persistedInstance = entityManager.persistFlushFind(instance);
-    LOG.debug("Created instance: {} at path: {}", instanceUID, instancePath);
+    series.addInstance(instance);
 
-    return persistedInstance;
+    LOG.trace("Persisting instance: {}", instanceUID);
+    entityManager.persist(instance);
+    LOG.trace("Flushing instance: {}", instanceUID);
+    entityManager.flush();
+    LOG.debug("Successfully created instance: {} (DB ID: {}) at path: {} for series: {}",
+              instanceUID, instance.getId(), instancePath, series.getSeriesInstanceUID());
+
+    return instance;
   }
 
   /**

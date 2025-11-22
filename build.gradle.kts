@@ -25,12 +25,6 @@ repositories {
     }
 }
 
-tasks.test {
-	reports {
-		junitXml.required.set(false)
-		html.required.set(true)
-	}
-}
 
 val dcm4cheVersion = "5.34.1"
 val cliVersion = "1.11.0"
@@ -58,11 +52,10 @@ dependencies {
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 }
 
-
-testing {
-    suites {
-        val test by getting(JvmTestSuite::class) {
-            useJUnitJupiter()
-        }
+tasks.withType<Test> {
+    useJUnitPlatform()
+    reports {
+        junitXml.required.set(false)
+        html.required.set(true)
     }
 }

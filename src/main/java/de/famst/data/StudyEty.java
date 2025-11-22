@@ -44,277 +44,277 @@ import java.util.Objects;
  */
 @Entity
 @Table(
-  name = "STUDY",
-  uniqueConstraints = {
-    @UniqueConstraint(
-      name = "AK_STUDYUID",
-      columnNames = {"studyInstanceUID"})
-  })
+    name = "STUDY",
+    uniqueConstraints = {
+        @UniqueConstraint(
+            name = "AK_STUDYUID",
+            columnNames = {"studyInstanceUID"})
+    })
 public class StudyEty
 {
-  @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
-  private long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private long id;
 
-  @OneToMany(fetch = FetchType.LAZY, mappedBy = "study", cascade = CascadeType.ALL, orphanRemoval = true)
-  private List<SeriesEty> series = new ArrayList<>();
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "study", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<SeriesEty> series = new ArrayList<>();
 
-  @ManyToOne(fetch = FetchType.LAZY)
-  private PatientEty patient;
+    @ManyToOne(fetch = FetchType.LAZY)
+    private PatientEty patient;
 
-  @Column(nullable = false)
-  private String studyInstanceUID;
+    @Column(nullable = false, unique = true)
+    private String studyInstanceUID;
 
-  private String studyId;
-  private String studyDescription;
-  private LocalDate studyDate;
-  private LocalTime studyTime;
-  private String accessionNumber;
-  private String modalitiesInStudy;
-  private String referringPhysicianName;
+    private String studyId;
+    private String studyDescription;
+    private LocalDate studyDate;
+    private LocalTime studyTime;
+    private String accessionNumber;
+    private String modalitiesInStudy;
+    private String referringPhysicianName;
 
-  /**
-   * Default constructor required by JPA.
-   */
-  public StudyEty()
-  {
-    // Required by JPA
-  }
-
-  /**
-   * Constructor with required fields.
-   *
-   * @param studyInstanceUID the unique Study Instance UID
-   * @throws IllegalArgumentException if studyInstanceUID is null or empty
-   */
-  public StudyEty(String studyInstanceUID)
-  {
-    setStudyInstanceUID(studyInstanceUID);
-  }
-
-  /**
-   * Returns the database primary key.
-   *
-   * @return the entity ID
-   */
-  public long getId()
-  {
-    return id;
-  }
-
-  /**
-   * Returns the Study Instance UID.
-   * This is the unique DICOM identifier for the study.
-   *
-   * @return the Study Instance UID, may be null if not set
-   */
-  public String getStudyInstanceUID()
-  {
-    return studyInstanceUID;
-  }
-
-  /**
-   * Sets the Study Instance UID.
-   *
-   * @param studyInstanceUID the Study Instance UID to set
-   * @throws IllegalArgumentException if studyInstanceUID is null or empty
-   */
-  public void setStudyInstanceUID(String studyInstanceUID)
-  {
-    if (studyInstanceUID == null || studyInstanceUID.trim().isEmpty())
+    /**
+     * Default constructor required by JPA.
+     */
+    public StudyEty()
     {
-      throw new IllegalArgumentException("Study Instance UID cannot be null or empty");
-    }
-    this.studyInstanceUID = studyInstanceUID;
-  }
-
-  /**
-   * Returns an unmodifiable view of the series collection.
-   *
-   * @return unmodifiable collection of series, never null
-   */
-  public Collection<SeriesEty> getSeries()
-  {
-    return Collections.unmodifiableList(series);
-  }
-
-  /**
-   * Adds a series to this study.
-   * This method ensures bidirectional relationship consistency.
-   *
-   * @param seriesEty the series to add
-   * @throws IllegalArgumentException if seriesEty is null
-   */
-  public void addSeries(SeriesEty seriesEty)
-  {
-    if (seriesEty == null)
-    {
-      throw new IllegalArgumentException("Series cannot be null");
+        // Required by JPA
     }
 
-    if (series.contains(seriesEty))
+    /**
+     * Constructor with required fields.
+     *
+     * @param studyInstanceUID the unique Study Instance UID
+     * @throws IllegalArgumentException if studyInstanceUID is null or empty
+     */
+    public StudyEty(String studyInstanceUID)
     {
-      return;
+        setStudyInstanceUID(studyInstanceUID);
     }
 
-    series.add(seriesEty);
-    seriesEty.setStudy(this);
-  }
-
-  /**
-   * Removes a series from this study.
-   *
-   * @param seriesEty the series to remove
-   */
-  public void removeSeries(SeriesEty seriesEty)
-  {
-    if (seriesEty != null)
+    /**
+     * Returns the database primary key.
+     *
+     * @return the entity ID
+     */
+    public long getId()
     {
-      series.remove(seriesEty);
-      seriesEty.setStudy(null);
+        return id;
     }
-  }
 
-  /**
-   * Returns the number of series in this study.
-   *
-   * @return the count of series
-   */
-  public int getSeriesCount()
-  {
-    return series.size();
-  }
+    /**
+     * Returns the Study Instance UID.
+     * This is the unique DICOM identifier for the study.
+     *
+     * @return the Study Instance UID, may be null if not set
+     */
+    public String getStudyInstanceUID()
+    {
+        return studyInstanceUID;
+    }
 
-  /**
-   * Returns the patient associated with this study.
-   *
-   * @return the patient, may be null
-   */
-  public PatientEty getPatient()
-  {
-    return patient;
-  }
+    /**
+     * Sets the Study Instance UID.
+     *
+     * @param studyInstanceUID the Study Instance UID to set
+     * @throws IllegalArgumentException if studyInstanceUID is null or empty
+     */
+    public void setStudyInstanceUID(String studyInstanceUID)
+    {
+        if (studyInstanceUID == null || studyInstanceUID.trim().isEmpty())
+        {
+            throw new IllegalArgumentException("Study Instance UID cannot be null or empty");
+        }
+        this.studyInstanceUID = studyInstanceUID;
+    }
 
-  /**
-   * Sets the patient for this study.
-   * This method ensures bidirectional relationship consistency.
-   *
-   * @param patient the patient to associate with this study
-   */
-  public void setPatient(PatientEty patient)
-  {
-    this.patient = patient;
-  }
+    /**
+     * Returns an unmodifiable view of the series collection.
+     *
+     * @return unmodifiable collection of series, never null
+     */
+    public Collection<SeriesEty> getSeries()
+    {
+        return Collections.unmodifiableList(series);
+    }
 
-  public LocalDate getStudyDate()
-  {
-    return studyDate;
-  }
+    /**
+     * Adds a series to this study.
+     * This method ensures bidirectional relationship consistency.
+     *
+     * @param seriesEty the series to add
+     * @throws IllegalArgumentException if seriesEty is null
+     */
+    public void addSeries(SeriesEty seriesEty)
+    {
+        if (seriesEty == null)
+        {
+            throw new IllegalArgumentException("Series cannot be null");
+        }
 
-  public void setStudyDate(LocalDate studyDate)
-  {
-    this.studyDate = studyDate;
-  }
+        if (series.contains(seriesEty))
+        {
+            return;
+        }
 
-  public LocalTime getStudyTime()
-  {
-    return studyTime;
-  }
+        series.add(seriesEty);
+        seriesEty.setStudy(this);
+    }
 
-  public void setStudyTime(LocalTime studyTime)
-  {
-    this.studyTime = studyTime;
-  }
+    /**
+     * Removes a series from this study.
+     *
+     * @param seriesEty the series to remove
+     */
+    public void removeSeries(SeriesEty seriesEty)
+    {
+        if (seriesEty != null)
+        {
+            series.remove(seriesEty);
+            seriesEty.setStudy(null);
+        }
+    }
 
-  public String getAccessionNumber()
-  {
-    return accessionNumber;
-  }
+    /**
+     * Returns the number of series in this study.
+     *
+     * @return the count of series
+     */
+    public int getSeriesCount()
+    {
+        return series.size();
+    }
 
-  public void setAccessionNumber(String accessionNumber)
-  {
-    this.accessionNumber = accessionNumber;
-  }
+    /**
+     * Returns the patient associated with this study.
+     *
+     * @return the patient, may be null
+     */
+    public PatientEty getPatient()
+    {
+        return patient;
+    }
 
-  public String getModalitiesInStudy()
-  {
-    return modalitiesInStudy;
-  }
+    /**
+     * Sets the patient for this study.
+     * This method ensures bidirectional relationship consistency.
+     *
+     * @param patient the patient to associate with this study
+     */
+    public void setPatient(PatientEty patient)
+    {
+        this.patient = patient;
+    }
 
-  public void setModalitiesInStudy(String modalitiesInStudy)
-  {
-    this.modalitiesInStudy = modalitiesInStudy;
-  }
+    public LocalDate getStudyDate()
+    {
+        return studyDate;
+    }
 
-  public String getReferringPhysicianName()
-  {
-    return referringPhysicianName;
-  }
+    public void setStudyDate(LocalDate studyDate)
+    {
+        this.studyDate = studyDate;
+    }
 
-  public void setReferringPhysicianName(String referringPhysicianName)
-  {
-    this.referringPhysicianName = referringPhysicianName;
-  }
+    public LocalTime getStudyTime()
+    {
+        return studyTime;
+    }
 
-  public String getStudyId()
-  {
-    return studyId;
-  }
+    public void setStudyTime(LocalTime studyTime)
+    {
+        this.studyTime = studyTime;
+    }
 
-  public void setStudyId(String studyId)
-  {
-    this.studyId = studyId;
-  }
+    public String getAccessionNumber()
+    {
+        return accessionNumber;
+    }
 
-  public void setStudyDescription(String studyDescription)
-  {
-    this.studyDescription = studyDescription;
-  }
+    public void setAccessionNumber(String accessionNumber)
+    {
+        this.accessionNumber = accessionNumber;
+    }
 
-  public String getStudyDescription()
-  {
-    return studyDescription;
-  }
+    public String getModalitiesInStudy()
+    {
+        return modalitiesInStudy;
+    }
 
-  /**
-   * Checks if this study has any series.
-   *
-   * @return true if at least one series exists, false otherwise
-   */
-  public boolean hasSeries()
-  {
-    return !series.isEmpty();
-  }
+    public void setModalitiesInStudy(String modalitiesInStudy)
+    {
+        this.modalitiesInStudy = modalitiesInStudy;
+    }
 
-  /**
-   * Checks if this study is associated with a patient.
-   *
-   * @return true if patient is set, false otherwise
-   */
-  public boolean hasPatient()
-  {
-    return patient != null;
-  }
+    public String getReferringPhysicianName()
+    {
+        return referringPhysicianName;
+    }
 
-  @Override
-  public boolean equals(Object o)
-  {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
-    StudyEty studyEty = (StudyEty) o;
-    return studyInstanceUID != null && Objects.equals(studyInstanceUID, studyEty.studyInstanceUID);
-  }
+    public void setReferringPhysicianName(String referringPhysicianName)
+    {
+        this.referringPhysicianName = referringPhysicianName;
+    }
 
-  @Override
-  public int hashCode()
-  {
-    return Objects.hashCode(studyInstanceUID);
-  }
+    public String getStudyId()
+    {
+        return studyId;
+    }
 
-  @Override
-  public String toString()
-  {
-    return "StudyEty{" +
+    public void setStudyId(String studyId)
+    {
+        this.studyId = studyId;
+    }
+
+    public void setStudyDescription(String studyDescription)
+    {
+        this.studyDescription = studyDescription;
+    }
+
+    public String getStudyDescription()
+    {
+        return studyDescription;
+    }
+
+    /**
+     * Checks if this study has any series.
+     *
+     * @return true if at least one series exists, false otherwise
+     */
+    public boolean hasSeries()
+    {
+        return !series.isEmpty();
+    }
+
+    /**
+     * Checks if this study is associated with a patient.
+     *
+     * @return true if patient is set, false otherwise
+     */
+    public boolean hasPatient()
+    {
+        return patient != null;
+    }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        StudyEty studyEty = (StudyEty) o;
+        return studyInstanceUID != null && Objects.equals(studyInstanceUID, studyEty.studyInstanceUID);
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return Objects.hashCode(studyInstanceUID);
+    }
+
+    @Override
+    public String toString()
+    {
+        return "StudyEty{" +
             "id=" + id +
             ", studyInstanceUID='" + studyInstanceUID + '\'' +
             ", studyId='" + studyId + '\'' +
@@ -323,6 +323,6 @@ public class StudyEty
             ", seriesCount=" + series.size() +
             ", patientName=" + (patient != null ? patient.getPatientName() : "null") +
             '}';
-  }
+    }
 
 }

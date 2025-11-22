@@ -3,7 +3,9 @@ package de.famst.data;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.dao.DataAccessException;
+import org.springframework.dao.DataIntegrityViolationException;
 
 import static de.famst.AssertException.ThrowableAssertion.assertThrown;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -27,6 +29,9 @@ public class UniqueConstraintsTest
 
     @Autowired
     private InstanceRepository instanceRepository;
+
+    @Autowired
+    private TestEntityManager entityManager;
 
     // ========== Patient Unique Constraint Tests ==========
 
@@ -249,7 +254,7 @@ public class UniqueConstraintsTest
         instanceRepository.saveAndFlush(instanceA);
 
         assertThrown(() -> instanceRepository.saveAndFlush(instanceB))
-            .isInstanceOf(DataAccessException.class);
+            .isInstanceOf(DataIntegrityViolationException.class);
     }
 
     @Test
@@ -280,7 +285,7 @@ public class UniqueConstraintsTest
         // instanceUID is null
 
         assertThrown(() -> instanceRepository.saveAndFlush(instance))
-            .isInstanceOf(DataAccessException.class);
+            .isInstanceOf(DataIntegrityViolationException.class);
     }
 
     @Test
@@ -291,7 +296,7 @@ public class UniqueConstraintsTest
         // path is null
 
         assertThrown(() -> instanceRepository.saveAndFlush(instance))
-            .isInstanceOf(DataAccessException.class);
+            .isInstanceOf(DataIntegrityViolationException.class);
     }
 
     // ========== Cross-Entity Tests ==========
@@ -313,7 +318,7 @@ public class UniqueConstraintsTest
 
         // Should fail due to unique constraint on patient name
         assertThrown(() -> patientRepository.saveAndFlush(patientB))
-            .isInstanceOf(DataAccessException.class);
+            .isInstanceOf(DataIntegrityViolationException.class);
     }
 
     @Test
