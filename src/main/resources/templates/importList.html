@@ -16,15 +16,81 @@
     <div th:replace="fragments/menu :: menu">MENU</div>
 
     <h2>Import List</h2>
+
+    <!-- Success/Error Messages -->
+    <div th:if="${successMessage}" class="alert alert-success alert-dismissible" role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+        <span class="glyphicon glyphicon-ok-sign"></span>
+        <span th:text="${successMessage}">Success message</span>
+    </div>
+
+    <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible" role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+        <span class="glyphicon glyphicon-exclamation-sign"></span>
+        <span th:text="${errorMessage}">Error message</span>
+    </div>
+
+    <!-- Import Form -->
+    <div class="panel panel-default" style="margin-bottom: 20px;">
+        <div class="panel-heading">
+            <h3 class="panel-title">Add New Import</h3>
+        </div>
+        <div class="panel-body">
+            <form action="#" th:action="@{/importlist/add}" method="post" class="form-inline">
+                <div class="form-group" style="width: 70%; display: inline-block;">
+                    <label for="folderPath" class="sr-only">Folder Path</label>
+                    <input type="text"
+                           class="form-control"
+                           id="folderPath"
+                           name="folderPath"
+                           placeholder="Enter folder path (e.g., /path/to/dicom/folder)"
+                           style="width: 100%;"
+                           required="required"/>
+                </div>
+                <button type="submit" class="btn btn-primary" style="margin-left: 10px;">
+                    <span class="glyphicon glyphicon-play"></span> Start Import
+                </button>
+            </form>
+            <p class="help-block" style="margin-top: 10px;">
+                Enter the absolute path to a folder containing DICOM files. The folder will be scanned recursively.
+            </p>
+        </div>
+    </div>
+
+    <!-- Import List Table -->
+    <h3>Running and Completed Imports</h3>
     <table class="table table-striped table-bordered">
-        <tr id="import.table.header">
-            <th>Import</th>
-        </tr>
-
-        <tr id="import.table.content" th:each="import : ${imports}">
-            <td th:text="${import}">PATIENT NAME</td>
-        </tr>
-
+        <thead>
+            <tr id="import.table.header">
+                <th>Status</th>
+                <th>Folder Path</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:if="${imports.isEmpty()}">
+                <td colspan="2" class="text-center text-muted">
+                    <em>No imports found. Add a folder path above to start an import.</em>
+                </td>
+            </tr>
+            <tr id="import.table.content" th:each="import : ${imports}">
+                <td style="width: 120px;">
+                    <span th:if="${import.startsWith('DONE: ')}" class="label label-success">
+                        <span class="glyphicon glyphicon-ok"></span> Completed
+                    </span>
+                    <span th:unless="${import.startsWith('DONE: ')}" class="label label-info">
+                        <span class="glyphicon glyphicon-refresh"></span> Running
+                    </span>
+                </td>
+                <td>
+                    <span th:if="${import.startsWith('DONE: ')}" th:text="${import.substring(6)}">Path</span>
+                    <span th:unless="${import.startsWith('DONE: ')}" th:text="${import}">Path</span>
+                </td>
+            </tr>
+        </tbody>
     </table>
 </div>
 
