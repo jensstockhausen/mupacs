@@ -1,0 +1,144 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
+
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <title>μPACS - Home</title>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"/>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+    <link rel="stylesheet" href="./../static/mupacs.css" th:href="@{/mupacs.css}"/>
+
+    <style>
+        .jumbotron {
+            background-color: #f8f9fa;
+            padding: 60px 30px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .feature-box {
+            text-align: center;
+            padding: 30px;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            transition: box-shadow 0.3s ease;
+        }
+        .feature-box:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .feature-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+            color: #337ab7;
+        }
+        .btn-large {
+            font-size: 18px;
+            padding: 12px 30px;
+            margin: 10px;
+        }
+    </style>
+</head>
+
+<body>
+<div class="container">
+
+    <div th:replace="fragments/menu :: menu">MENU</div>
+
+    <!-- Hero Section -->
+    <div class="jumbotron">
+        <h1>&mu;PACS</h1>
+        <p class="lead">Picture Archiving and Communication System</p>
+        <p>A lightweight DICOM archive system for medical imaging management</p>
+        <div style="margin-top: 30px;">
+            <a href="/patientlist" class="btn btn-primary btn-large">
+                <span class="glyphicon glyphicon-list"></span> Browse Archive
+            </a>
+        </div>
+    </div>
+
+    <!-- Features Section -->
+    <div class="row">
+        <div class="col-md-3 col-sm-6">
+            <div class="feature-box">
+                <div class="feature-icon">
+                    <span class="glyphicon glyphicon-user"></span>
+                </div>
+                <h3>Patients</h3>
+                <p>Browse and manage patient records with pagination support</p>
+                <a href="/patientlist" class="btn btn-default">View Patients</a>
+            </div>
+        </div>
+
+        <div class="col-md-3 col-sm-6">
+            <div class="feature-box">
+                <div class="feature-icon">
+                    <span class="glyphicon glyphicon-folder-open"></span>
+                </div>
+                <h3>Studies</h3>
+                <p>Expandable study view with details and date information</p>
+                <a href="/patientlist" class="btn btn-default">Browse Studies</a>
+            </div>
+        </div>
+
+        <div class="col-md-3 col-sm-6">
+            <div class="feature-box">
+                <div class="feature-icon">
+                    <span class="glyphicon glyphicon-film"></span>
+                </div>
+                <h3>Series</h3>
+                <p>Access imaging series and individual DICOM instances</p>
+                <a href="/patientlist" class="btn btn-default">View Series</a>
+            </div>
+        </div>
+
+        <div class="col-md-3 col-sm-6">
+            <div class="feature-box">
+                <div class="feature-icon">
+                    <span class="glyphicon glyphicon-tasks"></span>
+                </div>
+                <h3>Hierarchy</h3>
+                <p>Navigate through the complete DICOM data hierarchy</p>
+                <a href="/patientlist" class="btn btn-default">Start Browsing</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Info Section -->
+    <div class="row" style="margin-top: 40px;">
+        <div class="col-md-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">About μPACS</h3>
+                </div>
+                <div class="panel-body">
+                    <p>
+                        μPACS is a lightweight Picture Archiving and Communication System designed for
+                        storing, retrieving, and managing medical imaging data in DICOM format.
+                    </p>
+                    <p>
+                        The system follows the standard DICOM hierarchy:
+                        <strong>Patient</strong> → <strong>Study</strong> → <strong>Series</strong> → <strong>Instance</strong>
+                    </p>
+                    <ul>
+                        <li><strong>Patient:</strong> Individual person who is the subject of medical imaging</li>
+                        <li><strong>Study:</strong> A single imaging examination (e.g., CT scan, MRI)</li>
+                        <li><strong>Series:</strong> A collection of images from a specific acquisition</li>
+                        <li><strong>Instance:</strong> Individual DICOM image file</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div th:replace="fragments/footer :: footer">EMPTY FOOTER</div>
+
+</div>
+</body>
+</html>
+
