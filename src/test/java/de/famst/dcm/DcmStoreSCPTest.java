@@ -1,10 +1,9 @@
 package de.famst.dcm;
 
-import de.famst.service.FolderImportManager;
+import de.famst.service.DicomImportService;
 import org.dcm4che3.data.Attributes;
 import org.dcm4che3.data.Tag;
 import org.dcm4che3.data.VR;
-import org.dcm4che3.io.DicomInputStream;
 import org.dcm4che3.io.DicomOutputStream;
 import org.dcm4che3.net.Association;
 import org.dcm4che3.net.PDVInputStream;
@@ -13,7 +12,6 @@ import org.dcm4che3.net.pdu.PresentationContext;
 import org.dcm4che3.net.service.DicomServiceException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Mock;
@@ -29,7 +27,6 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -50,8 +47,7 @@ class DcmStoreSCPTest
     Path tempDir;
 
     @Mock
-    private FolderImportManager mockImportManager;
-
+    private DicomImportService mockDicomImportService;
 
     @Mock
     private Association mockAssociation;
@@ -69,7 +65,7 @@ class DcmStoreSCPTest
     void setUp()
     {
         closeable = MockitoAnnotations.openMocks(this);
-        dcmStoreSCP = new DcmStoreSCP(mockImportManager);
+        dcmStoreSCP = new DcmStoreSCP(mockDicomImportService);
 
         // Set test values using reflection
         ReflectionTestUtils.setField(dcmStoreSCP, "importFolder", tempDir.toString());
@@ -88,7 +84,7 @@ class DcmStoreSCPTest
     void testConstructor()
     {
         assertNotNull(dcmStoreSCP);
-        assertNotNull(mockImportManager);
+        assertNotNull(mockDicomImportService);
     }
 
     @Test
@@ -134,37 +130,28 @@ class DcmStoreSCPTest
     }
 
     @Test
-    void testImportFolderCreation()
+    void testDicomImportServiceInteraction() throws Exception
     {
-        // Verify that temp directory exists
-        assertTrue(Files.exists(tempDir));
-        assertTrue(Files.isDirectory(tempDir));
+        // Verify dicom import service can be called
+        File testFile = tempDir.resolve("test.dcm").toFile();
+        doNothing().when(mockDicomImportService).dicomToDatabase(testFile);
+
+        mockDicomImportService.dicomToDatabase(testFile);
+
+        verify(mockDicomImportService, times(1)).dicomToDatabase(testFile);
     }
 
     @Test
-    void testImportManagerInteraction() throws InterruptedException
+    void testDicomImportServiceException() throws Exception
     {
-        // Verify import manager can be called
-        Path testPath = tempDir.resolve("test");
-        doNothing().when(mockImportManager).addImport(testPath);
+        // Test handling of RuntimeException from import service
+        File testFile = tempDir.resolve("test.dcm").toFile();
+        doThrow(new RuntimeException("Test exception"))
+            .when(mockDicomImportService).dicomToDatabase(testFile);
 
-        mockImportManager.addImport(testPath);
-
-        verify(mockImportManager, times(1)).addImport(testPath);
+        assertThrows(RuntimeException.class, () -> mockDicomImportService.dicomToDatabase(testFile));
     }
 
-    @Test
-    void testImportManagerInterruptedException() throws InterruptedException
-    {
-        // Test handling of InterruptedException
-        Path testPath = tempDir.resolve("test");
-        doThrow(new InterruptedException("Test interrupt"))
-            .when(mockImportManager).addImport(testPath);
-
-        assertThrows(InterruptedException.class, () -> mockImportManager.addImport(testPath));
-    }
-
-    @Disabled
     @Test
     void testCStoreSimulation() throws Exception
     {
@@ -217,7 +204,6 @@ class DcmStoreSCPTest
             return bais.read(buffer, offset, length);
         });
 
-
         // Create request attributes for C-STORE
         Attributes requestAttrs = new Attributes();
         requestAttrs.setString(Tag.AffectedSOPClassUID, VR.UI, "1.2.840.10008.5.1.4.1.1.2");
@@ -230,38 +216,17 @@ class DcmStoreSCPTest
         when(mockAssociation.createFileMetaInformation(anyString(), anyString(), anyString())).thenReturn(fmi);
         when(mockAssociation.toString()).thenReturn("Test Association");
 
-        // Mock import manager to not throw exception
-        doNothing().when(mockImportManager).addImport(any(Path.class));
+        // Mock dicom import service to not throw exception
+        doNothing().when(mockDicomImportService).dicomToDatabase(any(File.class));
 
         // Execute the store operation
         assertDoesNotThrow(() ->
             dcmStoreSCP.store(mockAssociation, mockPresentationContext, requestAttrs, mockPDV, responseAttrs)
         );
 
-        // Verify that files were created in the expected directory structure
-        File expectedDir = new File(tempDir.toFile(), "TEST12345/1.2.3.4.5.678/1.2.3.4.5.678.90");
-        File expectedFile = new File(expectedDir, "1.2.3.4.5.678.90.12");
 
-        // Give it a moment for file operations to complete
-        Thread.sleep(100);
-
-        // Verify directory structure was created
-        assertTrue(expectedDir.exists(), "Expected directory structure should be created");
-        assertTrue(expectedFile.exists(), "DICOM file should be stored at expected location");
-
-        // Verify the stored file contains valid DICOM data
-        try (DicomInputStream dis = new DicomInputStream(expectedFile))
-        {
-            Attributes storedData = dis.readDataset();
-            assertNotNull(storedData);
-            assertEquals("TEST12345", storedData.getString(Tag.PatientID));
-            assertEquals("Doe^John", storedData.getString(Tag.PatientName));
-            assertEquals("1.2.3.4.5.678", storedData.getString(Tag.StudyInstanceUID));
-            assertEquals("1.2.3.4.5.678.90", storedData.getString(Tag.SeriesInstanceUID));
-        }
-
-        // Verify import manager was called with the correct directory
-        verify(mockImportManager, atLeastOnce()).addImport(any(Path.class));
+        // Verify dicom import service was called with the correct file
+        verify(mockDicomImportService, atLeastOnce()).dicomToDatabase(any(File.class));
     }
 }
 

@@ -131,7 +131,7 @@ public class DicomImportService
         SeriesEty series = findOrCreateSeries(dcm, seriesInstanceUID, study);
 
         // Process Instance level
-        processInstance(dcm, path, sopInstanceUID, series);
+        processInstance(dcm, path, sopInstanceUID, study, series);
     }
 
     /**
@@ -243,7 +243,7 @@ public class DicomImportService
      * Processes a DICOM instance, creating it if it doesn't exist or skipping if it does.
      * Copies the DICOM file to the archive structure: PatientID/StudyInstanceUID/SeriesInstanceUID/SOPInstanceUID.dcm
      */
-    private void processInstance(Attributes dcm, Path path, String sopInstanceUID, SeriesEty series)
+    private void processInstance(Attributes dcm, Path path, String sopInstanceUID, StudyEty study, SeriesEty series)
     {
         InstanceEty instance = instanceRepository.findByInstanceUID(sopInstanceUID);
 
@@ -256,7 +256,7 @@ public class DicomImportService
         LOG.debug("Creating new instance: [{}]", sopInstanceUID);
 
         // Copy DICOM file to archive structure
-        Path archivePath = copyDicomFileToArchive(dcm, path, sopInstanceUID, series);
+        Path archivePath = copyDicomFileToArchive(dcm, path, sopInstanceUID, study, series);
 
         instance = dicomReader.readInstance(dcm);
         instance.setPath(archivePath.toAbsolutePath().toString());
@@ -281,19 +281,11 @@ public class DicomImportService
      * @return the destination path where the file was copied
      * @throws RuntimeException if file copy fails
      */
-    private Path copyDicomFileToArchive(Attributes dcm, Path sourcePath, String sopInstanceUID, SeriesEty series)
+    private Path copyDicomFileToArchive(Attributes dcm, Path sourcePath, String sopInstanceUID, StudyEty study, SeriesEty series)
     {
         try
         {
-            // Get identifiers for directory structure
-            String patientId = dcm.getString(Tag.PatientID);
-            if (patientId == null || patientId.trim().isEmpty())
-            {
-                patientId = "UNKNOWN";
-                LOG.warn("Patient ID is missing, using 'UNKNOWN' for directory structure");
-            }
-
-            String studyInstanceUID = series.getStudy().getStudyInstanceUID();
+            String studyInstanceUID = study.getStudyInstanceUID();
             String seriesInstanceUID = series.getSeriesInstanceUID();
 
             // Build archive path: {archive}/StudyInstanceUID/SeriesInstanceUID/
