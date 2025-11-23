@@ -1,0 +1,194 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
+
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <title>DICOM Configuration - μPACS</title>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"/>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+    <link rel="stylesheet" href="./../static/mupacs.css" th:href="@{/mupacs.css}"/>
+</head>
+
+<body>
+<div class="container">
+
+    <div th:replace="fragments/menu :: menu">MENU</div>
+
+    <h2>DICOM Service Configuration</h2>
+
+    <!-- Service Status Panel -->
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            <h3 class="panel-title">
+                <span class="glyphicon glyphicon-info-sign"></span> Service Status
+            </h3>
+        </div>
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <dl class="dl-horizontal">
+                        <dt>Status:</dt>
+                        <dd>
+                            <span class="label" th:classappend="${config.statusClass}" th:text="${config.statusLabel}">
+                                Running
+                            </span>
+                        </dd>
+                        <dt>Device Name:</dt>
+                        <dd th:text="${config.deviceName}">MUPACS-DEVICE</dd>
+                        <dt>Registered Services:</dt>
+                        <dd th:text="${config.registeredServices}">3</dd>
+                    </dl>
+                </div>
+                <div class="col-md-6">
+                    <div class="alert alert-info" style="margin-bottom: 0;">
+                        <strong>Service Information:</strong><br/>
+                        The DICOM service is configured to accept connections on the specified port
+                        and provides C-ECHO, C-FIND, and C-STORE operations.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Network Configuration Panel -->
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">
+                <span class="glyphicon glyphicon-globe"></span> Network Configuration
+            </h3>
+        </div>
+        <div class="panel-body">
+            <table class="table table-bordered">
+                <tbody>
+                    <tr>
+                        <th style="width: 30%;">Application Entity Title (AE Title)</th>
+                        <td>
+                            <code th:text="${config.aeTitle}">MUPACS</code>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Hostname</th>
+                        <td>
+                            <code th:text="${config.host}">localhost</code>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Port</th>
+                        <td>
+                            <code th:text="${config.port}">11112</code>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Connection String</th>
+                        <td>
+                            <code th:text="${config.connectionString}">localhost:11112</code>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Supported Services Panel -->
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">
+                <span class="glyphicon glyphicon-list"></span> Supported DICOM Services
+            </h3>
+        </div>
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="panel panel-info">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">
+                                <span class="glyphicon glyphicon-ok-circle"></span> C-ECHO SCP
+                            </h4>
+                        </div>
+                        <div class="panel-body">
+                            <p><strong>Verification Service</strong></p>
+                            <p class="text-muted">
+                                Responds to DICOM echo requests to verify connectivity.
+                                Used for testing network connections.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="panel panel-success">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">
+                                <span class="glyphicon glyphicon-search"></span> C-FIND SCP
+                            </h4>
+                        </div>
+                        <div class="panel-body">
+                            <p><strong>Query Service</strong></p>
+                            <p class="text-muted">
+                                Allows querying of patient, study, and series information
+                                stored in the archive.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="panel panel-warning">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">
+                                <span class="glyphicon glyphicon-save"></span> C-STORE SCP
+                            </h4>
+                        </div>
+                        <div class="panel-body">
+                            <p><strong>Storage Service</strong></p>
+                            <p class="text-muted">
+                                Accepts and stores DICOM images and related data
+                                from remote systems.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Connection Instructions Panel -->
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">
+                <span class="glyphicon glyphicon-console"></span> Connection Instructions
+            </h3>
+        </div>
+        <div class="panel-body">
+            <h4>Connecting from DICOM Clients</h4>
+            <p>To connect to this PACS system from a DICOM client, use the following parameters:</p>
+
+            <div class="well">
+                <dl class="dl-horizontal">
+                    <dt>Called AE Title:</dt>
+                    <dd><code th:text="${config.aeTitle}">MUPACS</code></dd>
+                    <dt>Hostname:</dt>
+                    <dd><code th:text="${config.host}">localhost</code></dd>
+                    <dt>Port:</dt>
+                    <dd><code th:text="${config.port}">11112</code></dd>
+                </dl>
+            </div>
+
+            <h4>Example: dcm4che echoscu</h4>
+            <pre><code>echoscu -c <span th:text="${config.aeTitle}">MUPACS</span>@<span th:text="${config.host}">localhost</span>:<span th:text="${config.port}">11112</span></code></pre>
+
+            <h4>Example: dcm4che storescu</h4>
+            <pre><code>storescu -c <span th:text="${config.aeTitle}">MUPACS</span>@<span th:text="${config.host}">localhost</span>:<span th:text="${config.port}">11112</span> /path/to/dicom/files</code></pre>
+        </div>
+    </div>
+
+    <div th:replace="fragments/footer :: footer">EMPTY FOOTER</div>
+
+</div>
+</body>
+</html>
+

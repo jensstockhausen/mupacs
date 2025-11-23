@@ -130,6 +130,35 @@ public class DcmServiceRegisty
         }
     }
 
+    // Configuration getters for status page
 
+    public String getAeTitle()
+    {
+        return aeTitle;
+    }
+
+    public String getHost()
+    {
+        return host;
+    }
+
+    public Integer getPort()
+    {
+        return port;
+    }
+
+    public boolean isRunning()
+    {
+        return device != null;
+    }
+
+    public String getDeviceName()
+    {
+        return device != null ? device.getDeviceName() : "N/A";
+    }
+
+    public int getRegisteredServicesCount()
+    {
+        return dicomServiceRegistry != null ? 3 : 0; // Echo, Find, Store
+    }
 }
-
