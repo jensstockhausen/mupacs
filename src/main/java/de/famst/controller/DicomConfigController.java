@@ -3,6 +3,7 @@ package de.famst.controller;
 import de.famst.data.AetEty;
 import de.famst.data.AetRepository;
 import de.famst.dcm.DcmServiceRegisty;
+import de.famst.service.DcmClientService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,11 +23,15 @@ public class DicomConfigController
 {
     private final DcmServiceRegisty dcmServiceRegistry;
     private final AetRepository aetRepository;
+    private final DcmClientService dcmClientService;
 
-    public DicomConfigController(DcmServiceRegisty dcmServiceRegistry, AetRepository aetRepository)
+    public DicomConfigController(DcmServiceRegisty dcmServiceRegistry,
+                                 AetRepository aetRepository,
+                                 DcmClientService dcmClientService)
     {
         this.dcmServiceRegistry = dcmServiceRegistry;
         this.aetRepository = aetRepository;
+        this.dcmClientService = dcmClientService;
     }
 
     @GetMapping("/dicomconfig")
@@ -141,6 +146,41 @@ public class DicomConfigController
         {
             redirectAttributes.addFlashAttribute("errorMessage",
                 "Failed to delete AET: " + e.getMessage());
+        }
+
+        return "redirect:/dicomconfig";
+    }
+
+    @PostMapping("/dicomconfig/aet/echo/{id}")
+    public String echoAet(@PathVariable("id") Long id, RedirectAttributes redirectAttributes)
+    {
+        try
+        {
+            Optional<AetEty> aet = aetRepository.findById(id);
+            if (aet.isEmpty())
+            {
+                redirectAttributes.addFlashAttribute("errorMessage", "AET not found");
+                return "redirect:/dicomconfig";
+            }
+
+            AetEty remote = aet.get();
+            boolean success = dcmClientService.echoById(id);
+
+            if (success)
+            {
+                redirectAttributes.addFlashAttribute("successMessage",
+                    "C-ECHO successful to " + remote.getAet() + " (" + remote.getConnectionString() + ") - DICOM connection is working correctly.");
+            }
+            else
+            {
+                redirectAttributes.addFlashAttribute("errorMessage",
+                    "C-ECHO failed to " + remote.getAet() + " (" + remote.getConnectionString() + ") - " + dcmClientService.getLastMessage());
+            }
+        }
+        catch (Exception e)
+        {
+            redirectAttributes.addFlashAttribute("errorMessage",
+                "C-ECHO error: " + e.getMessage());
         }
 
         return "redirect:/dicomconfig";

@@ -3,6 +3,7 @@ package de.famst.controller;
 import de.famst.data.AetEty;
 import de.famst.data.AetRepository;
 import de.famst.dcm.DcmServiceRegisty;
+import de.famst.service.DcmClientService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -41,6 +42,9 @@ class DicomConfigControllerTest
 
     @MockitoBean
     private AetRepository mockAetRepository;
+
+    @MockitoBean
+    private DcmClientService mockDcmClientService;
 
     @Test
     void testGetDicomConfiguration() throws Exception
@@ -219,6 +223,49 @@ class DicomConfigControllerTest
             .andExpect(flash().attributeExists("errorMessage"));
 
         verify(mockAetRepository, never()).deleteById(anyLong());
+    }
+
+    @Test
+    void testEchoAet_Success() throws Exception
+    {
+        AetEty aet = new AetEty("REMOTE_PACS", "localhost", 104);
+        given(mockAetRepository.findById(1L)).willReturn(Optional.of(aet));
+        given(mockDcmClientService.echoById(1L)).willReturn(true);
+
+        mockMvc.perform(post("/dicomconfig/aet/echo/1"))
+            .andExpect(status().is3xxRedirection())
+            .andExpect(redirectedUrl("/dicomconfig"))
+            .andExpect(flash().attributeExists("successMessage"));
+
+        verify(mockDcmClientService, times(1)).echoById(1L);
+    }
+
+    @Test
+    void testEchoAet_Failure() throws Exception
+    {
+        AetEty aet = new AetEty("REMOTE_PACS", "localhost", 104);
+        given(mockAetRepository.findById(1L)).willReturn(Optional.of(aet));
+        given(mockDcmClientService.echoById(1L)).willReturn(false);
+
+        mockMvc.perform(post("/dicomconfig/aet/echo/1"))
+            .andExpect(status().is3xxRedirection())
+            .andExpect(redirectedUrl("/dicomconfig"))
+            .andExpect(flash().attributeExists("errorMessage"));
+
+        verify(mockDcmClientService, times(1)).echoById(1L);
+    }
+
+    @Test
+    void testEchoAet_NotFound() throws Exception
+    {
+        given(mockAetRepository.findById(999L)).willReturn(Optional.empty());
+
+        mockMvc.perform(post("/dicomconfig/aet/echo/999"))
+            .andExpect(status().is3xxRedirection())
+            .andExpect(redirectedUrl("/dicomconfig"))
+            .andExpect(flash().attributeExists("errorMessage"));
+
+        verify(mockDcmClientService, never()).echoById(anyLong());
     }
 }
 

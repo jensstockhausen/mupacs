@@ -161,8 +161,8 @@
                         <th style="width: 200px;">AE Title</th>
                         <th style="width: 250px;">Host</th>
                         <th style="width: 100px;">Port</th>
-                        <th style="width: 300px;">Connection String</th>
-                        <th style="width: 150px;">Actions</th>
+                        <!-- <th style="width: 300px;">Connection String</th> -->
+                        <th style="width: 200px;">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -178,10 +178,18 @@
                         </td>
                         <td th:text="${aet.host}">192.168.1.100</td>
                         <td th:text="${aet.port}">104</td>
+                        <!--
                         <td>
                             <code th:text="${aet.connectionString}">REMOTE_PACS@192.168.1.100:104</code>
                         </td>
+                        -->
                         <td>
+                            <button type="button" class="btn btn-sm btn-info"
+                                    th:attr="data-id=${aet.id},data-aet=${aet.aet}"
+                                    onclick="echoAetFromData(this)"
+                                    title="Test connectivity with C-ECHO">
+                                <span class="glyphicon glyphicon-flash"></span> Echo
+                            </button>
                             <button type="button" class="btn btn-sm btn-warning"
                                     th:attr="data-id=${aet.id},data-aet=${aet.aet},data-host=${aet.host},data-port=${aet.port}"
                                     onclick="editAetFromData(this)">
@@ -359,6 +367,17 @@
     </div>
 
     <script>
+        function echoAetFromData(button) {
+            var id = button.getAttribute('data-id');
+
+            // Create and submit a form to trigger C-ECHO
+            var form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '/dicomconfig/aet/echo/' + id;
+            document.body.appendChild(form);
+            form.submit();
+        }
+
         function editAetFromData(button) {
             var id = button.getAttribute('data-id');
             var aet = button.getAttribute('data-aet');
