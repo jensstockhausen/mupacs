@@ -20,6 +20,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -88,7 +89,7 @@ class DcmStoreSCPTest
     }
 
     @Test
-    void testStoreWithNullSOPInstanceUID()
+    void testStoreWithNullSOPInstanceUID() throws IOException
     {
         // Create request attributes with null SOP Instance UID
         Attributes requestAttrs = new Attributes();

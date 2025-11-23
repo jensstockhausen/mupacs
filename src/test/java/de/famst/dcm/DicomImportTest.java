@@ -18,7 +18,6 @@ import static org.hamcrest.Matchers.notNullValue;
  */
 public class DicomImportTest
 {
-
     private DicomReader dicomReader;
     private Attributes dcm;
 
