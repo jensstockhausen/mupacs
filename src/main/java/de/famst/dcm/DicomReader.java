@@ -40,7 +40,7 @@ public class DicomReader
     study.setStudyId(dcm.getString(Tag.StudyID));
     study.setStudyDescription(dcm.getString(Tag.StudyDescription));
 
-    if (dcm.contains(Tag.StudyDate))
+    if ( (dcm.contains(Tag.StudyDate)) && (null != dcm.getDate(Tag.StudyDate)))
     {
       study.setStudyDate(
         dcm.getDate(Tag.StudyDate)
@@ -48,7 +48,7 @@ public class DicomReader
           .toLocalDate());
     }
 
-    if (dcm.contains(Tag.StudyTime))
+    if ((dcm.contains(Tag.StudyTime)) && (null != dcm.getDate(Tag.StudyTime)))
     {
       study.setStudyTime(
         dcm.getDate(Tag.StudyTime)

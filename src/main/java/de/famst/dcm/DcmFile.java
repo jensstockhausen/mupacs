@@ -30,8 +30,7 @@ public class DcmFile
         try( DicomInputStream dis = new DicomInputStream(file); )
         {
             dis.setIncludeBulkData(DicomInputStream.IncludeBulkData.NO);
-            dcm = dis.readDataset(-1, -1);
-            dis.close();
+            dcm = dis.readDataset();
         }
         catch (IOException e)
         {

@@ -8,15 +8,22 @@ import de.famst.data.SeriesEty;
 import de.famst.data.SeriesRepository;
 import de.famst.data.StudyEty;
 import de.famst.data.StudyRepository;
+import de.famst.dcm.DcmFile;
 import de.famst.dcm.DicomReader;
 import org.dcm4che3.data.Attributes;
 import org.dcm4che3.data.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 
 /**
  * Service responsible for importing DICOM data into the database.
@@ -32,6 +39,10 @@ import java.nio.file.Path;
 public class DicomImportService
 {
     private static final Logger LOG = LoggerFactory.getLogger(DicomImportService.class);
+
+    @Value("${mupacs.archive}")
+    String mupacsArchive;
+
 
     private final DicomReader dicomReader;
     private final InstanceRepository instanceRepository;
@@ -60,6 +71,13 @@ public class DicomImportService
         this.studyRepository = studyRepository;
         this.patientRepository = patientRepository;
         this.dicomReader = dicomReader;
+    }
+
+    @Transactional
+    public void dicomToDatabase(File dcmFile)
+    {
+        Attributes dcm = DcmFile.readContent(dcmFile);
+        dicomToDatabase(dcm, dcmFile.toPath());
     }
 
     /**
@@ -223,6 +241,7 @@ public class DicomImportService
 
     /**
      * Processes a DICOM instance, creating it if it doesn't exist or skipping if it does.
+     * Copies the DICOM file to the archive structure: PatientID/StudyInstanceUID/SeriesInstanceUID/SOPInstanceUID.dcm
      */
     private void processInstance(Attributes dcm, Path path, String sopInstanceUID, SeriesEty series)
     {
@@ -235,8 +254,12 @@ public class DicomImportService
         }
 
         LOG.debug("Creating new instance: [{}]", sopInstanceUID);
+
+        // Copy DICOM file to archive structure
+        Path archivePath = copyDicomFileToArchive(dcm, path, sopInstanceUID, series);
+
         instance = dicomReader.readInstance(dcm);
-        instance.setPath(path.toAbsolutePath().toString());
+        instance.setPath(archivePath.toAbsolutePath().toString());
         instance.setSeries(series);
         instance = instanceRepository.save(instance);
 
@@ -245,6 +268,66 @@ public class DicomImportService
 
         LOG.info("Created new instance: [{}] for series: [{}]",
             sopInstanceUID, series.getSeriesInstanceUID());
+    }
+
+    /**
+     * Copies the DICOM file to the archive directory structure.
+     * Structure: {archive}/PatientID/StudyInstanceUID/SeriesInstanceUID/SOPInstanceUID.dcm
+     *
+     * @param dcm DICOM attributes
+     * @param sourcePath source file path
+     * @param sopInstanceUID SOP Instance UID
+     * @param series the series entity containing study and patient information
+     * @return the destination path where the file was copied
+     * @throws RuntimeException if file copy fails
+     */
+    private Path copyDicomFileToArchive(Attributes dcm, Path sourcePath, String sopInstanceUID, SeriesEty series)
+    {
+        try
+        {
+            // Get identifiers for directory structure
+            String patientId = dcm.getString(Tag.PatientID);
+            if (patientId == null || patientId.trim().isEmpty())
+            {
+                patientId = "UNKNOWN";
+                LOG.warn("Patient ID is missing, using 'UNKNOWN' for directory structure");
+            }
+
+            String studyInstanceUID = series.getStudy().getStudyInstanceUID();
+            String seriesInstanceUID = series.getSeriesInstanceUID();
+
+            // Build archive path: {archive}/StudyInstanceUID/SeriesInstanceUID/
+            Path archiveBase = Paths.get(mupacsArchive);
+            Path destinationDir = archiveBase
+                    .resolve(studyInstanceUID)
+                    .resolve(seriesInstanceUID);
+
+            // Create directories if they don't exist
+            if (!Files.exists(destinationDir))
+            {
+                Files.createDirectories(destinationDir);
+                LOG.debug("Created archive directory structure: [{}]", destinationDir);
+            }
+
+            // Build destination file path: SOPInstanceUID.dcm
+            Path destinationPath = destinationDir.resolve(sopInstanceUID + ".dcm");
+
+            // Copy file to archive location
+            Files.copy(sourcePath, destinationPath, StandardCopyOption.REPLACE_EXISTING);
+
+            LOG.info("Copied DICOM file from [{}] to archive [{}]",
+                    sourcePath.getFileName(), destinationPath);
+
+            return destinationPath;
+        }
+        catch (IOException e)
+        {
+            String errorMsg = String.format(
+                    "Failed to copy DICOM file [%s] to archive for SOP Instance UID [%s]: %s",
+                    sourcePath, sopInstanceUID, e.getMessage());
+            LOG.error(errorMsg, e);
+            throw new RuntimeException(errorMsg, e);
+        }
     }
 
 

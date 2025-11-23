@@ -1,21 +1,16 @@
 package de.famst.dcm;
 
-import de.famst.service.FolderImportManager;
+import de.famst.service.DicomImportService;
 import jakarta.inject.Inject;
 import org.dcm4che3.data.Attributes;
 import org.dcm4che3.data.Tag;
 import org.dcm4che3.io.DicomOutputStream;
-import org.dcm4che3.net.ApplicationEntity;
 import org.dcm4che3.net.Association;
-import org.dcm4che3.net.Connection;
-import org.dcm4che3.net.Device;
 import org.dcm4che3.net.PDVInputStream;
 import org.dcm4che3.net.Status;
-import org.dcm4che3.net.TransferCapability;
 import org.dcm4che3.net.pdu.PresentationContext;
 import org.dcm4che3.net.service.BasicCStoreSCP;
 import org.dcm4che3.net.service.DicomServiceException;
-import org.dcm4che3.net.service.DicomServiceRegistry;
 import org.dcm4che3.util.SafeClose;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,10 +19,6 @@ import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
-import java.security.GeneralSecurityException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * Created by jens on 13/10/2016.
@@ -35,118 +26,69 @@ import java.util.concurrent.ScheduledExecutorService;
 @Component
 public class DcmStoreSCP extends BasicCStoreSCP
 {
-    private static Logger LOG = LoggerFactory.getLogger(DcmStoreSCP.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DcmStoreSCP.class);
 
     private static final String PART_EXT = ".part";
+
+    private final DicomImportService dicomImportService;
 
     @Value("${mupacs.cstore.scp.import}")
     private String importFolder;
 
-    @Value("${mupcas.cstore.scp.port}")
-    private Integer port;
-
-    @Value("${mupcas.cstore.scp.host}")
-    private String host;
-
-    private Device device;
-    private Connection connection;
-    private ApplicationEntity ae;
-
-    private FolderImportManager importManager;
-
-    private DicomServiceRegistry dicomServiceRegistry;
-
     @Inject
-    public DcmStoreSCP(FolderImportManager importManager)
+    public DcmStoreSCP(DicomImportService dicomImportService)
     {
-        this.importManager = importManager;
-    }
-
-    public void setDicomServiceRegistry(DicomServiceRegistry dicomServiceRegistry)
-    {
-        this.dicomServiceRegistry = dicomServiceRegistry;
-    }
-
-    public void start()
-    {
-        LOG.info("starting C-STORE SCP device");
-
-        device = new Device();
-
-        ae = new ApplicationEntity();
-        ae.setAETitle("MUPACS");
-        ae.setAcceptedCallingAETitles();
-
-        TransferCapability tc = new TransferCapability(
-                null, "*", TransferCapability.Role.SCP, "*");
-
-        ae.addTransferCapability(tc);
-
-        device.addApplicationEntity(ae);
-
-        connection = new Connection();
-        connection.setPort(port);
-        connection.setHostname(host);
-
-        device.addConnection(connection);
-        ae.addConnection(connection);
-
-        device.setDimseRQHandler(dicomServiceRegistry);
-
-        ExecutorService executorService = Executors.newCachedThreadPool();
-        ScheduledExecutorService scheduledExecutorService =
-                Executors.newSingleThreadScheduledExecutor();
-
-        device.setScheduledExecutor(scheduledExecutorService);
-        device.setExecutor(executorService);
-
-        try
-        {
-            device.bindConnections();
-            LOG.info("bound to [{}:{}]", connection.getHostname(), connection.getPort());
-        }
-        catch (IOException | GeneralSecurityException e)
-        {
-            LOG.error("[{}]", e);
-        }
-    }
-
-
-    public void stop()
-    {
-        LOG.info("stopping C-STORE SCP device");
-        device.unbindConnections();
+        super("*"); // Accept all SOP Classes
+        this.dicomImportService = dicomImportService;
     }
 
 
     @Override
-    protected void store(Association as, PresentationContext pc, Attributes rq, PDVInputStream data, Attributes rsp) throws IOException
+    protected void store(Association as, PresentationContext pc,
+                         Attributes rq, PDVInputStream data,
+                         Attributes rsp) throws IOException
     {
-        LOG.info("C-STORE [{}]", as);
+        LOG.info("Received C-STORE request from [{}]", as);
 
         String cuid = rq.getString(Tag.AffectedSOPClassUID);
         String iuid = rq.getString(Tag.AffectedSOPInstanceUID);
         String tsuid = pc.getTransferSyntax();
+
+        if (iuid == null || iuid.isEmpty())
+        {
+            LOG.error("Invalid SOP Instance UID received");
+            throw new DicomServiceException(Status.ProcessingFailure, "Invalid SOP Instance UID");
+        }
 
         File file = new File(importFolder, iuid + PART_EXT);
 
         try
         {
             storeTo(as, as.createFileMetaInformation(iuid, cuid, tsuid), data, file);
-
-            Attributes part = DcmFile.readContent(file);
-
-            String path = part.getString(Tag.PatientID);
-            path += "/" + part.getString(Tag.StudyInstanceUID);
-            path += "/" + part.getString(Tag.SeriesInstanceUID);
-            path += "/";
-
-            renameTo(as, file, new File(importFolder, path + iuid));
+            LOG.info("Successfully stored DICOM instance [{}] to [{}]", iuid, file.getAbsolutePath());
         }
         catch (Exception e)
         {
+            LOG.error("Error storing DICOM instance [{}]: {}", iuid, e.getMessage(), e);
             deleteFile(as, file);
             throw new DicomServiceException(Status.ProcessingFailure, e);
+        }
+
+        try
+        {
+            dicomImportService.dicomToDatabase(file);
+        }
+        catch (Exception e)
+        {
+            LOG.error("Unexpected error during import of [{}]: {}", iuid, e.getMessage(), e);
+            LOG.error("Cannot Import DICOM file [{}]", file.getAbsolutePath());
+            throw new DicomServiceException(Status.ProcessingFailure, e);
+        }
+
+
+        if (!deleteFile(as, file))
+        {
+            LOG.warn("Failed to delete temporary file [{}] after import", file.getAbsolutePath());
         }
     }
 
@@ -154,15 +96,25 @@ public class DcmStoreSCP extends BasicCStoreSCP
     private void storeTo(Association as, Attributes fmi,
                          PDVInputStream data, File file) throws IOException
     {
-        LOG.info("[{}] writing to [{}]", as, file);
+        LOG.debug("[{}] Writing DICOM data to [{}]", as, file.getAbsolutePath());
 
-        file.getParentFile().mkdirs();
+        File parentDir = file.getParentFile();
+        if (parentDir != null && !parentDir.exists())
+        {
+            if (!parentDir.mkdirs())
+            {
+                LOG.error("Failed to create directory: {}", parentDir.getAbsolutePath());
+                throw new IOException("Failed to create directory: " + parentDir.getAbsolutePath());
+            }
+        }
 
-        DicomOutputStream out = new DicomOutputStream(file);
+        DicomOutputStream out = null;
         try
         {
+            out = new DicomOutputStream(file);
             out.writeFileMetaInformation(fmi);
             data.copyTo(out);
+            LOG.debug("[{}] Successfully wrote data to [{}]", as, file.getAbsolutePath());
         }
         finally
         {
@@ -170,42 +122,27 @@ public class DcmStoreSCP extends BasicCStoreSCP
         }
     }
 
-    private void renameTo(Association as, File from, File dest)
-            throws IOException
+
+    private Boolean deleteFile(Association as, File file)
     {
-        LOG.info("[{}] renaming [{}] to [{}]", as, from, dest);
-
-        if (!dest.getParentFile().mkdirs() && !dest.delete())
+        if (file != null && file.exists())
         {
-            LOG.error("creating/deleting [{}]", dest.getAbsolutePath());
+            if (file.delete())
+            {
+                LOG.info("[{}] Successfully deleted file [{}]", as, file.getAbsolutePath());
+                return true;
+            }
+            else
+            {
+                LOG.warn("[{}] Failed to delete file [{}]", as, file.getAbsolutePath());
+            }
+        }
+        else
+        {
+            LOG.debug("[{}] File does not exist or is null: [{}]", as, file);
         }
 
-        if (!from.renameTo(dest))
-        {
-            throw new IOException("Failed to rename " + from + " to " + dest);
-        }
-
-        try
-        {
-            importManager.addImport(dest.toPath());
-        }
-        catch (InterruptedException e)
-        {
-            LOG.warn("[{}]", e);
-            Thread.currentThread().interrupt();
-        }
-    }
-
-
-    private void deleteFile(Association as, File file)
-    {
-        if (file.delete())
-        {
-            LOG.info("[{}] deleting [{}]", as, file);
-        } else
-        {
-            LOG.warn("[{}] deleting [{}] failed!", as, file);
-        }
+        return false;
     }
 
 
