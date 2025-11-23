@@ -18,7 +18,7 @@
 <body>
 <div class="container">
 
-    <div th:replace="fragments/menu :: menu">MENU</div>
+    <div th:replace="~{fragments/menu :: menu}">MENU</div>
 
     <h2>List of Studies</h2>
     <h4 th:text="'Patient: ' + ${patient.patientsName}">PATIENT</h4>

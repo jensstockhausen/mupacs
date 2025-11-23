@@ -46,12 +46,13 @@
 </head>
 
 <body>
-<div class="container">
+<div class="container-fluid">
 
-    <div th:replace="fragments/menu :: menu">MENU</div>
+    <div th:replace="~{fragments/menu :: menu}">MENU</div>
 
     <!-- Hero Section -->
     <div class="jumbotron">
+        <img src="/application_icon.png" th:src="@{/application_icon.png}" alt="μPACS Icon" style="height: 120px; margin-bottom: 20px;"/>
         <h1>&mu;PACS</h1>
         <p class="lead">Picture Archiving and Communication System</p>
         <p>A lightweight DICOM archive system for medical imaging management</p>
@@ -168,7 +169,7 @@
         </div>
     </div>
 
-    <div th:replace="fragments/footer :: footer">EMPTY FOOTER</div>
+    <div th:replace="~{fragments/footer :: footer}">EMPTY FOOTER</div>
 
 </div>
 </body>

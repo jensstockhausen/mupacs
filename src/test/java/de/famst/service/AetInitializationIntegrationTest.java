@@ -33,7 +33,7 @@ class AetInitializationIntegrationTest
 
         // Verify both test AETs were created
         List<AetEty> allAets = aetRepository.findAll();
-        assertTrue(allAets.size() >= 2, "At least 2 AETs should be initialized from config");
+        assertTrue(allAets.size() >= 2, "At least 1 AETs should be initialized from config");
 
         // Verify TEST_PACS1
         Optional<AetEty> pacs1 = aetRepository.findByAet("TEST_PACS1");

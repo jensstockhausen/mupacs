@@ -1,0 +1,272 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
+
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <title>Logs - μPACS</title>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"/>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+    <link rel="stylesheet" href="./../static/mupacs.css" th:href="@{/mupacs.css}"/>
+
+    <style>
+        #logContent {
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 12px;
+            padding: 15px;
+            border-radius: 4px;
+            height: 600px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .log-controls {
+            margin-bottom: 15px;
+        }
+
+        .auto-refresh-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: #5cb85c;
+            margin-left: 10px;
+            animation: pulse 2s infinite;
+        }
+
+        .auto-refresh-indicator.paused {
+            background-color: #d9534f;
+            animation: none;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        .log-line-error {
+            color: #f48771;
+            font-weight: bold;
+        }
+
+        .log-line-warn {
+            color: #fafa40;
+        }
+
+        .log-line-info {
+            color: #4fc1ff;
+        }
+
+        .log-line-debug {
+            color: #b5cea8;
+        }
+    </style>
+</head>
+
+<body>
+<div class="container-fluid">
+
+    <div th:replace="~{fragments/menu :: menu}">MENU</div>
+
+    <h2>Application Logs</h2>
+
+    <!-- Log Controls -->
+    <div class="panel panel-default log-controls">
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <button id="refreshBtn" class="btn btn-primary">
+                        <span class="glyphicon glyphicon-refresh"></span> Refresh Now
+                    </button>
+                    <button id="toggleAutoRefresh" class="btn btn-success">
+                        <span class="glyphicon glyphicon-pause"></span> Pause Auto-Refresh
+                    </button>
+                    <button id="scrollToBottom" class="btn btn-default">
+                        <span class="glyphicon glyphicon-arrow-down"></span> Scroll to Bottom
+                    </button>
+                    <span class="auto-refresh-indicator" id="refreshIndicator" title="Auto-refresh active"></span>
+                </div>
+                <div class="col-md-6 text-right">
+                    <div class="form-inline">
+                        <label for="lineCount">Lines to display:</label>
+                        <select id="lineCount" class="form-control">
+                            <option value="100">100</option>
+                            <option value="250">250</option>
+                            <option value="500" selected>500</option>
+                            <option value="1000">1000</option>
+                            <option value="2000">2000</option>
+                        </select>
+                        <span id="lastUpdate" class="text-muted" style="margin-left: 15px;">
+                            Last update: <span id="lastUpdateTime">-</span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Log Content Panel -->
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">
+                <span class="glyphicon glyphicon-file"></span> Log File: ./log/mupacs.log
+            </h3>
+        </div>
+        <div class="panel-body" style="padding: 0;">
+            <div id="logContent">Loading logs...</div>
+        </div>
+    </div>
+
+    <div th:replace="~{fragments/footer :: footer}">EMPTY FOOTER</div>
+
+</div>
+
+<script>
+    var autoRefreshEnabled = true;
+    var refreshInterval;
+    var lineCount = 500;
+
+    $(document).ready(function() {
+        // Initial load
+        loadLogs();
+
+        // Start auto-refresh
+        startAutoRefresh();
+
+        // Refresh button
+        $('#refreshBtn').click(function() {
+            loadLogs();
+        });
+
+        // Toggle auto-refresh
+        $('#toggleAutoRefresh').click(function() {
+            if (autoRefreshEnabled) {
+                stopAutoRefresh();
+                $(this).html('<span class="glyphicon glyphicon-play"></span> Resume Auto-Refresh');
+                $(this).removeClass('btn-success').addClass('btn-warning');
+                $('#refreshIndicator').addClass('paused');
+            } else {
+                startAutoRefresh();
+                $(this).html('<span class="glyphicon glyphicon-pause"></span> Pause Auto-Refresh');
+                $(this).removeClass('btn-warning').addClass('btn-success');
+                $('#refreshIndicator').removeClass('paused');
+            }
+        });
+
+        // Scroll to bottom button
+        $('#scrollToBottom').click(function() {
+            scrollToBottom();
+        });
+
+        // Line count change
+        $('#lineCount').change(function() {
+            lineCount = parseInt($(this).val());
+            loadLogs();
+        });
+    });
+
+    function startAutoRefresh() {
+        autoRefreshEnabled = true;
+        refreshInterval = setInterval(function() {
+            loadLogs();
+        }, 5000); // 5 seconds
+    }
+
+    function stopAutoRefresh() {
+        autoRefreshEnabled = false;
+        if (refreshInterval) {
+            clearInterval(refreshInterval);
+        }
+    }
+
+    function loadLogs() {
+        $.ajax({
+            url: '/logs/content',
+            type: 'GET',
+            data: { lines: lineCount },
+            success: function(data) {
+                displayLogs(data);
+                updateLastUpdateTime();
+            },
+            error: function(xhr, status, error) {
+                $('#logContent').text('Error loading logs: ' + error);
+            }
+        });
+    }
+
+    function displayLogs(logText) {
+        var logContent = $('#logContent');
+        var wasAtBottom = isScrolledToBottom();
+
+        // Split into lines and apply syntax highlighting
+        var lines = logText.split('\n');
+        var html = '';
+
+        lines.forEach(function(line) {
+            var cssClass = '';
+            if (line.includes('ERROR')) {
+                cssClass = 'log-line-error';
+            } else if (line.includes('WARN')) {
+                cssClass = 'log-line-warn';
+            } else if (line.includes('INFO')) {
+                cssClass = 'log-line-info';
+            } else if (line.includes('DEBUG')) {
+                cssClass = 'log-line-debug';
+            }
+
+            if (cssClass) {
+                html += '<span class="' + cssClass + '">' + escapeHtml(line) + '</span>\n';
+            } else {
+                html += escapeHtml(line) + '\n';
+            }
+        });
+
+        logContent.html(html);
+
+        // Auto-scroll to bottom if was already at bottom
+        if (wasAtBottom) {
+            scrollToBottom();
+        }
+    }
+
+    function isScrolledToBottom() {
+        var logContent = $('#logContent')[0];
+        return logContent.scrollHeight - logContent.scrollTop <= logContent.clientHeight + 50;
+    }
+
+    function scrollToBottom() {
+        var logContent = $('#logContent')[0];
+        logContent.scrollTop = logContent.scrollHeight;
+    }
+
+    function updateLastUpdateTime() {
+        var now = new Date();
+        var timeString = now.getHours().toString().padStart(2, '0') + ':' +
+                        now.getMinutes().toString().padStart(2, '0') + ':' +
+                        now.getSeconds().toString().padStart(2, '0');
+        $('#lastUpdateTime').text(timeString);
+    }
+
+    function escapeHtml(text) {
+        var map = {
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#039;'
+        };
+        return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+    }
+</script>
+
+</body>
+</html>
+

@@ -16,9 +16,9 @@
 </head>
 
 <body>
-<div class="container">
+<div class="container-fluid">
 
-    <div th:replace="fragments/menu :: menu">MENU</div>
+    <div th:replace="~{fragments/menu :: menu}">MENU</div>
 
     <h2>DICOM Service Configuration</h2>
 
@@ -401,7 +401,7 @@
         }
     </script>
 
-    <div th:replace="fragments/footer :: footer">EMPTY FOOTER</div>
+    <div th:replace="~{fragments/footer :: footer}">EMPTY FOOTER</div>
 
 </div>
 </body>

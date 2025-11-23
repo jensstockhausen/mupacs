@@ -16,9 +16,9 @@
 </head>
 
 <body>
-<div class="container">
+<div class="container-fluid">
 
-    <div th:replace="fragments/menu :: menu">MENU</div>
+    <div th:replace="~{fragments/menu :: menu}">MENU</div>
 
     <h2>List of Patients</h2>
     <table class="table table-striped table-bordered">
@@ -146,7 +146,7 @@
         </div>
     </div>
 
-    <div th:replace="fragments/footer :: footer">EMPTY FOOTER</div>
+    <div th:replace="~{fragments/footer :: footer}">EMPTY FOOTER</div>
 
 </div>
 </body>
