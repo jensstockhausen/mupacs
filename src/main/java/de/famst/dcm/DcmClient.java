@@ -44,7 +44,7 @@ public class DcmClient
 {
     private static final Logger LOG = LoggerFactory.getLogger(DcmClient.class);
 
-    @Value("${mupacs.dicom.scu.ae-title:MUPACS_SCU}")
+    @Value("${mupacs.dicom.ae-title}")
     private String localAeTitle;
 
     @Value("${mupacs.dicom.scu.connect-timeout}")

@@ -32,13 +32,13 @@ public class DcmServiceRegisty
     private DcmFindSCP dcmFindSCP;
     private DcmEchoSCP dcmEchoSCP;
 
-    @Value("${mupcas.dicom.scp.port}")
+    @Value("${mupacs.dicom.scp.port}")
     private Integer port;
 
-    @Value("${mupcas.dicom.scp.host}")
+    @Value("${mupacs.dicom.scp.host}")
     private String host;
 
-    @Value("${mupcas.dicom.scp.ae-title}")
+    @Value("${mupacs.dicom.ae-title}")
     private String aeTitle;
 
     private Device device;

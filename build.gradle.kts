@@ -6,7 +6,7 @@ plugins {
 
 group = "de.famst"
 version = "0.0.1-SNAPSHOT"
-description = "micon PACS"
+description = "micro PACS"
 
 java {
     toolchain {
