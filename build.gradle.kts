@@ -8,6 +8,7 @@ group = "de.famst"
 version = "0.0.1-SNAPSHOT"
 description = "micro PACS"
 
+
 java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(17)
@@ -34,6 +35,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-data-rest")
+    implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
     implementation("org.springframework.data:spring-data-rest-hal-explorer")
 
@@ -50,6 +52,9 @@ dependencies {
     implementation("org.eclipse.parsson:parsson:1.1.7")
 
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
+	testImplementation("org.springframework.boot:spring-boot-test-autoconfigure")
+    testImplementation("org.springframework.boot:spring-boot-data-jpa-test")
+    testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
 }
 
 tasks.withType<Test> {

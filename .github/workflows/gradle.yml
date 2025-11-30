@@ -34,7 +34,10 @@ jobs:
       uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4.0.0
 
     - name: Build with Gradle Wrapper
-      run: ./gradlew build test
+      run: ./gradlew build
+
+    - name: Test with Gradle Wrapper
+      run: ./gradlew test --rerun-tasks
 
     - name: Publish Test Report
       uses: mikepenz/action-junit-report@v5
