@@ -39,6 +39,12 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
     implementation("org.springframework.data:spring-data-rest-hal-explorer")
 
+    constraints {
+        implementation("org.apache.commons:commons-lang3:3.18.0") {
+            because("Apache Commons Lang <3.18.0 is vulnerable to Uncontrolled Recursion when processing long inputs")
+        }
+    }
+
     implementation("jakarta.inject:jakarta.inject-api:2.0.1")
 
     implementation("commons-cli:commons-cli:${cliVersion}")
