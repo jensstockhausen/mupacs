@@ -19,9 +19,7 @@
 - [Usage](#usage)
 - [DICOM Services](#dicom-services)
 - [Web Interface](#web-interface)
-- [Development](#development)
 - [Testing](#testing)
-- [License](#license)
 
 ---
 
