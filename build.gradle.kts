@@ -60,7 +60,7 @@ dependencies {
 tasks.withType<Test> {
     useJUnitPlatform()
     reports {
-        junitXml.required.set(false)
+        junitXml.required.set(true)
         html.required.set(true)
     }
 }
