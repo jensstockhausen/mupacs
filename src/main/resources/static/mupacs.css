@@ -1,5 +1,254 @@
+/* ============================================================================
+   MuPACS - Main Stylesheet
+   ============================================================================ */
+
+/* ----------------------------------------------------------------------------
+   Common Button Styles
+   ---------------------------------------------------------------------------- */
 .btn-default {
     min-width: 80px;
     max-width: 80px;
     max-height: 40px;
 }
+
+/* ----------------------------------------------------------------------------
+   Menu Fragment Styles
+   ---------------------------------------------------------------------------- */
+.navbar-default {
+    margin-bottom: 20px;
+}
+
+/* ----------------------------------------------------------------------------
+   Index Page Styles
+   ---------------------------------------------------------------------------- */
+.jumbotron {
+    background-color: #f8f9fa;
+    padding: 60px 30px;
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+.feature-box {
+    text-align: center;
+    padding: 30px;
+    margin-bottom: 20px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    transition: box-shadow 0.3s ease;
+}
+
+.feature-box:hover {
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.feature-icon {
+    font-size: 48px;
+    margin-bottom: 15px;
+    color: #337ab7;
+}
+
+.btn-large {
+    font-size: 18px;
+    padding: 12px 30px;
+    margin: 10px;
+}
+
+.index-icon {
+    height: 120px;
+    margin-bottom: 20px;
+}
+
+.index-hero-buttons {
+    margin-top: 30px;
+}
+
+.index-config-section {
+    margin-top: 20px;
+}
+
+.index-info-section {
+    margin-top: 40px;
+}
+
+/* ----------------------------------------------------------------------------
+   Patient List Page Styles
+   ---------------------------------------------------------------------------- */
+.patient-list-table th:nth-child(1) {
+    width: 60px;
+}
+
+.patient-list-table th:nth-child(2) {
+    width: 200px;
+}
+
+.patient-list-table th:nth-child(5) {
+    width: 120px;
+}
+
+.study-row {
+    display: none;
+    background-color: #f9f9f9;
+}
+
+.study-header {
+    background-color: #e8f4f8 !important;
+    font-weight: bold;
+}
+
+.study-row td:first-child {
+    border-left: 5px solid #337ab7;
+}
+
+.study-row td:nth-child(2) {
+    padding-left: 20px;
+}
+
+.study-actions-form {
+    display: inline;
+    margin-left: 10px;
+}
+
+/* ----------------------------------------------------------------------------
+   Import List Page Styles
+   ---------------------------------------------------------------------------- */
+.import-panel {
+    margin-bottom: 20px;
+}
+
+.import-form-group {
+    width: 70%;
+    display: inline-block;
+}
+
+.import-form-control {
+    width: 100%;
+}
+
+.import-button {
+    margin-left: 10px;
+}
+
+.import-help-block {
+    margin-top: 10px;
+}
+
+.import-status-column {
+    width: 120px;
+}
+
+/* ----------------------------------------------------------------------------
+   DICOM Config Page Styles
+   ---------------------------------------------------------------------------- */
+.dicom-config-network-table th {
+    width: 30%;
+}
+
+.dicom-aet-table th:nth-child(1) {
+    width: 50px;
+}
+
+.dicom-aet-table th:nth-child(2) {
+    width: 200px;
+}
+
+.dicom-aet-table th:nth-child(3) {
+    width: 250px;
+}
+
+.dicom-aet-table th:nth-child(4) {
+    width: 100px;
+}
+
+.dicom-aet-table th:nth-child(5) {
+    width: 200px;
+}
+
+.dicom-aet-form-group {
+    margin-left: 10px;
+}
+
+.dicom-aet-input-aet {
+    width: 200px;
+}
+
+.dicom-aet-input-host {
+    width: 200px;
+}
+
+.dicom-aet-input-port {
+    width: 100px;
+}
+
+.dicom-aet-add-button {
+    margin-left: 10px;
+}
+
+.dicom-config-info-alert {
+    margin-bottom: 0;
+}
+
+/* ----------------------------------------------------------------------------
+   Logs Page Styles
+   ---------------------------------------------------------------------------- */
+#logContent {
+    background-color: #1e1e1e;
+    color: #d4d4d4;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 12px;
+    padding: 15px;
+    border-radius: 4px;
+    height: 600px;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+.log-controls {
+    margin-bottom: 15px;
+}
+
+.auto-refresh-indicator {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: #5cb85c;
+    margin-left: 10px;
+    animation: pulse 2s infinite;
+}
+
+.auto-refresh-indicator.paused {
+    background-color: #d9534f;
+    animation: none;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+}
+
+.log-line-error {
+    color: #f48771;
+    font-weight: bold;
+}
+
+.log-line-warn {
+    color: #fafa40;
+}
+
+.log-line-info {
+    color: #4fc1ff;
+}
+
+.log-line-debug {
+    color: #b5cea8;
+}
+
+.log-controls-right {
+    margin-left: 15px;
+}
+
+.logs-panel-body {
+    padding: 0;
+}
+

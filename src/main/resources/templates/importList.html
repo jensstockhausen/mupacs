@@ -35,27 +35,26 @@
     </div>
 
     <!-- Import Form -->
-    <div class="panel panel-default" style="margin-bottom: 20px;">
+    <div class="panel panel-default import-panel">
         <div class="panel-heading">
             <h3 class="panel-title">Add New Import</h3>
         </div>
         <div class="panel-body">
             <form action="#" th:action="@{/importlist/add}" method="post" class="form-inline">
-                <div class="form-group" style="width: 70%; display: inline-block;">
+                <div class="form-group import-form-group">
                     <label for="folderPath" class="sr-only">Folder Path</label>
                     <input type="text"
-                           class="form-control"
+                           class="form-control import-form-control"
                            id="folderPath"
                            name="folderPath"
                            placeholder="Enter folder path (e.g., /path/to/dicom/folder)"
-                           style="width: 100%;"
                            required="required"/>
                 </div>
-                <button type="submit" class="btn btn-primary" style="margin-left: 10px;">
+                <button type="submit" class="btn btn-primary import-button">
                     <span class="glyphicon glyphicon-play"></span> Start Import
                 </button>
             </form>
-            <p class="help-block" style="margin-top: 10px;">
+            <p class="help-block import-help-block">
                 Enter the absolute path to a folder containing DICOM files. The folder will be scanned recursively.
             </p>
         </div>
@@ -77,7 +76,7 @@
                 </td>
             </tr>
             <tr id="import.table.content" th:each="import : ${imports}">
-                <td style="width: 120px;">
+                <td class="import-status-column">
                     <span th:if="${import.startsWith('DONE: ')}" class="label label-success">
                         <span class="glyphicon glyphicon-ok"></span> Completed
                     </span>

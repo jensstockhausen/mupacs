@@ -46,7 +46,7 @@
                     </dl>
                 </div>
                 <div class="col-md-6">
-                    <div class="alert alert-info" style="margin-bottom: 0;">
+                    <div class="alert alert-info dicom-config-info-alert">
                         <strong>Service Information:</strong><br/>
                         The DICOM service is configured to accept connections on the specified port
                         and provides C-ECHO, C-FIND, and C-STORE operations.
@@ -64,10 +64,10 @@
             </h3>
         </div>
         <div class="panel-body">
-            <table class="table table-bordered">
+            <table class="table table-bordered dicom-config-network-table">
                 <tbody>
                     <tr>
-                        <th style="width: 30%;">Application Entity Title (AE Title)</th>
+                        <th>Application Entity Title (AE Title)</th>
                         <td>
                             <code th:text="${config.aeTitle}">MUPACS</code>
                         </td>
@@ -133,20 +133,20 @@
                     <form action="#" th:action="@{/dicomconfig/aet/add}" method="post" class="form-inline">
                         <div class="form-group">
                             <label for="aetInput" class="sr-only">AE Title</label>
-                            <input type="text" class="form-control" id="aetInput" name="aet"
-                                   placeholder="AE Title (e.g., REMOTE_PACS)" required="required" style="width: 200px;"/>
+                            <input type="text" class="form-control dicom-aet-input-aet" id="aetInput" name="aet"
+                                   placeholder="AE Title (e.g., REMOTE_PACS)" required="required"/>
                         </div>
-                        <div class="form-group" style="margin-left: 10px;">
+                        <div class="form-group dicom-aet-form-group">
                             <label for="hostInput" class="sr-only">Host</label>
-                            <input type="text" class="form-control" id="hostInput" name="host"
-                                   placeholder="Host (e.g., 192.168.1.100)" required="required" style="width: 200px;"/>
+                            <input type="text" class="form-control dicom-aet-input-host" id="hostInput" name="host"
+                                   placeholder="Host (e.g., 192.168.1.100)" required="required"/>
                         </div>
-                        <div class="form-group" style="margin-left: 10px;">
+                        <div class="form-group dicom-aet-form-group">
                             <label for="portInput" class="sr-only">Port</label>
-                            <input type="number" class="form-control" id="portInput" name="port"
-                                   placeholder="Port" min="1" max="65535" required="required" style="width: 100px;"/>
+                            <input type="number" class="form-control dicom-aet-input-port" id="portInput" name="port"
+                                   placeholder="Port" min="1" max="65535" required="required"/>
                         </div>
-                        <button type="submit" class="btn btn-primary" style="margin-left: 10px;">
+                        <button type="submit" class="btn btn-primary dicom-aet-add-button">
                             <span class="glyphicon glyphicon-plus"></span> Add AET
                         </button>
                     </form>
@@ -154,15 +154,15 @@
             </div>
 
             <!-- AET List Table -->
-            <table class="table table-striped table-bordered">
+            <table class="table table-striped table-bordered dicom-aet-table">
                 <thead>
                     <tr>
-                        <th style="width: 50px;">ID</th>
-                        <th style="width: 200px;">AE Title</th>
-                        <th style="width: 250px;">Host</th>
-                        <th style="width: 100px;">Port</th>
-                        <!-- <th style="width: 300px;">Connection String</th> -->
-                        <th style="width: 200px;">Actions</th>
+                        <th>ID</th>
+                        <th>AE Title</th>
+                        <th>Host</th>
+                        <th>Port</th>
+                        <!-- <th>Connection String</th> -->
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>

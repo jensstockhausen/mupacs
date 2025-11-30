@@ -13,36 +13,6 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 
     <link rel="stylesheet" href="./../static/mupacs.css" th:href="@{/mupacs.css}"/>
-
-    <style>
-        .jumbotron {
-            background-color: #f8f9fa;
-            padding: 60px 30px;
-            margin-bottom: 30px;
-            text-align: center;
-        }
-        .feature-box {
-            text-align: center;
-            padding: 30px;
-            margin-bottom: 20px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            transition: box-shadow 0.3s ease;
-        }
-        .feature-box:hover {
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        }
-        .feature-icon {
-            font-size: 48px;
-            margin-bottom: 15px;
-            color: #337ab7;
-        }
-        .btn-large {
-            font-size: 18px;
-            padding: 12px 30px;
-            margin: 10px;
-        }
-    </style>
 </head>
 
 <body>
@@ -52,11 +22,11 @@
 
     <!-- Hero Section -->
     <div class="jumbotron">
-        <img src="/application_icon.png" th:src="@{/application_icon.png}" alt="μPACS Icon" style="height: 120px; margin-bottom: 20px;"/>
+        <img src="/application_icon.png" th:src="@{/application_icon.png}" alt="μPACS Icon" class="index-icon"/>
         <h1>&mu;PACS</h1>
         <p class="lead">Picture Archiving and Communication System</p>
         <p>A lightweight DICOM archive system for medical imaging management</p>
-        <div style="margin-top: 30px;">
+        <div class="index-hero-buttons">
             <a href="/patientlist" class="btn btn-primary btn-large">
                 <span class="glyphicon glyphicon-list"></span> Browse Archive
             </a>
@@ -111,7 +81,7 @@
     </div>
 
     <!-- Configuration Section -->
-    <div class="row" style="margin-top: 20px;">
+    <div class="row index-config-section">
         <div class="col-md-12">
             <div class="panel panel-info">
                 <div class="panel-heading">
@@ -143,7 +113,7 @@
     </div>
 
     <!-- Info Section -->
-    <div class="row" style="margin-top: 40px;">
+    <div class="row index-info-section">
         <div class="col-md-12">
             <div class="panel panel-default">
                 <div class="panel-heading">

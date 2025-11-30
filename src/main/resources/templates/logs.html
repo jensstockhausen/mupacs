@@ -13,62 +13,6 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 
     <link rel="stylesheet" href="./../static/mupacs.css" th:href="@{/mupacs.css}"/>
-
-    <style>
-        #logContent {
-            background-color: #1e1e1e;
-            color: #d4d4d4;
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 12px;
-            padding: 15px;
-            border-radius: 4px;
-            height: 600px;
-            overflow-y: auto;
-            white-space: pre-wrap;
-            word-wrap: break-word;
-        }
-
-        .log-controls {
-            margin-bottom: 15px;
-        }
-
-        .auto-refresh-indicator {
-            display: inline-block;
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background-color: #5cb85c;
-            margin-left: 10px;
-            animation: pulse 2s infinite;
-        }
-
-        .auto-refresh-indicator.paused {
-            background-color: #d9534f;
-            animation: none;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.3; }
-        }
-
-        .log-line-error {
-            color: #f48771;
-            font-weight: bold;
-        }
-
-        .log-line-warn {
-            color: #fafa40;
-        }
-
-        .log-line-info {
-            color: #4fc1ff;
-        }
-
-        .log-line-debug {
-            color: #b5cea8;
-        }
-    </style>
 </head>
 
 <body>
@@ -104,7 +48,7 @@
                             <option value="1000">1000</option>
                             <option value="2000">2000</option>
                         </select>
-                        <span id="lastUpdate" class="text-muted" style="margin-left: 15px;">
+                        <span id="lastUpdate" class="text-muted log-controls-right">
                             Last update: <span id="lastUpdateTime">-</span>
                         </span>
                     </div>
@@ -120,7 +64,7 @@
                 <span class="glyphicon glyphicon-file"></span> Log File: ./log/mupacs.log
             </h3>
         </div>
-        <div class="panel-body" style="padding: 0;">
+        <div class="panel-body logs-panel-body">
             <div id="logContent">Loading logs...</div>
         </div>
     </div>
