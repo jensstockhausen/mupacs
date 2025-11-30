@@ -25,9 +25,10 @@
         <thead>
             <tr>
                 <th style="width: 60px;">ID</th>
-                <th style="width: 120px;">Patient ID</th>
+                <th style="width: 200px;">Patient ID</th>
                 <th>Patient's Name</th>
-                <th style="width: 100px;">Studies</th>
+                <th> </th>
+                <th style="width: 120px;">Studies</th>
             </tr>
         </thead>
         <tbody>
@@ -37,6 +38,7 @@
                     <td th:text="${p.id}">ID</td>
                     <td th:text="${p.patientId}">PATIENT ID</td>
                     <td th:text="${p.patientsName}">PATIENTS NAME</td>
+                    <td> </td>
                     <td>
                         <button type="button"
                                 class="btn btn-primary btn-sm"
@@ -50,24 +52,37 @@
                     </td>
                 </tr>
 
+                <!-- Study Header Row (initially hidden) -->
+                <tr th:if="${p.numberOfStudies > 0}"
+                    th:id="'study-header-' + ${p.id}"
+                    class="study-row study-header"
+                    th:data-patient-id="${p.id}"
+                    style="display: none; background-color: #e8f4f8; font-weight: bold;">
+                    <td style="border-left: 5px solid #337ab7;"></td>
+                    <td style="padding-left: 20px;">Study ID</td>
+                    <td>Study Description</td>
+                    <td>Study Date</td>
+                    <td>Series / Actions</td>
+                </tr>
+
                 <!-- Study Rows (initially hidden) -->
                 <tr th:each="study : ${p.studies}"
                     th:id="'study-' + ${p.id} + '-' + ${study.id}"
                     class="study-row"
                     th:data-patient-id="${p.id}"
                     style="display: none; background-color: #f9f9f9;">
-                    <td></td>
-                    <td colspan="3" style="padding-left: 40px;">
-                        <div>
-                            <strong>Study ID:</strong> <span th:text="${study.ety().studyId}">-</span> |
-                            <strong>Description:</strong> <span th:text="${study.ety().studyDescription}">-</span> |
-                            <strong>Date:</strong> <span th:text="${study.ety().studyDate}">-</span> |
-                            <strong>Series:</strong> <span th:text="${study.numberOfSeries}">0</span>
-                            <form action="#" th:action="@{/serieslist}" method="get" style="display: inline; margin-left: 10px;">
-                                <input type="hidden" name="studyId" th:value="${study.id}"/>
-                                <button type="submit" class="btn btn-xs btn-primary">View Series</button>
-                            </form>
-                        </div>
+                    <td style="border-left: 5px solid #337ab7;"></td>
+                    <td style="padding-left: 20px;" th:text="${study.ety().studyId}">-</td>
+                    <td th:text="${study.ety().studyDescription}">-</td>
+                    <td th:text="${study.ety().studyDate}">-</td>
+                    <td>
+                        <span class="badge" th:text="${study.numberOfSeries} + ' series'">0 series</span>
+                        <form action="#" th:action="@{/serieslist}" method="get" style="display: inline; margin-left: 10px;">
+                            <input type="hidden" name="studyId" th:value="${study.id}"/>
+                            <button type="submit" class="btn btn-xs btn-primary">
+                                <span class="glyphicon glyphicon-eye-open"></span> View
+                            </button>
+                        </form>
                     </td>
                 </tr>
             </th:block>
