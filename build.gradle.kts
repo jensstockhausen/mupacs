@@ -40,7 +40,7 @@ dependencies {
     implementation("org.springframework.data:spring-data-rest-hal-explorer")
 
     constraints {
-        implementation("org.apache.commons:commons-lang3:3.18.0") {
+        implementation("org.apache.commons:commons-lang3:3.20.0") {
             because("Apache Commons Lang <3.18.0 is vulnerable to Uncontrolled Recursion when processing long inputs")
         }
     }
