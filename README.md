@@ -48,22 +48,27 @@ The system follows the DICOM hierarchy: **Patient → Study → Series → Insta
 ### Data Management
 - **Hierarchical Storage**: Organized file system structure by StudyInstanceUID/SeriesInstanceUID
 - **Metadata Database**: Fast querying using H2 embedded database
-- **Unique Constraint Validation**: Ensures data integrity across all DICOM UIDs
+- **Unique Constraint Validation**: Patient ID as unique identifier (DICOM standard compliant)
+- **Data Integrity**: Ensures uniqueness across all DICOM UIDs
 - **Folder Import**: Batch import from filesystem with recursive directory scanning
 
 ### Web Interface
 - **Patient List**: Paginated view of all patients with expandable study details
-- **Study Browser**: View studies with series and instance information
+- **Hierarchical View**: All patient data (demographics, studies, series, instances) in one page
+- **Modular Templates**: Reusable Thymeleaf fragments for maintainable UI
 - **DICOM Configuration**: Manage server settings and remote AETs
-- **Log Viewer**: Real-time log monitoring with auto-refresh
 - **Import Management**: Trigger and monitor folder imports
+- **Log Viewer**: Real-time log monitoring with auto-refresh
+- **Responsive Design**: Works on desktop and mobile browsers
 
 ### Technical Features
 - **Spring Boot Framework**: Modern Java application framework
-- **Thymeleaf Templates**: Server-side rendering for the web UI
+- **Thymeleaf Templates**: Server-side rendering with reusable fragments
 - **REST API**: RESTful endpoints for programmatic access
 - **Async Processing**: Non-blocking import and DICOM operations
 - **Transaction Management**: ACID compliance for database operations
+- **Property Dump**: Automatic configuration verification on startup
+- **Error Handling**: Enhanced error messages for common issues (SSL/TLS, connectivity)
 - **Comprehensive Testing**: Unit and integration tests with >80% coverage
 
 ---
@@ -86,12 +91,15 @@ mupacs/
 │   ├── data/               # JPA entities and repositories
 │   ├── dcm/                # DICOM service implementations
 │   ├── service/            # Business logic and services
+│   ├── config/             # Spring configuration classes
+│   ├── exception/          # Global exception handlers
 │   └── MuPACSApplication.java
 ├── src/main/resources/
 │   ├── application.properties
 │   ├── logback.xml
 │   ├── static/            # CSS, JS, images
 │   └── templates/         # Thymeleaf HTML templates
+│       └── fragments/     # Reusable template fragments
 ├── archive/               # DICOM file storage (created at runtime)
 ├── database/              # H2 database files (created at runtime)
 ├── import/                # Folder import staging area
@@ -116,7 +124,7 @@ Each entity stores relevant DICOM attributes (UIDs, dates, descriptions, etc.)
 - **Gradle** (wrapper included, no separate installation needed)
 - **Network ports**:
   - Web interface: `8080` (configurable)
-  - DICOM services: `11112` (configurable)
+  - DICOM services: `8104` (configurable)
 
 ---
 
@@ -157,32 +165,48 @@ http://localhost:8080
 Edit `src/main/resources/application.properties`:
 
 ```properties
-# Server Port
+# Server Port (default: 8080)
 server.port=8080
 
 # DICOM Service Configuration
-mupacs.dicom.aetitle=MUPACS
-mupacs.dicom.hostname=localhost
-mupacs.dicom.port=11112
+mupacs.dicom.ae-title=MUPACS
+mupacs.dicom.scp.host=0.0.0.0
+mupacs.dicom.scp.port=8104
+
+# DICOM Client Timeouts
+mupacs.dicom.scu.connect-timeout=5000
+mupacs.dicom.scu.response-timeout=10000
 
 # Remote AET Configuration (semicolon-separated)
-mupacs.dicom.aet=WORKSTATION@localhost:11113;MODALITY@192.168.1.100:104
+# Format: aet@host:port;aet@host:port
+mupacs.dicom.aet=AET@127.0.0.1:104
 
 # Database Location
-spring.datasource.url=jdbc:h2:file:./database/mupacs
+spring.datasource.url=jdbc:h2:file:./database/mupacs;MODE=MSSQLServer;AUTO_SERVER=TRUE
 
 # Archive Storage Path
-mupacs.archive.path=./archive
+mupacs.archive=./archive
 
-# Logging
+# Import Directory
+mupacs.cstore.scp.import=./import
+
+# REST API Base Path
+spring.data.rest.basePath=/api
+
+# Logging (optional, defaults to console)
 logging.level.de.famst=INFO
 logging.file.name=./log/mupacs.log
 ```
 
+### Important Ports
+- **HTTP Web Interface**: `8080` (configurable via `server.port`)
+- **DICOM Services**: `8104` (configurable via `mupacs.dicom.scp.port`)
+
 ### DICOM Configuration
-- **AE Title**: Application Entity Title for this PACS
-- **Port**: DICOM service listening port (default: 11112)
-- **Remote AETs**: Configure known DICOM nodes via web interface or properties
+- **AE Title**: Application Entity Title for this PACS (default: `MUPACS`)
+- **SCP Host**: Network interface to bind to (`0.0.0.0` = all interfaces)
+- **SCP Port**: DICOM service listening port (default: `8104`)
+- **Remote AETs**: Configure known DICOM nodes via web interface or properties file
 
 ---
 
@@ -194,7 +218,7 @@ logging.file.name=./log/mupacs.log
 Configure the modality to send images to:
 - **AE Title**: `MUPACS` (or your configured AE Title)
 - **Host**: Your server's IP address
-- **Port**: `11112` (or your configured port)
+- **Port**: `8104` (or your configured port)
 
 The system will automatically:
 1. Receive the DICOM images (C-STORE)
@@ -210,14 +234,22 @@ The system will automatically:
 ### Browsing Images
 
 #### Patient List
-- View all patients with pagination
-- Expand/collapse study details per patient
-- Click study rows to view series
+The Patient List page provides a comprehensive hierarchical view:
+- **Left Panel**: Paginated list of all patients
+  - Click on any patient to view details
+  - Shows patient name, ID, birth date, sex, and study count
+- **Right Panel**: Detailed patient information
+  - Demographics (name, ID, birth date, age, sex, height, weight, etc.)
+  - Medical information (alerts, allergies, pregnancy status, comments)
+  - Studies with expandable series information
+  - Each series shows:
+    - Modality, series number, description
+    - Instance count
+    - Detailed series attributes (body part, protocol, performing physician, etc.)
+    - Complete instance list
 
-#### Study View
-- See all series within a study
-- View study date, description, modality
-- Navigate to instance details
+The hierarchical display eliminates the need to navigate between separate pages - all information is accessible from the patient list.
+
 
 ### Managing Remote AETs
 
@@ -265,14 +297,11 @@ Supports DICOM queries at:
 
 | Page | URL | Description |
 |------|-----|-------------|
-| Home | `/` | Landing page with navigation |
-| Patient List | `/patientList` | Browse all patients |
-| Study List | `/studyList` | View studies for selected patient |
-| Series List | `/seriesList` | View series for selected study |
-| Instance List | `/instanceList` | View instances for selected series |
-| Import | `/importList` | Trigger folder imports |
-| DICOM Config | `/dicomConfig` | Configure DICOM services and AETs |
-| Logs | `/logs` | View application logs |
+| Home | `/` | Landing page with navigation and system overview |
+| Patient List | `/patientlist` | Browse all patients with hierarchical study/series/instance view |
+| Import | `/importlist` | Trigger folder imports |
+| DICOM Config | `/dicomconfig` | Configure DICOM services and AETs |
+| Logs | `/logs` | View application logs with auto-refresh |
 
 ### Common UI Elements
 - **Navigation Menu**: Present on all pages for easy navigation
@@ -391,14 +420,112 @@ id("org.springframework.boot") version "3.3.6"
 
 ---
 
+## 🐳 Docker Deployment
+
+MuPACS can be deployed using Docker for easy containerization and deployment.
+
+### Quick Start with Docker Compose
+```bash
+# Build the application
+./gradlew clean build
+
+# Start with Docker Compose
+docker-compose up -d
+```
+
+### Manual Docker Build
+```bash
+# Build the JAR
+./gradlew clean build
+
+# Build Docker image
+docker build -t famst/micropacs:0.0.1-SNAPSHOT .
+
+# Run container
+docker run -d \
+  --name mupacs \
+  -p 8080:8080 \
+  -p 8104:8104 \
+  -v mupacs-data:/app/data \
+  -v mupacs-archive:/app/archive \
+  famst/micropacs:0.0.1-SNAPSHOT
+```
+
+### Exposed Ports
+- **8080**: HTTP web interface
+- **8104**: DICOM C-STORE SCP
+
+📖 **See [DOCKER.md](DOCKER.md) for complete Docker deployment guide**
+
+---
+
+## 🔧 Troubleshooting
+
+### Common Issues
+
+#### SSL/TLS Error: "Invalid character found in method name"
+This error occurs when accessing the server with `https://` instead of `http://`.
+
+**Solution**: Always use `http://localhost:8080` (not `https://`)
+
+#### DICOM Connection Issues
+- Verify firewall allows port 8104
+- Check DICOM client AE Title configuration
+- Use C-ECHO to test connectivity
+
+#### Database Issues
+- Check `database/` directory permissions
+- Ensure H2 database files are not corrupted
+- Review logs for SQL errors
+
+#### Import Issues
+- Verify the import folder path is accessible
+- Check DICOM file validity
+- Monitor logs for import errors
+
+📖 **See [TROUBLESHOOTING.md](TROUBLESHOOTING.md) for detailed troubleshooting guide**
+
+---
+
 ## 🔮 Roadmap
 
 - [ ] C-MOVE SCP/SCU implementation
 - [ ] WADO (Web Access to DICOM Objects) support
 - [ ] Image thumbnail generation
-- [ ] DICOM viewer integration
+- [ ] DICOM viewer integration (Weasis, OHIF)
 - [ ] Advanced query filters
-- [ ] Export functionality
+- [ ] Export functionality (DICOM, JPEG, PNG)
+- [ ] User authentication and access control
+- [ ] Audit logging
+- [ ] HTTPS support
+- [ ] Multi-tenant support
+
+---
+
+## 📚 Additional Documentation
+
+- [Docker Deployment Guide](DOCKER.md) - Complete guide for Docker deployment
+- [Troubleshooting Guide](TROUBLESHOOTING.md) - Detailed troubleshooting steps
+- [Property Dump Feature](Property_Dump_Feature.md) - Configuration verification on startup
+- [Protocol Mismatch Detection](Protocol_Mismatch_Detection_Fixed.md) - SSL/TLS error handling
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit issues or pull requests.
+
+### Development Guidelines
+- Follow existing code style
+- Add tests for new features
+- Update documentation
+- Ensure all tests pass before submitting
+
+---
+
+## 📄 License
+
+This project is licensed under the terms specified in the repository.
 
 ---
 
