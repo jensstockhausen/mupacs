@@ -1,0 +1,47 @@
+# Git
+.git
+.gitignore
+.gitattributes
+
+# IDE
+.idea
+.vscode
+*.iml
+*.ipr
+*.iws
+
+# Build artifacts
+build
+!build/libs/*.jar
+target
+out
+bin
+
+# Gradle
+.gradle
+gradle/wrapper/gradle-wrapper.jar
+
+# Test data
+archive/*
+import/*
+database/*
+log/*
+
+# Documentation
+*.md
+README.md
+docs/
+
+# CI/CD
+.github
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.log
+*.swp
+*.bak
+

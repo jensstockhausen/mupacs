@@ -8,6 +8,11 @@
 /database
 /log
 
+### docker compose volumes ###
+/mupacs-archive
+/mupacs-data
+/mupacs-import
+/mupacs-logs
 
 ### IntelliJ IDEA ###
 .idea

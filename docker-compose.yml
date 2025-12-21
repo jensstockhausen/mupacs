@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  mupacs:
+    image: famst/micropacs:${VERSION:-0.0.1-SNAPSHOT}
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: mupacs
+    ports:
+      - "8080:8080"  # HTTP port for web interface
+      - "8104:8104"  # DICOM port for DICOM services
+    environment:
+      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE:-default}
+      - JAVA_OPTS=-Xmx512m -Xms256m
+    volumes:
+      - ./mupacs-data:/app/database
+      - ./mupacs-archive:/app/archive
+      - ./mupacs-import:/app/import
+      - ./mupacs-logs:/app/log
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+
