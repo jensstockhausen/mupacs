@@ -19,5 +19,8 @@ EXPOSE 8080
 # Expose DICOM port
 EXPOSE 8104
 
+# only update the database schema
+ENV SPRING_JPA_HIBERNATE_DDL-AUTO=update
+
 # Set the entry point
 ENTRYPOINT ["java", "org.springframework.boot.loader.launch.JarLauncher"]
