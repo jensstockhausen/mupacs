@@ -1,0 +1,66 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
+
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns="http://www.w3.org/1999/xhtml">
+
+<body>
+
+<!-- Series Details Fragment -->
+<div th:fragment="seriesDetails(series, p, study)">
+    <div th:id="'series-details-' + ${p.id} + '-' + ${study.id} + '-' + ${series.id}"
+         class="series-details-content">
+        <div class="series-details-box">
+            <div class="row">
+                <div class="col-md-6">
+                    <dl class="dl-horizontal series-dl">
+                        <dt>Series UID:</dt>
+                        <dd th:text="${series.seriesInstanceUID ?: 'N/A'}" class="uid-text">-</dd>
+
+                        <dt>Series Date:</dt>
+                        <dd th:text="${series.seriesDate ?: 'N/A'}">-</dd>
+
+                        <dt>Series Time:</dt>
+                        <dd th:text="${series.seriesTime ?: 'N/A'}">-</dd>
+
+                        <dt>Body Part:</dt>
+                        <dd th:text="${series.bodyPartExamined ?: 'N/A'}">-</dd>
+                    </dl>
+                </div>
+                <div class="col-md-6">
+                    <dl class="dl-horizontal series-dl">
+                        <dt>Protocol:</dt>
+                        <dd th:text="${series.protocolName ?: 'N/A'}">-</dd>
+
+                        <dt>Performing MD:</dt>
+                        <dd th:text="${series.performingPhysicianName ?: 'N/A'}">-</dd>
+
+                        <dt>Patient Position:</dt>
+                        <dd th:text="${series.patientPosition ?: 'N/A'}">-</dd>
+
+                        <dt>Laterality:</dt>
+                        <dd th:text="${series.laterality ?: 'N/A'}">-</dd>
+                    </dl>
+                </div>
+            </div>
+
+            <!-- Instance Information -->
+            <div th:if="${series.instances.size() > 0}">
+                <strong>Instances:</strong>
+                <div class="instance-list">
+                    <ul>
+                        <li th:each="instance, iterStat : ${series.instances}">
+                            <span class="instance-item"
+                                  th:title="${instance.instanceUID}"
+                                  th:text="${iterStat.index + 1}">1</span>
+                            <span th:text="' - ' + (${instance.instanceUID ?: 'N/A'})"> - N/A</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
+

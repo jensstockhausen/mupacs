@@ -1,0 +1,73 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
+
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns="http://www.w3.org/1999/xhtml">
+
+<body>
+
+<!-- Study Panel Fragment -->
+<div th:fragment="studyPanel(study, p)">
+    <div class="panel panel-info study-panel">
+        <div class="panel-heading clickable-panel-heading"
+             th:onclick="'toggleSeries(' + ${p.id} + ',' + ${study.id} + ')'">
+            <h5 class="panel-title">
+                <span class="glyphicon glyphicon-folder-open"></span>
+                <span th:text="${study.ety().studyDescription ?: 'Study'}">Study</span>
+                <span class="pull-right">
+                    <span class="badge" th:text="${study.numberOfSeries} + ' series'">0 series</span>
+                    <span th:id="'series-toggle-icon-' + ${p.id} + '-' + ${study.id}"
+                          class="glyphicon glyphicon-chevron-down series-toggle-icon"></span>
+                </span>
+            </h5>
+        </div>
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <dl class="dl-horizontal">
+                        <dt>Study ID:</dt>
+                        <dd th:text="${study.ety().studyId ?: 'N/A'}">-</dd>
+
+                        <dt>Accession #:</dt>
+                        <dd th:text="${study.ety().accessionNumber ?: 'N/A'}">-</dd>
+
+                        <dt>Study Date:</dt>
+                        <dd th:text="${study.ety().studyDate ?: 'N/A'}">-</dd>
+
+                        <dt>Study Time:</dt>
+                        <dd th:text="${study.ety().studyTime ?: 'N/A'}">-</dd>
+                    </dl>
+                </div>
+                <div class="col-md-6">
+                    <dl class="dl-horizontal">
+                        <dt>Modalities:</dt>
+                        <dd th:text="${study.ety().modalitiesInStudy ?: 'N/A'}">-</dd>
+
+                        <dt>Referring MD:</dt>
+                        <dd th:text="${study.ety().referringPhysicianName ?: 'N/A'}">-</dd>
+
+                        <dt>Study UID:</dt>
+                        <dd th:text="${study.ety().studyInstanceUID ?: 'N/A'}" class="study-uid">-</dd>
+                    </dl>
+                </div>
+            </div>
+
+            <!-- Series Section -->
+            <div th:id="'series-list-' + ${p.id} + '-' + ${study.id}" class="series-section">
+                <hr/>
+                <h5><strong>Series (<span th:text="${study.numberOfSeries}">0</span>)</strong></h5>
+
+                <div th:if="${study.numberOfSeries == 0}" class="alert alert-info series-alert">
+                    No series available for this study.
+                </div>
+
+                <div th:each="series : ${study.ety().series}">
+                    <div th:replace="~{fragments/seriesItem :: seriesItem(${series}, ${p}, ${study})}"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
+

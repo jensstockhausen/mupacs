@@ -1,0 +1,29 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
+
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns="http://www.w3.org/1999/xhtml">
+
+<body>
+
+<!-- Patient List Item Fragment -->
+<div th:fragment="patientItem(p)">
+    <div class="patient-item"
+         th:id="'patient-item-' + ${p.id}"
+         th:data-patient-id="${p.id}"
+         th:onclick="'selectPatient(' + ${p.id} + ', this)'">
+        <div class="patient-name">
+            <span th:text="${p.patientsName ?: 'Unknown'}">Patient Name</span>
+            <span class="badge pull-right" th:text="${p.numberOfStudies}">0</span>
+        </div>
+        <div class="patient-info">
+            <span th:text="'ID: ' + ${p.patientId ?: 'N/A'}">ID: N/A</span> |
+            <span th:text="${p.patientBirthDate ?: 'N/A'}">N/A</span> |
+            <span th:text="${p.patientSex ?: 'N/A'}">N/A</span>
+            <span th:if="${p.patientAge != null}" th:text="'(' + ${p.patientAge} + ')'"></span>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
+

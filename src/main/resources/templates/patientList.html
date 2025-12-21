@@ -27,73 +27,13 @@
         <div class="col-md-4 patient-list-column">
             <h4>Patient List</h4>
 
-            <div class="patient-item"
-                 th:each="p : ${patients}"
-                 th:id="'patient-item-' + ${p.id}"
-                 th:data-patient-id="${p.id}"
-                 th:onclick="'selectPatient(' + ${p.id} + ', this)'">
-                <div class="patient-name">
-                    <span th:text="${p.patientsName ?: 'Unknown'}">Patient Name</span>
-                    <span class="badge pull-right" th:text="${p.numberOfStudies}">0</span>
-                </div>
-                <div class="patient-info">
-                    <span th:text="'ID: ' + ${p.patientId ?: 'N/A'}">ID: N/A</span> |
-                    <span th:text="${p.patientBirthDate ?: 'N/A'}">N/A</span> |
-                    <span th:text="${p.patientSex ?: 'N/A'}">N/A</span>
-                    <span th:if="${p.patientAge != null}" th:text="'(' + ${p.patientAge} + ')'"></span>
-                </div>
+            <!-- Patient List Items -->
+            <div th:each="p : ${patients}">
+                <div th:replace="~{fragments/patientListItem :: patientItem(${p})}"></div>
             </div>
 
             <!-- Pagination Controls -->
-            <div th:if="${totalPages > 1}" class="pagination-container">
-                <nav aria-label="Page navigation">
-                    <ul class="pagination pagination-sm">
-                        <!-- First Page -->
-                        <li th:class="${currentPage == 0} ? 'disabled' : ''">
-                            <a th:href="@{/patientlist(page=0, size=${pageSize})}" aria-label="First">
-                                <span aria-hidden="true">&laquo;&laquo;</span>
-                            </a>
-                        </li>
-
-                        <!-- Previous Page -->
-                        <li th:class="${currentPage == 0} ? 'disabled' : ''">
-                            <a th:href="@{/patientlist(page=${currentPage - 1}, size=${pageSize})}"
-                               aria-label="Previous">
-                                <span aria-hidden="true">&laquo;</span>
-                            </a>
-                        </li>
-
-                        <!-- Page Numbers -->
-                        <li th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
-                            th:if="${i >= currentPage - 2 && i <= currentPage + 2}"
-                            th:class="${i == currentPage} ? 'active' : ''">
-                            <a th:href="@{/patientlist(page=${i}, size=${pageSize})}" th:text="${i + 1}">1</a>
-                        </li>
-
-                        <!-- Next Page -->
-                        <li th:class="${currentPage == totalPages - 1} ? 'disabled' : ''">
-                            <a th:href="@{/patientlist(page=${currentPage + 1}, size=${pageSize})}" aria-label="Next">
-                                <span aria-hidden="true">&raquo;</span>
-                            </a>
-                        </li>
-
-                        <!-- Last Page -->
-                        <li th:class="${currentPage == totalPages - 1} ? 'disabled' : ''">
-                            <a th:href="@{/patientlist(page=${totalPages - 1}, size=${pageSize})}" aria-label="Last">
-                                <span aria-hidden="true">&raquo;&raquo;</span>
-                            </a>
-                        </li>
-                    </ul>
-                </nav>
-
-                <!-- Page Information -->
-                <div class="text-center pagination-info">
-                    <p>
-                        Page <span th:text="${currentPage + 1}">1</span> of <span th:text="${totalPages}">1</span>
-                        (Total: <span th:text="${totalItems}">0</span>)
-                    </p>
-                </div>
-            </div>
+            <div th:replace="~{fragments/pagination :: pagination(${currentPage}, ${totalPages}, ${pageSize}, ${totalItems})}"></div>
         </div>
 
         <!-- Right Column: Patient Details -->
@@ -105,105 +45,10 @@
                 <h4>Patient Details</h4>
 
                 <!-- Patient Demographics -->
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        <h5 class="panel-title">
-                            <span class="glyphicon glyphicon-user"></span> Demographics
-                        </h5>
-                    </div>
-                    <div class="panel-body">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <dl class="dl-horizontal">
-                                    <dt>Patient Name:</dt>
-                                    <dd th:text="${p.patientsName ?: 'N/A'}">-</dd>
-
-                                    <dt>Patient ID:</dt>
-                                    <dd th:text="${p.patientId ?: 'N/A'}">-</dd>
-
-                                    <dt>Other IDs:</dt>
-                                    <dd th:text="${p.otherPatientIds ?: 'N/A'}">-</dd>
-
-                                    <dt>Other Names:</dt>
-                                    <dd th:text="${p.otherPatientNames ?: 'N/A'}">-</dd>
-
-                                    <dt>Birth Date:</dt>
-                                    <dd th:text="${p.patientBirthDate ?: 'N/A'}">-</dd>
-
-                                    <dt>Birth Time:</dt>
-                                    <dd th:text="${p.patientBirthTime ?: 'N/A'}">-</dd>
-                                </dl>
-                            </div>
-                            <div class="col-md-6">
-                                <dl class="dl-horizontal">
-                                    <dt>Age:</dt>
-                                    <dd th:text="${p.patientAge ?: 'N/A'}">-</dd>
-
-                                    <dt>Sex:</dt>
-                                    <dd th:text="${p.patientSex ?: 'N/A'}">-</dd>
-
-                                    <dt>Ethnic Group:</dt>
-                                    <dd th:text="${p.ethnicGroup ?: 'N/A'}">-</dd>
-
-                                    <dt>Size (Height):</dt>
-                                    <dd>
-                                        <span th:if="${p.patientSize != null}"
-                                              th:text="${p.patientSize} + ' m'">-</span>
-                                        <span th:unless="${p.patientSize != null}">N/A</span>
-                                    </dd>
-
-                                    <dt>Weight:</dt>
-                                    <dd>
-                                        <span th:if="${p.patientWeight != null}"
-                                              th:text="${p.patientWeight} + ' kg'">-</span>
-                                        <span th:unless="${p.patientWeight != null}">N/A</span>
-                                    </dd>
-                                </dl>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <div th:replace="~{fragments/patientDemographics :: demographics(${p})}"></div>
 
                 <!-- Medical Information -->
-                <div class="panel panel-warning"
-                     th:if="${p.medicalAlerts != null or p.allergies != null or p.pregnancyStatus != null}">
-                    <div class="panel-heading">
-                        <h5 class="panel-title">
-                            <span class="glyphicon glyphicon-warning-sign"></span> Medical Information
-                        </h5>
-                    </div>
-                    <div class="panel-body">
-                        <dl class="dl-horizontal">
-                            <dt>Medical Alerts:</dt>
-                            <dd th:text="${p.medicalAlerts ?: 'N/A'}" class="medical-alert">-
-                            </dd>
-
-                            <dt>Allergies:</dt>
-                            <dd th:text="${p.allergies ?: 'N/A'}" class="allergy-info">-
-                            </dd>
-
-                            <dt>Pregnancy Status:</dt>
-                            <dd>
-                                <span th:if="${p.pregnancyStatus == 1}">Not Pregnant</span>
-                                <span th:if="${p.pregnancyStatus == 2}">Possibly Pregnant</span>
-                                <span th:if="${p.pregnancyStatus == 3}">Definitely Pregnant</span>
-                                <span th:if="${p.pregnancyStatus == 4}">Unknown</span>
-                                <span th:unless="${p.pregnancyStatus != null}">N/A</span>
-                            </dd>
-
-                            <dt>Responsible Person:</dt>
-                            <dd th:text="${p.responsiblePerson ?: 'N/A'}">-</dd>
-
-                            <dt>Responsible Org:</dt>
-                            <dd th:text="${p.responsibleOrganization ?: 'N/A'}">-</dd>
-                        </dl>
-
-                        <div th:if="${p.patientComments != null and !#strings.isEmpty(p.patientComments)}">
-                            <strong>Comments:</strong>
-                            <p th:text="${p.patientComments}" class="well well-sm patient-comments">-</p>
-                        </div>
-                    </div>
-                </div>
+                <div th:replace="~{fragments/patientMedicalInfo :: medicalInfo(${p})}"></div>
 
                 <!-- Studies Section -->
                 <h4 th:if="${p.numberOfStudies > 0}">
@@ -213,145 +58,8 @@
                     No studies available for this patient.
                 </div>
 
-                <div th:each="study : ${p.studies}" class="panel panel-info study-panel">
-                    <div class="panel-heading clickable-panel-heading"
-                         th:onclick="'toggleSeries(' + ${p.id} + ',' + ${study.id} + ')'">
-                        <h5 class="panel-title">
-                            <span class="glyphicon glyphicon-folder-open"></span>
-                            <span th:text="${study.ety().studyDescription ?: 'Study'}">Study</span>
-                            <span class="pull-right">
-                                <span class="badge" th:text="${study.numberOfSeries} + ' series'">0 series</span>
-                                <span th:id="'series-toggle-icon-' + ${p.id} + '-' + ${study.id}"
-                                      class="glyphicon glyphicon-chevron-down series-toggle-icon"></span>
-                            </span>
-                        </h5>
-                    </div>
-                    <div class="panel-body">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <dl class="dl-horizontal">
-                                    <dt>Study ID:</dt>
-                                    <dd th:text="${study.ety().studyId ?: 'N/A'}">-</dd>
-
-                                    <dt>Accession #:</dt>
-                                    <dd th:text="${study.ety().accessionNumber ?: 'N/A'}">-</dd>
-
-                                    <dt>Study Date:</dt>
-                                    <dd th:text="${study.ety().studyDate ?: 'N/A'}">-</dd>
-
-                                    <dt>Study Time:</dt>
-                                    <dd th:text="${study.ety().studyTime ?: 'N/A'}">-</dd>
-                                </dl>
-                            </div>
-                            <div class="col-md-6">
-                                <dl class="dl-horizontal">
-                                    <dt>Modalities:</dt>
-                                    <dd th:text="${study.ety().modalitiesInStudy ?: 'N/A'}">-</dd>
-
-                                    <dt>Referring MD:</dt>
-                                    <dd th:text="${study.ety().referringPhysicianName ?: 'N/A'}">-</dd>
-
-                                    <dt>Study UID:</dt>
-                                    <dd th:text="${study.ety().studyInstanceUID ?: 'N/A'}" class="study-uid">-
-                                    </dd>
-                                </dl>
-                            </div>
-                        </div>
-
-                        <!-- Series Information -->
-                        <div th:id="'series-list-' + ${p.id} + '-' + ${study.id}" class="series-section">
-                            <hr/>
-                            <h5><strong>Series (<span th:text="${study.numberOfSeries}">0</span>)</strong></h5>
-
-                            <div th:if="${study.numberOfSeries == 0}" class="alert alert-info series-alert">
-                                No series available for this study.
-                            </div>
-
-                            <div th:each="series : ${study.ety().series}" class="series-item">
-                                <div class="row">
-                                    <div class="col-md-8">
-                                        <strong>
-                                            <span class="glyphicon glyphicon-th-list"></span>
-                                            <span th:text="${series.modality ?: 'N/A'}">Modality</span> -
-                                            Series #<span th:text="${series.seriesNumber ?: 'N/A'}">N/A</span>
-                                        </strong>
-                                        <div class="series-description"
-                                             th:text="${series.seriesDescription ?: 'No description'}">
-                                            Series Description
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4 text-right">
-                                        <span class="badge instance-badge"
-                                              th:text="${series.instances.size()} + ' instances'">0 instances</span>
-                                        <button type="button"
-                                                class="btn btn-xs btn-info series-details-btn"
-                                                th:onclick="'toggleSeriesDetails(' + ${p.id} + ',' + ${study.id} + ',' + ${series.id} + ')'">
-                                            <span class="glyphicon glyphicon-info-sign"></span>
-                                        </button>
-                                    </div>
-                                </div>
-
-                                <!-- Series Details (collapsible) -->
-                                <div th:id="'series-details-' + ${p.id} + '-' + ${study.id} + '-' + ${series.id}"
-                                     class="series-details-content">
-                                    <div class="series-details-box">
-                                        <div class="row">
-                                            <div class="col-md-6">
-                                                <dl class="dl-horizontal series-dl">
-                                                    <dt>Series UID:</dt>
-                                                    <dd th:text="${series.seriesInstanceUID ?: 'N/A'}" class="uid-text">
-                                                        -
-                                                    </dd>
-
-                                                    <dt>Series Date:</dt>
-                                                    <dd th:text="${series.seriesDate ?: 'N/A'}">-</dd>
-
-                                                    <dt>Series Time:</dt>
-                                                    <dd th:text="${series.seriesTime ?: 'N/A'}">-</dd>
-
-                                                    <dt>Body Part:</dt>
-                                                    <dd th:text="${series.bodyPartExamined ?: 'N/A'}">-</dd>
-                                                </dl>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <dl class="dl-horizontal series-dl">
-                                                    <dt>Protocol:</dt>
-                                                    <dd th:text="${series.protocolName ?: 'N/A'}">-</dd>
-
-                                                    <dt>Performing MD:</dt>
-                                                    <dd th:text="${series.performingPhysicianName ?: 'N/A'}">-</dd>
-
-                                                    <dt>Patient Position:</dt>
-                                                    <dd th:text="${series.patientPosition ?: 'N/A'}">-</dd>
-
-                                                    <dt>Laterality:</dt>
-                                                    <dd th:text="${series.laterality ?: 'N/A'}">-</dd>
-                                                </dl>
-                                            </div>
-                                        </div>
-
-                                        <!-- Instance Information -->
-                                        <div th:if="${series.instances.size() > 0}">
-                                            <strong>Instances:</strong>
-                                            <div class="instance-list">
-                                                <ul>
-                                                    <li th:each="instance, iterStat : ${series.instances}">
-                                                        <span
-                                                                class="instance-item"
-                                                                th:title="${instance.instanceUID}"
-                                                                th:text="${iterStat.index + 1}">1</span>
-                                                        <span th:text="' - ' + (${instance.instanceUID ?: 'N/A'})"> - N/A
-                                                        </span>
-                                                    </li>
-
-                                                </ul>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                <div th:each="study : ${p.studies}">
+                    <div th:replace="~{fragments/studyPanel :: studyPanel(${study}, ${p})}"></div>
                 </div>
             </div>
 
@@ -364,63 +72,7 @@
         </div>
     </div>
 
-    <script>
-        function selectPatient(patientId, element) {
-            // Remove selected class from all patient items
-            var allItems = document.querySelectorAll('.patient-item');
-            allItems.forEach(function (item) {
-                item.classList.remove('selected');
-            });
-
-            // Add selected class to clicked item
-            element.classList.add('selected');
-
-            // Hide all patient details
-            var allDetails = document.querySelectorAll('.patient-details-content');
-            allDetails.forEach(function (detail) {
-                detail.classList.remove('active');
-            });
-
-            // Hide placeholder
-            var placeholder = document.getElementById('no-selection-placeholder');
-            placeholder.classList.add('hidden');
-
-            // Show selected patient details
-            var details = document.getElementById('patient-details-' + patientId);
-            if (details) {
-                details.classList.add('active');
-            }
-        }
-
-        function toggleSeries(patientId, studyId) {
-            var seriesList = document.getElementById('series-list-' + patientId + '-' + studyId);
-            var icon = document.getElementById('series-toggle-icon-' + patientId + '-' + studyId);
-
-            if (seriesList.classList.contains('series-expanded')) {
-                seriesList.classList.remove('series-expanded');
-                if (icon) {
-                    icon.classList.remove('glyphicon-chevron-up');
-                    icon.classList.add('glyphicon-chevron-down');
-                }
-            } else {
-                seriesList.classList.add('series-expanded');
-                if (icon) {
-                    icon.classList.remove('glyphicon-chevron-down');
-                    icon.classList.add('glyphicon-chevron-up');
-                }
-            }
-        }
-
-        function toggleSeriesDetails(patientId, studyId, seriesId) {
-            var detailsDiv = document.getElementById('series-details-' + patientId + '-' + studyId + '-' + seriesId);
-
-            if (detailsDiv.classList.contains('series-details-expanded')) {
-                detailsDiv.classList.remove('series-details-expanded');
-            } else {
-                detailsDiv.classList.add('series-details-expanded');
-            }
-        }
-    </script>
+    <script th:replace="~{fragments/patientListScripts :: patientListScripts}"></script>
 
     <div th:replace="~{fragments/footer :: footer}">EMPTY FOOTER</div>
 

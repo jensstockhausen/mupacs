@@ -1,0 +1,69 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
+
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns="http://www.w3.org/1999/xhtml">
+
+<body>
+
+<!-- Patient List JavaScript Fragment -->
+<script th:fragment="patientListScripts">
+    function selectPatient(patientId, element) {
+        // Remove selected class from all patient items
+        var allItems = document.querySelectorAll('.patient-item');
+        allItems.forEach(function (item) {
+            item.classList.remove('selected');
+        });
+
+        // Add selected class to clicked item
+        element.classList.add('selected');
+
+        // Hide all patient details
+        var allDetails = document.querySelectorAll('.patient-details-content');
+        allDetails.forEach(function (detail) {
+            detail.classList.remove('active');
+        });
+
+        // Hide placeholder
+        var placeholder = document.getElementById('no-selection-placeholder');
+        placeholder.classList.add('hidden');
+
+        // Show selected patient details
+        var details = document.getElementById('patient-details-' + patientId);
+        if (details) {
+            details.classList.add('active');
+        }
+    }
+
+    function toggleSeries(patientId, studyId) {
+        var seriesList = document.getElementById('series-list-' + patientId + '-' + studyId);
+        var icon = document.getElementById('series-toggle-icon-' + patientId + '-' + studyId);
+
+        if (seriesList.classList.contains('series-expanded')) {
+            seriesList.classList.remove('series-expanded');
+            if (icon) {
+                icon.classList.remove('glyphicon-chevron-up');
+                icon.classList.add('glyphicon-chevron-down');
+            }
+        } else {
+            seriesList.classList.add('series-expanded');
+            if (icon) {
+                icon.classList.remove('glyphicon-chevron-down');
+                icon.classList.add('glyphicon-chevron-up');
+            }
+        }
+    }
+
+    function toggleSeriesDetails(patientId, studyId, seriesId) {
+        var detailsDiv = document.getElementById('series-details-' + patientId + '-' + studyId + '-' + seriesId);
+
+        if (detailsDiv.classList.contains('series-details-expanded')) {
+            detailsDiv.classList.remove('series-details-expanded');
+        } else {
+            detailsDiv.classList.add('series-details-expanded');
+        }
+    }
+</script>
+
+</body>
+</html>
+

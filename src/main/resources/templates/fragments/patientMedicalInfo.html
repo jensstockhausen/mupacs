@@ -1,0 +1,51 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
+
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns="http://www.w3.org/1999/xhtml">
+
+<body>
+
+<!-- Patient Medical Information Fragment -->
+<div th:fragment="medicalInfo(p)">
+    <div class="panel panel-warning"
+         th:if="${p.medicalAlerts != null or p.allergies != null or p.pregnancyStatus != null}">
+        <div class="panel-heading">
+            <h5 class="panel-title">
+                <span class="glyphicon glyphicon-warning-sign"></span> Medical Information
+            </h5>
+        </div>
+        <div class="panel-body">
+            <dl class="dl-horizontal">
+                <dt>Medical Alerts:</dt>
+                <dd th:text="${p.medicalAlerts ?: 'N/A'}" class="medical-alert">-</dd>
+
+                <dt>Allergies:</dt>
+                <dd th:text="${p.allergies ?: 'N/A'}" class="allergy-info">-</dd>
+
+                <dt>Pregnancy Status:</dt>
+                <dd>
+                    <span th:if="${p.pregnancyStatus == 1}">Not Pregnant</span>
+                    <span th:if="${p.pregnancyStatus == 2}">Possibly Pregnant</span>
+                    <span th:if="${p.pregnancyStatus == 3}">Definitely Pregnant</span>
+                    <span th:if="${p.pregnancyStatus == 4}">Unknown</span>
+                    <span th:unless="${p.pregnancyStatus != null}">N/A</span>
+                </dd>
+
+                <dt>Responsible Person:</dt>
+                <dd th:text="${p.responsiblePerson ?: 'N/A'}">-</dd>
+
+                <dt>Responsible Org:</dt>
+                <dd th:text="${p.responsibleOrganization ?: 'N/A'}">-</dd>
+            </dl>
+
+            <div th:if="${p.patientComments != null and !#strings.isEmpty(p.patientComments)}">
+                <strong>Comments:</strong>
+                <p th:text="${p.patientComments}" class="well well-sm patient-comments">-</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
+

@@ -1,0 +1,41 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
+
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns="http://www.w3.org/1999/xhtml">
+
+<body>
+
+<!-- Series Item Fragment -->
+<div th:fragment="seriesItem(series, p, study)">
+    <div class="series-item">
+        <div class="row">
+            <div class="col-md-8">
+                <strong>
+                    <span class="glyphicon glyphicon-th-list"></span>
+                    <span th:text="${series.modality ?: 'N/A'}">Modality</span> -
+                    Series #<span th:text="${series.seriesNumber ?: 'N/A'}">N/A</span>
+                </strong>
+                <div class="series-description"
+                     th:text="${series.seriesDescription ?: 'No description'}">
+                    Series Description
+                </div>
+            </div>
+            <div class="col-md-4 text-right">
+                <span class="badge instance-badge"
+                      th:text="${series.instances.size()} + ' instances'">0 instances</span>
+                <button type="button"
+                        class="btn btn-xs btn-info series-details-btn"
+                        th:onclick="'toggleSeriesDetails(' + ${p.id} + ',' + ${study.id} + ',' + ${series.id} + ')'">
+                    <span class="glyphicon glyphicon-info-sign"></span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Include series details -->
+        <div th:replace="~{fragments/seriesDetails :: seriesDetails(${series}, ${p}, ${study})}"></div>
+    </div>
+</div>
+
+</body>
+</html>
+

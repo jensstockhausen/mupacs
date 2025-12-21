@@ -1,0 +1,72 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
+
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns="http://www.w3.org/1999/xhtml">
+
+<body>
+
+<!-- Patient Demographics Fragment -->
+<div th:fragment="demographics(p)">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h5 class="panel-title">
+                <span class="glyphicon glyphicon-user"></span> Demographics
+            </h5>
+        </div>
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <dl class="dl-horizontal">
+                        <dt>Patient Name:</dt>
+                        <dd th:text="${p.patientsName ?: 'N/A'}">-</dd>
+
+                        <dt>Patient ID:</dt>
+                        <dd th:text="${p.patientId ?: 'N/A'}">-</dd>
+
+                        <dt>Other IDs:</dt>
+                        <dd th:text="${p.otherPatientIds ?: 'N/A'}">-</dd>
+
+                        <dt>Other Names:</dt>
+                        <dd th:text="${p.otherPatientNames ?: 'N/A'}">-</dd>
+
+                        <dt>Birth Date:</dt>
+                        <dd th:text="${p.patientBirthDate ?: 'N/A'}">-</dd>
+
+                        <dt>Birth Time:</dt>
+                        <dd th:text="${p.patientBirthTime ?: 'N/A'}">-</dd>
+                    </dl>
+                </div>
+                <div class="col-md-6">
+                    <dl class="dl-horizontal">
+                        <dt>Age:</dt>
+                        <dd th:text="${p.patientAge ?: 'N/A'}">-</dd>
+
+                        <dt>Sex:</dt>
+                        <dd th:text="${p.patientSex ?: 'N/A'}">-</dd>
+
+                        <dt>Ethnic Group:</dt>
+                        <dd th:text="${p.ethnicGroup ?: 'N/A'}">-</dd>
+
+                        <dt>Size (Height):</dt>
+                        <dd>
+                            <span th:if="${p.patientSize != null}"
+                                  th:text="${p.patientSize} + ' m'">-</span>
+                            <span th:unless="${p.patientSize != null}">N/A</span>
+                        </dd>
+
+                        <dt>Weight:</dt>
+                        <dd>
+                            <span th:if="${p.patientWeight != null}"
+                                  th:text="${p.patientWeight} + ' kg'">-</span>
+                            <span th:unless="${p.patientWeight != null}">N/A</span>
+                        </dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
+

@@ -1,0 +1,63 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
+
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns="http://www.w3.org/1999/xhtml">
+
+<body>
+
+<!-- Pagination Controls Fragment -->
+<div th:fragment="pagination(currentPage, totalPages, pageSize, totalItems)">
+    <div th:if="${totalPages > 1}" class="pagination-container">
+        <nav aria-label="Page navigation">
+            <ul class="pagination pagination-sm">
+                <!-- First Page -->
+                <li th:class="${currentPage == 0} ? 'disabled' : ''">
+                    <a th:href="@{/patientlist(page=0, size=${pageSize})}" aria-label="First">
+                        <span aria-hidden="true">&laquo;&laquo;</span>
+                    </a>
+                </li>
+
+                <!-- Previous Page -->
+                <li th:class="${currentPage == 0} ? 'disabled' : ''">
+                    <a th:href="@{/patientlist(page=${currentPage - 1}, size=${pageSize})}"
+                       aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+
+                <!-- Page Numbers -->
+                <li th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
+                    th:if="${i >= currentPage - 2 && i <= currentPage + 2}"
+                    th:class="${i == currentPage} ? 'active' : ''">
+                    <a th:href="@{/patientlist(page=${i}, size=${pageSize})}" th:text="${i + 1}">1</a>
+                </li>
+
+                <!-- Next Page -->
+                <li th:class="${currentPage == totalPages - 1} ? 'disabled' : ''">
+                    <a th:href="@{/patientlist(page=${currentPage + 1}, size=${pageSize})}" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+
+                <!-- Last Page -->
+                <li th:class="${currentPage == totalPages - 1} ? 'disabled' : ''">
+                    <a th:href="@{/patientlist(page=${totalPages - 1}, size=${pageSize})}" aria-label="Last">
+                        <span aria-hidden="true">&raquo;&raquo;</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Page Information -->
+        <div class="text-center pagination-info">
+            <p>
+                Page <span th:text="${currentPage + 1}">1</span> of <span th:text="${totalPages}">1</span>
+                (Total: <span th:text="${totalItems}">0</span>)
+            </p>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
+
