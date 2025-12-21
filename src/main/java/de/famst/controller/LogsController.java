@@ -59,7 +59,7 @@ public class LogsController
         catch (Exception e)
         {
             LOG.error("Error reading log file: {}", e.getMessage(), e);
-            return "Error reading log file: " + e.getMessage();
+            return "Error reading log file.";
         }
     }
 
