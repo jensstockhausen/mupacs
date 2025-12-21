@@ -36,15 +36,15 @@ public class UniqueConstraintsTest
     // ========== Patient Unique Constraint Tests ==========
 
     @Test
-    public void cannotAddPatientWithSameNameTwice()
+    public void cannotAddPatientWithSameIdTwice()
     {
         PatientEty patientA = new PatientEty();
         patientA.setPatientName("Doe^John");
         patientA.setPatientId("PAT001");
 
         PatientEty patientB = new PatientEty();
-        patientB.setPatientName("Doe^John");
-        patientB.setPatientId("PAT002");
+        patientB.setPatientName("Doe^Jane");
+        patientB.setPatientId("PAT001");  // Same ID as patientA
 
         patientRepository.saveAndFlush(patientA);
 
@@ -53,14 +53,14 @@ public class UniqueConstraintsTest
     }
 
     @Test
-    public void canAddPatientWithDifferentName()
+    public void canAddPatientWithDifferentId()
     {
         PatientEty patientA = new PatientEty();
         patientA.setPatientName("Doe^John");
         patientA.setPatientId("PAT001");
 
         PatientEty patientB = new PatientEty();
-        patientB.setPatientName("Doe^Jane");
+        patientB.setPatientName("Doe^John");  // Same name, different ID
         patientB.setPatientId("PAT002");
 
         assertDoesNotThrow(() -> {
@@ -68,16 +68,16 @@ public class UniqueConstraintsTest
             patientRepository.saveAndFlush(patientB);
         });
 
-        assertNotNull(patientRepository.findByPatientName("Doe^John"));
-        assertNotNull(patientRepository.findByPatientName("Doe^Jane"));
+        assertNotNull(patientRepository.findByPatientId("PAT001"));
+        assertNotNull(patientRepository.findByPatientId("PAT002"));
     }
 
     @Test
-    public void cannotAddPatientWithNullName()
+    public void cannotAddPatientWithNullId()
     {
         PatientEty patient = new PatientEty();
-        patient.setPatientId("PAT001");
-        // patientName is null
+        patient.setPatientName("Doe^John");
+        // patientId is null
 
         assertThrown(() -> patientRepository.saveAndFlush(patient))
             .isInstanceOf(DataAccessException.class);
@@ -302,23 +302,22 @@ public class UniqueConstraintsTest
     // ========== Cross-Entity Tests ==========
 
     @Test
-    public void canAddSamePatientNameInDifferentPatients_ButNotAllowed()
+    public void canAddSamePatientNameInDifferentPatients_NowAllowed()
     {
         // This test verifies the constraint works as designed
-        // Patient names must be unique per the constraint
+        // Patient IDs must be unique, but names can be duplicated
         PatientEty patientA = new PatientEty();
         patientA.setPatientName("Smith^John");
         patientA.setPatientId("PAT100");
 
         PatientEty patientB = new PatientEty();
-        patientB.setPatientName("Smith^John");
-        patientB.setPatientId("PAT101");
+        patientB.setPatientName("Smith^John");  // Same name
+        patientB.setPatientId("PAT101");        // Different ID
 
         patientRepository.saveAndFlush(patientA);
 
-        // Should fail due to unique constraint on patient name
-        assertThrown(() -> patientRepository.saveAndFlush(patientB))
-            .isInstanceOf(DataIntegrityViolationException.class);
+        // Should succeed - same name is now allowed with different IDs
+        assertDoesNotThrow(() -> patientRepository.saveAndFlush(patientB));
     }
 
     @Test

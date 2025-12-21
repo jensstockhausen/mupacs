@@ -113,16 +113,16 @@ public class DicomImportService
         }
 
         // Extract required DICOM identifiers
-        String patientName = dcm.getString(Tag.PatientName);
+        String patientId = dcm.getString(Tag.PatientID);
         String studyInstanceUID = dcm.getString(Tag.StudyInstanceUID);
         String seriesInstanceUID = dcm.getString(Tag.SeriesInstanceUID);
         String sopInstanceUID = dcm.getString(Tag.SOPInstanceUID);
 
         // Validate required tags
-        validateRequiredTags(patientName, studyInstanceUID, seriesInstanceUID, sopInstanceUID);
+        validateRequiredTags(patientId, studyInstanceUID, seriesInstanceUID, sopInstanceUID);
 
         // Process Patient level
-        PatientEty patient = findOrCreatePatient(dcm, patientName);
+        PatientEty patient = findOrCreatePatient(dcm, patientId);
 
         // Process Study level
         StudyEty study = findOrCreateStudy(dcm, studyInstanceUID, patient);
@@ -137,12 +137,12 @@ public class DicomImportService
     /**
      * Validates that all required DICOM tags are present and non-empty.
      */
-    private void validateRequiredTags(String patientName, String studyInstanceUID,
+    private void validateRequiredTags(String patientId, String studyInstanceUID,
                                       String seriesInstanceUID, String sopInstanceUID)
     {
-        if (patientName == null || patientName.trim().isEmpty())
+        if (patientId == null || patientId.trim().isEmpty())
         {
-            throw new IllegalArgumentException("Patient Name is required but missing or empty");
+            throw new IllegalArgumentException("Patient ID is required but missing or empty");
         }
 
         if (studyInstanceUID == null || studyInstanceUID.trim().isEmpty())
@@ -164,20 +164,20 @@ public class DicomImportService
     /**
      * Finds an existing patient or creates a new one.
      */
-    private PatientEty findOrCreatePatient(Attributes dcm, String patientName)
+    private PatientEty findOrCreatePatient(Attributes dcm, String patientId)
     {
-        PatientEty patient = patientRepository.findByPatientName(patientName);
+        PatientEty patient = patientRepository.findByPatientId(patientId);
 
         if (patient == null)
         {
-            LOG.debug("Creating new patient: [{}]", patientName);
+            LOG.debug("Creating new patient: [{}]", patientId);
             patient = dicomReader.readPatient(dcm);
             patient = patientRepository.save(patient);
-            LOG.info("Created new patient: [{}]", patientName);
+            LOG.info("Created new patient: [{}]", patientId);
         }
         else
         {
-            LOG.debug("Found existing patient: [{}]", patientName);
+            LOG.debug("Found existing patient: [{}]", patientId);
         }
 
         return patient;

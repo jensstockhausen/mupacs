@@ -17,7 +17,7 @@ public interface PatientRepository extends JpaRepository<PatientEty, Long>
 {
     PatientEty findByPatientName(@Param("patientname") String patientName);
 
-    List<PatientEty> findByPatientId(String patientId);
+    PatientEty findByPatientId(String patientId);
 
     List<PatientEty> findByPatientNameLike(String patientName);
 

@@ -58,8 +58,8 @@ import java.util.Objects;
     name = "PATIENT",
     uniqueConstraints = {
         @UniqueConstraint(
-            name = "AK_PATIENTNAME",
-            columnNames = {"patientName"})
+            name = "AK_PATIENTID",
+            columnNames = {"patientId"})
     })
 public class PatientEty
 {
@@ -70,9 +70,9 @@ public class PatientEty
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "patient", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<StudyEty> studies = new ArrayList<>();
 
-    @Column(nullable = false, unique = true)
     private String patientName;
 
+    @Column(nullable = false, unique = true)
     private String patientId;
 
     private LocalDate patientBirthDate;
@@ -122,13 +122,13 @@ public class PatientEty
      * Constructor with required fields.
      *
      * @param patientName the patient name
-     * @param patientId   the patient ID
-     * @throws IllegalArgumentException if patientName is null or empty
+     * @param patientId   the patient ID (unique identifier)
+     * @throws IllegalArgumentException if patientId is null or empty
      */
     public PatientEty(String patientName, String patientId)
     {
-        setPatientName(patientName);
-        this.patientId = patientId;
+        this.patientName = patientName;
+        setPatientId(patientId);
     }
 
     /**
@@ -143,7 +143,6 @@ public class PatientEty
 
     /**
      * Returns the patient name.
-     * This is the unique identifier for the patient in this system.
      *
      * @return the patient name, may be null if not set
      */
@@ -156,14 +155,9 @@ public class PatientEty
      * Sets the patient name.
      *
      * @param patientName the patient name to set
-     * @throws IllegalArgumentException if patientName is null or empty
      */
     public void setPatientName(String patientName)
     {
-        if (patientName == null || patientName.trim().isEmpty())
-        {
-            throw new IllegalArgumentException("Patient name cannot be null or empty");
-        }
         this.patientName = patientName;
     }
 
@@ -226,6 +220,7 @@ public class PatientEty
 
     /**
      * Returns the patient ID from the ordering system.
+     * This is the unique identifier for the patient in this system.
      *
      * @return the patient ID, may be null
      */
@@ -238,9 +233,14 @@ public class PatientEty
      * Sets the patient ID.
      *
      * @param patientId the patient ID to set
+     * @throws IllegalArgumentException if patientId is null or empty
      */
     public void setPatientId(String patientId)
     {
+        if (patientId == null || patientId.trim().isEmpty())
+        {
+            throw new IllegalArgumentException("Patient ID cannot be null or empty");
+        }
         this.patientId = patientId;
     }
 
@@ -560,13 +560,13 @@ public class PatientEty
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         PatientEty that = (PatientEty) o;
-        return patientName != null && Objects.equals(patientName, that.patientName);
+        return patientId != null && Objects.equals(patientId, that.patientId);
     }
 
     @Override
     public int hashCode()
     {
-        return Objects.hashCode(patientName);
+        return Objects.hashCode(patientId);
     }
 
     @Override

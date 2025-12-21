@@ -62,11 +62,12 @@ public class RepositoryTest
     // Patient
 
     @Test
-    public void canFindPatientByExactName()
+    public void canFindPatientByExactId()
     {
-        PatientEty patientEty = patientRepository.findByPatientName("Demo_005");
+        PatientEty patientEty = patientRepository.findByPatientId("1.2.48.5");
 
         assertThat(patientEty, is(notNullValue()));
+        assertThat(patientEty.getPatientId(), is(equalTo("1.2.48.5")));
         assertThat(patientEty.getPatientName(), is(equalTo("Demo_005")));
     }
 
@@ -78,15 +79,6 @@ public class RepositoryTest
         assertThat(patients, hasSize(1));
         assertThat(patients.get(0), is(notNullValue()));
         assertThat(patients.get(0).getPatientName(), is(equalTo("Demo_005")));
-    }
-
-    @Test
-    public void canFindPatientByPatientId()
-    {
-        List<PatientEty> patients = patientRepository.findByPatientId("1.2.48.3");
-
-        assertThat(patients, hasSize(1));
-        assertThat(patients.get(0).getPatientName(), is(equalTo("Demo_003")));
     }
 
     // Study
@@ -103,7 +95,7 @@ public class RepositoryTest
     @Test
     public void canFindStudyByPatientId()
     {
-        PatientEty patientEty = patientRepository.findByPatientName("Demo_005");
+        PatientEty patientEty = patientRepository.findByPatientId("1.2.48.5");
         List<StudyEty> studies = studyRepository.findByPatientId(patientEty.getId());
 
         assertThat(studies, hasSize(2));

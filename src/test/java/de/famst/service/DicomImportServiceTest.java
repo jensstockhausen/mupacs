@@ -111,11 +111,11 @@ class DicomImportServiceTest
     }
 
     @Test
-    void testDicomToDatabase_WithMissingPatientName_ThrowsException()
+    void testDicomToDatabase_WithMissingPatientID_ThrowsException()
     {
         // Given
         dcmAttributes = new Attributes();
-        dcmAttributes.setString(Tag.PatientName, VR.PN, (String) null);
+        dcmAttributes.setString(Tag.PatientID, VR.LO, (String) null);
 
         // When & Then
         IllegalArgumentException exception = assertThrows(
@@ -123,15 +123,15 @@ class DicomImportServiceTest
             () -> dicomImportService.dicomToDatabase(dcmAttributes, testPath)
         );
 
-        assertEquals("Patient Name is required but missing or empty", exception.getMessage());
+        assertEquals("Patient ID is required but missing or empty", exception.getMessage());
     }
 
     @Test
-    void testDicomToDatabase_WithEmptyPatientName_ThrowsException()
+    void testDicomToDatabase_WithEmptyPatientID_ThrowsException()
     {
         // Given
         dcmAttributes = new Attributes();
-        dcmAttributes.setString(Tag.PatientName, VR.PN, "   ");
+        dcmAttributes.setString(Tag.PatientID, VR.LO, "   ");
 
         // When & Then
         IllegalArgumentException exception = assertThrows(
@@ -139,7 +139,7 @@ class DicomImportServiceTest
             () -> dicomImportService.dicomToDatabase(dcmAttributes, testPath)
         );
 
-        assertEquals("Patient Name is required but missing or empty", exception.getMessage());
+        assertEquals("Patient ID is required but missing or empty", exception.getMessage());
     }
 
     @Test
@@ -147,7 +147,7 @@ class DicomImportServiceTest
     {
         // Given
         dcmAttributes = new Attributes();
-        dcmAttributes.setString(Tag.PatientName, VR.PN, PATIENT_NAME);
+        dcmAttributes.setString(Tag.PatientID, VR.LO, PATIENT_ID);
         dcmAttributes.setString(Tag.StudyInstanceUID, VR.PN, (String) null);
 
         // When & Then
@@ -164,7 +164,7 @@ class DicomImportServiceTest
     {
         // Given
         dcmAttributes = new Attributes();
-        dcmAttributes.setString(Tag.PatientName, VR.PN, PATIENT_NAME);
+        dcmAttributes.setString(Tag.PatientID, VR.LO, PATIENT_ID);
         dcmAttributes.setString(Tag.StudyInstanceUID, VR.PN, STUDY_UID);
         dcmAttributes.setString(Tag.SeriesInstanceUID, VR.PN, (String) null);
 
@@ -182,7 +182,7 @@ class DicomImportServiceTest
     {
         // Given
         dcmAttributes = new Attributes();
-        dcmAttributes.setString(Tag.PatientName, VR.PN, PATIENT_NAME);
+        dcmAttributes.setString(Tag.PatientID, VR.LO, PATIENT_ID);
         dcmAttributes.setString(Tag.StudyInstanceUID, VR.PN, STUDY_UID);
         dcmAttributes.setString(Tag.SeriesInstanceUID, VR.PN, SERIES_UID);
         dcmAttributes.setString(Tag.SOPInstanceUID, VR.PN, (String) null);
@@ -209,7 +209,7 @@ class DicomImportServiceTest
         SeriesEty series = new SeriesEty(SERIES_UID);
         InstanceEty instance = new InstanceEty(INSTANCE_UID, testPath.toString());
 
-        when(patientRepository.findByPatientName(PATIENT_NAME)).thenReturn(null);
+        when(patientRepository.findByPatientId(PATIENT_ID)).thenReturn(null);
         when(studyRepository.findByStudyInstanceUID(STUDY_UID)).thenReturn(null);
         when(seriesRepository.findBySeriesInstanceUID(SERIES_UID)).thenReturn(null);
         when(instanceRepository.findByInstanceUID(INSTANCE_UID)).thenReturn(null);
@@ -223,7 +223,7 @@ class DicomImportServiceTest
         dicomImportService.dicomToDatabase(dcmAttributes, testPath);
 
         // Then
-        verify(patientRepository).findByPatientName(PATIENT_NAME);
+        verify(patientRepository).findByPatientId(PATIENT_ID);
         verify(patientRepository).save(any(PatientEty.class));
 
         verify(studyRepository).findByStudyInstanceUID(STUDY_UID);
@@ -247,7 +247,7 @@ class DicomImportServiceTest
         SeriesEty series = new SeriesEty(SERIES_UID);
         InstanceEty instance = new InstanceEty(INSTANCE_UID, testPath.toString());
 
-        when(patientRepository.findByPatientName(PATIENT_NAME)).thenReturn(existingPatient);
+        when(patientRepository.findByPatientId(PATIENT_ID)).thenReturn(existingPatient);
         when(studyRepository.findByStudyInstanceUID(STUDY_UID)).thenReturn(null);
         when(seriesRepository.findBySeriesInstanceUID(SERIES_UID)).thenReturn(null);
         when(instanceRepository.findByInstanceUID(INSTANCE_UID)).thenReturn(null);
@@ -260,7 +260,7 @@ class DicomImportServiceTest
         dicomImportService.dicomToDatabase(dcmAttributes, testPath);
 
         // Then
-        verify(patientRepository).findByPatientName(PATIENT_NAME);
+        verify(patientRepository).findByPatientId(PATIENT_ID);
         verify(patientRepository, never()).save(any(PatientEty.class));
         verify(studyRepository).save(any(StudyEty.class));
         verify(seriesRepository).save(any(SeriesEty.class));
@@ -278,7 +278,7 @@ class DicomImportServiceTest
         SeriesEty series = new SeriesEty(SERIES_UID);
         InstanceEty instance = new InstanceEty(INSTANCE_UID, testPath.toString());
 
-        when(patientRepository.findByPatientName(PATIENT_NAME)).thenReturn(patient);
+        when(patientRepository.findByPatientId(PATIENT_ID)).thenReturn(patient);
         when(studyRepository.findByStudyInstanceUID(STUDY_UID)).thenReturn(existingStudy);
         when(seriesRepository.findBySeriesInstanceUID(SERIES_UID)).thenReturn(null);
         when(instanceRepository.findByInstanceUID(INSTANCE_UID)).thenReturn(null);
@@ -308,7 +308,7 @@ class DicomImportServiceTest
         SeriesEty existingSeries = new SeriesEty(SERIES_UID);
         InstanceEty instance = new InstanceEty(INSTANCE_UID, testPath.toString());
 
-        when(patientRepository.findByPatientName(PATIENT_NAME)).thenReturn(patient);
+        when(patientRepository.findByPatientId(PATIENT_ID)).thenReturn(patient);
         when(studyRepository.findByStudyInstanceUID(STUDY_UID)).thenReturn(study);
         when(seriesRepository.findBySeriesInstanceUID(SERIES_UID)).thenReturn(existingSeries);
         when(instanceRepository.findByInstanceUID(INSTANCE_UID)).thenReturn(null);
@@ -335,7 +335,7 @@ class DicomImportServiceTest
         SeriesEty series = new SeriesEty(SERIES_UID);
         InstanceEty existingInstance = new InstanceEty(INSTANCE_UID, testPath.toString());
 
-        when(patientRepository.findByPatientName(PATIENT_NAME)).thenReturn(patient);
+        when(patientRepository.findByPatientId(PATIENT_ID)).thenReturn(patient);
         when(studyRepository.findByStudyInstanceUID(STUDY_UID)).thenReturn(study);
         when(seriesRepository.findBySeriesInstanceUID(SERIES_UID)).thenReturn(series);
         when(instanceRepository.findByInstanceUID(INSTANCE_UID)).thenReturn(existingInstance);
@@ -359,7 +359,7 @@ class DicomImportServiceTest
         SeriesEty existingSeries = new SeriesEty(SERIES_UID);
         InstanceEty existingInstance = new InstanceEty(INSTANCE_UID, testPath.toString());
 
-        when(patientRepository.findByPatientName(PATIENT_NAME)).thenReturn(existingPatient);
+        when(patientRepository.findByPatientId(PATIENT_ID)).thenReturn(existingPatient);
         when(studyRepository.findByStudyInstanceUID(STUDY_UID)).thenReturn(existingStudy);
         when(seriesRepository.findBySeriesInstanceUID(SERIES_UID)).thenReturn(existingSeries);
         when(instanceRepository.findByInstanceUID(INSTANCE_UID)).thenReturn(existingInstance);
@@ -385,7 +385,7 @@ class DicomImportServiceTest
         SeriesEty series = new SeriesEty(SERIES_UID);
         InstanceEty instance = new InstanceEty(INSTANCE_UID, testPath.toString());
 
-        when(patientRepository.findByPatientName(PATIENT_NAME)).thenReturn(null);
+        when(patientRepository.findByPatientId(PATIENT_ID)).thenReturn(null);
         when(studyRepository.findByStudyInstanceUID(STUDY_UID)).thenReturn(null);
         when(seriesRepository.findBySeriesInstanceUID(SERIES_UID)).thenReturn(null);
         when(instanceRepository.findByInstanceUID(INSTANCE_UID)).thenReturn(null);
@@ -422,7 +422,7 @@ class DicomImportServiceTest
         SeriesEty series = new SeriesEty(SERIES_UID);
         InstanceEty instance1 = new InstanceEty(INSTANCE_UID, testPath.toString());
 
-        when(patientRepository.findByPatientName(PATIENT_NAME)).thenReturn(null);
+        when(patientRepository.findByPatientId(PATIENT_ID)).thenReturn(null);
         when(studyRepository.findByStudyInstanceUID(STUDY_UID)).thenReturn(null);
         when(seriesRepository.findBySeriesInstanceUID(SERIES_UID)).thenReturn(null);
         when(instanceRepository.findByInstanceUID(INSTANCE_UID)).thenReturn(null);
@@ -440,7 +440,7 @@ class DicomImportServiceTest
 
         // Given - Second import with same instance
         when(instanceRepository.findByInstanceUID(INSTANCE_UID)).thenReturn(instance1);
-        when(patientRepository.findByPatientName(PATIENT_NAME)).thenReturn(patient);
+        when(patientRepository.findByPatientId(PATIENT_ID)).thenReturn(patient);
         when(studyRepository.findByStudyInstanceUID(STUDY_UID)).thenReturn(study);
         when(seriesRepository.findBySeriesInstanceUID(SERIES_UID)).thenReturn(series);
 
@@ -459,6 +459,7 @@ class DicomImportServiceTest
         // Given
         dcmAttributes = new Attributes();
         dcmAttributes.setString(Tag.PatientName, VR.PN, PATIENT_NAME);
+        dcmAttributes.setString(Tag.PatientID, VR.LO, PATIENT_ID);
         dcmAttributes.setString(Tag.StudyInstanceUID, VR.PN, STUDY_UID);
         dcmAttributes.setString(Tag.SeriesInstanceUID, VR.PN, SERIES_UID);
         dcmAttributes.setString(Tag.SOPInstanceUID, VR.PN, INSTANCE_UID);
