@@ -3,6 +3,7 @@ package de.famst.data;
 import de.famst.MuPACSApplication;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
@@ -26,6 +27,7 @@ import static org.hamcrest.Matchers.notNullValue;
  */
 @DataJpaTest
 @ContextConfiguration(classes = {MuPACSApplication.class, RepositoryTest.SpringConfig.class})
+@DisplayName("Repository Integration Tests")
 public class RepositoryTest
 {
     // add DBFiller as component
@@ -61,6 +63,7 @@ public class RepositoryTest
 
     // Patient
 
+    @DisplayName("Should find patient by exact patient ID")
     @Test
     public void canFindPatientByExactId()
     {
@@ -71,6 +74,7 @@ public class RepositoryTest
         assertThat(patientEty.getPatientName(), is(equalTo("Demo_005")));
     }
 
+    @DisplayName("Should find patient by partial name using LIKE pattern")
     @Test
     public void canFindPatientByPartialName()
     {
@@ -83,6 +87,7 @@ public class RepositoryTest
 
     // Study
 
+    @DisplayName("Should find study by Study Instance UID")
     @Test
     public void canFindStudyByStudyInstanceUID()
     {
@@ -92,6 +97,7 @@ public class RepositoryTest
         assertThat(studyEty.getAccessionNumber(), is(equalTo("111")));
     }
 
+    @DisplayName("Should find studies by patient database ID")
     @Test
     public void canFindStudyByPatientId()
     {
@@ -110,6 +116,7 @@ public class RepositoryTest
 
     // Series
 
+    @DisplayName("Should find series by Series Instance UID")
     @Test
     public void canFindSeriesBySeriesInstanceUID()
     {
@@ -117,6 +124,7 @@ public class RepositoryTest
         assertThat(seriesEty.getSeriesInstanceUID(), is(equalTo("1.2.48.3.1.1")));
     }
 
+    @DisplayName("Should find series by study database ID")
     @Test
     public void canFindSeriesByStudyId()
     {
@@ -134,6 +142,7 @@ public class RepositoryTest
 
     // Instance
 
+    @DisplayName("Should find instance by Instance UID")
     @Test
     public void canGetInstanceByInstanceUID()
     {
@@ -143,6 +152,7 @@ public class RepositoryTest
         assertThat(instanceEty.getPath(), is(equalTo("PATH0")));
     }
 
+    @DisplayName("Should find instances by series database ID")
     @Test
     public void canGetInstancesBySeriesId()
     {

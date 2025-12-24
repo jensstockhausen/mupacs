@@ -13,6 +13,7 @@ import org.dcm4che3.data.Attributes;
 import org.dcm4che3.data.Tag;
 import org.dcm4che3.data.VR;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.io.TempDir;
@@ -38,6 +39,7 @@ import static org.mockito.Mockito.when;
  * Tests the DICOM import logic with mocked repositories.
  */
 @ExtendWith(MockitoExtension.class)
+@DisplayName("DicomImportService Tests")
 class DicomImportServiceTest
 {
     @Mock
@@ -83,6 +85,7 @@ class DicomImportServiceTest
         ReflectionTestUtils.setField(dicomImportService,"mupacsArchive", tempDir.resolve("archive").toString());
     }
 
+    @DisplayName("Should throw exception when DICOM attributes are null")
     @Test
     void testDicomToDatabase_WithNullAttributes_ThrowsException()
     {
@@ -95,6 +98,7 @@ class DicomImportServiceTest
         assertEquals("DICOM attributes cannot be null", exception.getMessage());
     }
 
+    @DisplayName("Should throw exception when file path is null")
     @Test
     void testDicomToDatabase_WithNullPath_ThrowsException()
     {
@@ -110,6 +114,7 @@ class DicomImportServiceTest
         assertEquals("File path cannot be null", exception.getMessage());
     }
 
+    @DisplayName("Should throw exception when Patient ID is missing")
     @Test
     void testDicomToDatabase_WithMissingPatientID_ThrowsException()
     {
@@ -126,6 +131,7 @@ class DicomImportServiceTest
         assertEquals("Patient ID is required but missing or empty", exception.getMessage());
     }
 
+    @DisplayName("Should throw exception when Patient ID is empty")
     @Test
     void testDicomToDatabase_WithEmptyPatientID_ThrowsException()
     {
@@ -142,6 +148,7 @@ class DicomImportServiceTest
         assertEquals("Patient ID is required but missing or empty", exception.getMessage());
     }
 
+    @DisplayName("Should throw exception when Study Instance UID is missing")
     @Test
     void testDicomToDatabase_WithMissingStudyInstanceUID_ThrowsException()
     {
@@ -159,6 +166,7 @@ class DicomImportServiceTest
         assertEquals("Study Instance UID is required but missing or empty", exception.getMessage());
     }
 
+    @DisplayName("Should throw exception when Series Instance UID is missing")
     @Test
     void testDicomToDatabase_WithMissingSeriesInstanceUID_ThrowsException()
     {
@@ -177,6 +185,7 @@ class DicomImportServiceTest
         assertEquals("Series Instance UID is required but missing or empty", exception.getMessage());
     }
 
+    @DisplayName("Should throw exception when SOP Instance UID is missing")
     @Test
     void testDicomToDatabase_WithMissingSOPInstanceUID_ThrowsException()
     {
@@ -197,7 +206,7 @@ class DicomImportServiceTest
         assertEquals("SOP Instance UID is required but missing or empty", exception.getMessage());
     }
 
-
+    @DisplayName("Should create all entities when data is completely new")
     @Test
     void testDicomToDatabase_WithCompletelyNewData_CreatesAllEntities()
     {
@@ -236,6 +245,7 @@ class DicomImportServiceTest
         verify(instanceRepository).save(any(InstanceEty.class));
     }
 
+    @DisplayName("Should reuse existing patient when patient already exists")
     @Test
     void testDicomToDatabase_WithExistingPatient_ReusesPatient()
     {
@@ -267,6 +277,7 @@ class DicomImportServiceTest
         verify(instanceRepository).save(any(InstanceEty.class));
     }
 
+    @DisplayName("Should reuse existing study when study already exists")
     @Test
     void testDicomToDatabase_WithExistingStudy_ReusesStudy()
     {
@@ -297,6 +308,7 @@ class DicomImportServiceTest
         verify(instanceRepository).save(any(InstanceEty.class));
     }
 
+    @DisplayName("Should reuse existing series when series already exists")
     @Test
     void testDicomToDatabase_WithExistingSeries_ReusesSeries()
     {
@@ -324,6 +336,7 @@ class DicomImportServiceTest
         verify(instanceRepository).save(any(InstanceEty.class));
     }
 
+    @DisplayName("Should skip instance creation when instance already exists")
     @Test
     void testDicomToDatabase_WithExistingInstance_SkipsInstanceCreation()
     {
@@ -348,6 +361,7 @@ class DicomImportServiceTest
         verify(instanceRepository, never()).save(any(InstanceEty.class));
     }
 
+    @DisplayName("Should not create any entities when all already exist")
     @Test
     void testDicomToDatabase_WithAllExistingEntities_NoEntitiesCreated()
     {
@@ -374,6 +388,7 @@ class DicomImportServiceTest
         verify(instanceRepository, never()).save(any(InstanceEty.class));
     }
 
+    @DisplayName("Should establish bidirectional relationships between entities")
     @Test
     void testDicomToDatabase_VerifiesBidirectionalRelationships()
     {
@@ -411,6 +426,7 @@ class DicomImportServiceTest
     }
 
 
+    @DisplayName("Should only save new instance when multiple instances added")
     @Test
     void testDicomToDatabase_MultipleInstances_OnlySavesNewInstance()
     {

@@ -7,6 +7,7 @@ import org.dcm4che3.io.DicomOutputStream;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -26,6 +27,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * Note: Most tests are disabled by default as they require a running DICOM SCP.
  * To run these tests, start a DICOM SCP (e.g., dcm4che storescp) on localhost:11112.
  */
+@DisplayName("DcmClient Tests")
 class DcmClientTest
 {
     @TempDir
@@ -50,18 +52,21 @@ class DcmClientTest
         }
     }
 
+    @DisplayName("Should create DcmClient instance successfully")
     @Test
     void testConstruction()
     {
         assertNotNull(dcmClient);
     }
 
+    @DisplayName("Should initialize without errors when called explicitly")
     @Test
     void testExplicitInitialization()
     {
         assertDoesNotThrow(() -> dcmClient.initialize());
     }
 
+    @DisplayName("Should handle multiple initialization calls safely")
     @Test
     void testMultipleInitializations()
     {
@@ -73,6 +78,7 @@ class DcmClientTest
         });
     }
 
+    @DisplayName("Should initialize lazily when first operation is called")
     @Test
     void testLazyInitialization()
     {
@@ -83,6 +89,7 @@ class DcmClientTest
         assertTrue(true);
     }
 
+    @DisplayName("Should succeed C-ECHO when SCP is available")
     @Test
     @Disabled("Requires running DICOM SCP on localhost:11112")
     void testEchoSuccess()
@@ -91,6 +98,7 @@ class DcmClientTest
         assertTrue(result, "C-ECHO should succeed when SCP is available");
     }
 
+    @DisplayName("Should fail C-ECHO for invalid host")
     @Test
     void testEchoFailureInvalidHost()
     {
@@ -98,6 +106,7 @@ class DcmClientTest
         assertFalse(result, "C-ECHO should fail for invalid host");
     }
 
+    @DisplayName("Should fail C-ECHO for invalid port")
     @Test
     void testEchoFailureInvalidPort()
     {
@@ -105,6 +114,7 @@ class DcmClientTest
         assertFalse(result, "C-ECHO should fail for invalid port");
     }
 
+    @DisplayName("Should fail C-STORE for non-existent file")
     @Test
     void testStoreNonExistentFile()
     {
@@ -113,6 +123,7 @@ class DcmClientTest
         assertFalse(result, "C-STORE should fail for non-existent file");
     }
 
+    @DisplayName("Should succeed C-STORE when SCP is available")
     @Test
     @Disabled("Requires running DICOM SCP on localhost:11112")
     void testStoreSuccess() throws Exception
@@ -124,6 +135,7 @@ class DcmClientTest
         assertTrue(result, "C-STORE should succeed when SCP is available");
     }
 
+    @DisplayName("Should store all DICOM files from directory")
     @Test
     @Disabled("Requires running DICOM SCP on localhost:11112")
     void testStoreDirectory() throws Exception
@@ -137,6 +149,7 @@ class DcmClientTest
         assertEquals(3, successCount, "Should successfully store all 3 files");
     }
 
+    @DisplayName("Should return 0 for non-existent directory")
     @Test
     void testStoreDirectoryNonExistent()
     {
@@ -145,6 +158,7 @@ class DcmClientTest
         assertEquals(0, successCount, "Should return 0 for non-existent directory");
     }
 
+    @DisplayName("Should return 0 for empty directory")
     @Test
     void testStoreDirectoryEmpty()
     {
@@ -154,6 +168,7 @@ class DcmClientTest
         assertEquals(0, successCount, "Should return 0 for empty directory");
     }
 
+    @DisplayName("Should fail C-STORE for invalid DICOM file")
     @Test
     void testStoreInvalidDicomFile() throws Exception
     {
@@ -165,12 +180,14 @@ class DcmClientTest
         assertFalse(result, "C-STORE should fail for invalid DICOM file");
     }
 
+    @DisplayName("Should shutdown without errors")
     @Test
     void testShutdown()
     {
         assertDoesNotThrow(() -> dcmClient.shutdown());
     }
 
+    @DisplayName("Should handle multiple shutdown calls gracefully")
     @Test
     void testMultipleShutdowns()
     {
@@ -181,6 +198,7 @@ class DcmClientTest
         });
     }
 
+    @DisplayName("Should reinitialize successfully after shutdown")
     @Test
     void testReinitializationAfterShutdown()
     {
@@ -238,4 +256,3 @@ class DcmClientTest
         return "1.2.3.4.5.6.7.8." + System.currentTimeMillis() + "." + (int)(Math.random() * 10000);
     }
 }
-

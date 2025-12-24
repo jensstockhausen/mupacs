@@ -8,6 +8,7 @@ import org.dcm4che3.net.Dimse;
 import org.dcm4che3.net.PDVInputStream;
 import org.dcm4che3.net.pdu.PresentationContext;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -19,6 +20,7 @@ import static org.mockito.Mockito.when;
 /**
  * Unit tests for DcmEchoSCP class
  */
+@DisplayName("DcmEchoSCP Tests")
 class DcmEchoSCPTest
 {
     @Mock
@@ -49,12 +51,14 @@ class DcmEchoSCPTest
         }
     }
 
+    @DisplayName("Should create DcmEchoSCP instance successfully")
     @Test
     void testConstructor()
     {
         assertNotNull(dcmEchoSCP);
     }
 
+    @DisplayName("Should handle C-ECHO request without throwing exception")
     @Test
     void testCEchoRequest() throws Exception
     {
@@ -73,6 +77,7 @@ class DcmEchoSCPTest
         );
     }
 
+    @DisplayName("Should handle multiple consecutive C-ECHO requests")
     @Test
     void testMultipleCEchoRequests() throws Exception
     {
@@ -96,4 +101,3 @@ class DcmEchoSCPTest
         }
     }
 }
-

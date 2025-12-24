@@ -2,6 +2,7 @@ package de.famst.service;
 
 import de.famst.data.AetEty;
 import de.famst.data.AetRepository;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -18,6 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 @SpringBootTest
 @ActiveProfiles("test")
+@DisplayName("AET Initialization Integration Tests")
 class AetInitializationIntegrationTest
 {
     @Autowired
@@ -26,6 +28,7 @@ class AetInitializationIntegrationTest
     @Autowired
     private AetInitializationService aetInitializationService;
 
+    @DisplayName("Should initialize AETs from application configuration on startup")
     @Test
     void testAetsAreInitializedFromConfiguration()
     {
@@ -50,6 +53,7 @@ class AetInitializationIntegrationTest
         assertEquals("TEST_PACS2@192.168.1.100:11112", pacs2.get().getConnectionString());
     }
 
+    @DisplayName("Should not create duplicate AETs on re-initialization")
     @Test
     void testReInitializationDoesNotCreateDuplicates()
     {
@@ -64,4 +68,3 @@ class AetInitializationIntegrationTest
             "Re-initialization should not create duplicate AETs");
     }
 }
-

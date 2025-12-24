@@ -1,5 +1,6 @@
 package de.famst.data;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
@@ -16,6 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
  * Tests verify that duplicate UIDs/names are properly rejected by the database.
  */
 @DataJpaTest
+@DisplayName("Unique Constraints Tests")
 public class UniqueConstraintsTest
 {
     @Autowired
@@ -35,6 +37,7 @@ public class UniqueConstraintsTest
 
     // ========== Patient Unique Constraint Tests ==========
 
+    @DisplayName("Should reject patient with duplicate patient ID")
     @Test
     public void cannotAddPatientWithSameIdTwice()
     {
@@ -52,6 +55,7 @@ public class UniqueConstraintsTest
             .isInstanceOf(DataAccessException.class);
     }
 
+    @DisplayName("Should allow patients with different IDs but same name")
     @Test
     public void canAddPatientWithDifferentId()
     {
@@ -72,6 +76,7 @@ public class UniqueConstraintsTest
         assertNotNull(patientRepository.findByPatientId("PAT002"));
     }
 
+    @DisplayName("Should reject patient with null patient ID")
     @Test
     public void cannotAddPatientWithNullId()
     {
@@ -85,6 +90,7 @@ public class UniqueConstraintsTest
 
     // ========== Study Unique Constraint Tests ==========
 
+    @DisplayName("Should reject study with duplicate Study Instance UID")
     @Test
     public void cannotAddStudyWithSameInstanceUIDTwice()
     {
@@ -110,6 +116,7 @@ public class UniqueConstraintsTest
             .isInstanceOf(DataAccessException.class);
     }
 
+    @DisplayName("Should allow studies with different Study Instance UIDs")
     @Test
     public void canAddStudyWithDifferentInstanceUID()
     {
@@ -137,6 +144,7 @@ public class UniqueConstraintsTest
         assertNotNull(studyRepository.findByStudyInstanceUID("1.2.840.113619.2.1.200"));
     }
 
+    @DisplayName("Should reject study with null Study Instance UID")
     @Test
     public void cannotAddStudyWithNullInstanceUID()
     {
@@ -156,6 +164,7 @@ public class UniqueConstraintsTest
 
     // ========== Series Unique Constraint Tests ==========
 
+    @DisplayName("Should reject series with duplicate Series Instance UID")
     @Test
     public void cannotAddSeriesWithSameInstanceUIDTwice()
     {
@@ -185,6 +194,7 @@ public class UniqueConstraintsTest
             .isInstanceOf(DataAccessException.class);
     }
 
+    @DisplayName("Should allow series with different Series Instance UIDs")
     @Test
     public void canAddSeriesWithDifferentInstanceUID()
     {
@@ -216,6 +226,7 @@ public class UniqueConstraintsTest
         assertNotNull(seriesRepository.findBySeriesInstanceUID("1.2.840.113619.2.1.400.2"));
     }
 
+    @DisplayName("Should reject series with null Series Instance UID")
     @Test
     public void cannotAddSeriesWithNullInstanceUID()
     {
@@ -240,6 +251,7 @@ public class UniqueConstraintsTest
 
     // ========== Instance Unique Constraint Tests ==========
 
+    @DisplayName("Should reject instance with duplicate SOP Instance UID")
     @Test
     public void cannotInsertSameInstanceTwice()
     {
@@ -257,6 +269,7 @@ public class UniqueConstraintsTest
             .isInstanceOf(DataIntegrityViolationException.class);
     }
 
+    @DisplayName("Should allow instances with different SOP Instance UIDs")
     @Test
     public void canAddInstanceWithDifferentUID()
     {
@@ -277,6 +290,7 @@ public class UniqueConstraintsTest
         assertNotNull(instanceRepository.findByInstanceUID("1.2.3.5"));
     }
 
+    @DisplayName("Should reject instance with null SOP Instance UID")
     @Test
     public void cannotAddInstanceWithNullUID()
     {
@@ -288,6 +302,7 @@ public class UniqueConstraintsTest
             .isInstanceOf(DataIntegrityViolationException.class);
     }
 
+    @DisplayName("Should reject instance with null file path")
     @Test
     public void cannotAddInstanceWithNullPath()
     {
@@ -301,6 +316,7 @@ public class UniqueConstraintsTest
 
     // ========== Cross-Entity Tests ==========
 
+    @DisplayName("Should allow same patient name with different patient IDs")
     @Test
     public void canAddSamePatientNameInDifferentPatients_NowAllowed()
     {
@@ -320,6 +336,7 @@ public class UniqueConstraintsTest
         assertDoesNotThrow(() -> patientRepository.saveAndFlush(patientB));
     }
 
+    @DisplayName("Should allow multiple studies to belong to same patient")
     @Test
     public void multipleStudiesCanBelongToSamePatient()
     {
@@ -344,6 +361,7 @@ public class UniqueConstraintsTest
         });
     }
 
+    @DisplayName("Should allow multiple series to belong to same study")
     @Test
     public void multipleSeriesCanBelongToSameStudy()
     {
@@ -372,6 +390,7 @@ public class UniqueConstraintsTest
         });
     }
 
+    @DisplayName("Should allow multiple instances to belong to same series")
     @Test
     public void multipleInstancesCanBelongToSameSeries()
     {

@@ -12,6 +12,7 @@ import org.dcm4che3.net.pdu.PresentationContext;
 import org.dcm4che3.net.service.DicomServiceException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Mock;
@@ -42,6 +43,7 @@ import static org.mockito.Mockito.when;
 /**
  * Unit tests for DcmStoreSCP class
  */
+@DisplayName("DcmStoreSCP Tests")
 class DcmStoreSCPTest
 {
     @TempDir
@@ -81,6 +83,7 @@ class DcmStoreSCPTest
         }
     }
 
+    @DisplayName("Should create DcmStoreSCP instance successfully")
     @Test
     void testConstructor()
     {
@@ -88,6 +91,7 @@ class DcmStoreSCPTest
         assertNotNull(mockDicomImportService);
     }
 
+    @DisplayName("Should reject store request with null SOP Instance UID")
     @Test
     void testStoreWithNullSOPInstanceUID() throws IOException
     {
@@ -109,6 +113,7 @@ class DcmStoreSCPTest
         assertEquals(Status.ProcessingFailure, exception.getStatus());
     }
 
+    @DisplayName("Should reject store request with empty SOP Instance UID")
     @Test
     void testStoreWithEmptySOPInstanceUID()
     {
@@ -130,6 +135,7 @@ class DcmStoreSCPTest
         assertEquals(Status.ProcessingFailure, exception.getStatus());
     }
 
+    @DisplayName("Should interact with DicomImportService correctly")
     @Test
     void testDicomImportServiceInteraction() throws Exception
     {
@@ -142,6 +148,7 @@ class DcmStoreSCPTest
         verify(mockDicomImportService, times(1)).dicomToDatabase(testFile);
     }
 
+    @DisplayName("Should handle DicomImportService exception")
     @Test
     void testDicomImportServiceException() throws Exception
     {
@@ -153,6 +160,7 @@ class DcmStoreSCPTest
         assertThrows(RuntimeException.class, () -> mockDicomImportService.dicomToDatabase(testFile));
     }
 
+    @DisplayName("Should handle C-STORE request simulation")
     @Test
     void testCStoreSimulation() throws Exception
     {
@@ -230,4 +238,3 @@ class DcmStoreSCPTest
         verify(mockDicomImportService, atLeastOnce()).dicomToDatabase(any(File.class));
     }
 }
-

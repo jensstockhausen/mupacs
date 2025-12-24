@@ -4,6 +4,7 @@ import de.famst.data.AetEty;
 import de.famst.data.AetRepository;
 import de.famst.dcm.DcmClient;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -25,6 +26,7 @@ import static org.mockito.Mockito.when;
 /**
  * Unit tests for DcmClientService
  */
+@DisplayName("DcmClientService Tests")
 class DcmClientServiceTest
 {
     @Mock
@@ -52,6 +54,7 @@ class DcmClientServiceTest
         }
     }
 
+    @DisplayName("Should successfully echo when AET exists by name")
     @Test
     void testEchoByName_Success()
     {
@@ -65,6 +68,7 @@ class DcmClientServiceTest
         verify(mockDcmClient, times(1)).echo("REMOTE_PACS", "localhost", 104);
     }
 
+    @DisplayName("Should return false when AET not found by name for echo")
     @Test
     void testEchoByName_AetNotFound()
     {
@@ -76,6 +80,7 @@ class DcmClientServiceTest
         verify(mockDcmClient, never()).echo(anyString(), anyString(), anyInt());
     }
 
+    @DisplayName("Should successfully echo when AET exists by ID")
     @Test
     void testEchoById_Success()
     {
@@ -89,6 +94,7 @@ class DcmClientServiceTest
         verify(mockDcmClient, times(1)).echo("REMOTE_PACS", "192.168.1.100", 11112);
     }
 
+    @DisplayName("Should return false when AET not found by ID for echo")
     @Test
     void testEchoById_AetNotFound()
     {
@@ -100,6 +106,7 @@ class DcmClientServiceTest
         verify(mockDcmClient, never()).echo(anyString(), anyString(), anyInt());
     }
 
+    @DisplayName("Should successfully store file when AET exists by name")
     @Test
     void testStoreByName_Success()
     {
@@ -115,6 +122,7 @@ class DcmClientServiceTest
         verify(mockDcmClient, times(1)).store("REMOTE_PACS", "localhost", 104, dicomFile);
     }
 
+    @DisplayName("Should return false when AET not found by name for store")
     @Test
     void testStoreByName_AetNotFound()
     {
@@ -127,6 +135,7 @@ class DcmClientServiceTest
         verify(mockDcmClient, never()).store(anyString(), anyString(), anyInt(), any(File.class));
     }
 
+    @DisplayName("Should successfully store file when AET exists by ID")
     @Test
     void testStoreById_Success()
     {
@@ -142,6 +151,7 @@ class DcmClientServiceTest
         verify(mockDcmClient, times(1)).store("REMOTE_PACS", "localhost", 104, dicomFile);
     }
 
+    @DisplayName("Should successfully store directory of files when AET exists")
     @Test
     void testStoreDirectory_Success()
     {
@@ -157,6 +167,7 @@ class DcmClientServiceTest
         verify(mockDcmClient, times(1)).storeDirectory("REMOTE_PACS", "localhost", 104, directory);
     }
 
+    @DisplayName("Should return 0 when AET not found for store directory")
     @Test
     void testStoreDirectory_AetNotFound()
     {
@@ -169,6 +180,7 @@ class DcmClientServiceTest
         verify(mockDcmClient, never()).storeDirectory(anyString(), anyString(), anyInt(), any(File.class));
     }
 
+    @DisplayName("Should successfully store directory when AET exists by ID")
     @Test
     void testStoreDirectoryById_Success()
     {
@@ -184,6 +196,7 @@ class DcmClientServiceTest
         verify(mockDcmClient, times(1)).storeDirectory("REMOTE_PACS", "localhost", 104, directory);
     }
 
+    @DisplayName("Should echo directly without repository lookup")
     @Test
     void testEchoDirect()
     {
@@ -196,6 +209,7 @@ class DcmClientServiceTest
         verify(mockAetRepository, never()).findByAet(anyString());
     }
 
+    @DisplayName("Should store directly without repository lookup")
     @Test
     void testStoreDirect()
     {
@@ -209,4 +223,3 @@ class DcmClientServiceTest
         verify(mockAetRepository, never()).findByAet(anyString());
     }
 }
-

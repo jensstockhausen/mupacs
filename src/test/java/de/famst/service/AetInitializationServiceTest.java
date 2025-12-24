@@ -3,6 +3,7 @@ package de.famst.service;
 import de.famst.data.AetEty;
 import de.famst.data.AetRepository;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
@@ -24,6 +25,7 @@ import static org.mockito.Mockito.when;
 /**
  * Unit tests for AetInitializationService
  */
+@DisplayName("AET Initialization Service Tests")
 class AetInitializationServiceTest
 {
     @Mock
@@ -48,6 +50,7 @@ class AetInitializationServiceTest
         }
     }
 
+    @DisplayName("Should parse single AET entry correctly")
     @Test
     void testParseAetConfiguration_SingleEntry()
     {
@@ -60,6 +63,7 @@ class AetInitializationServiceTest
         assertEquals(104, aets.get(0).getPort());
     }
 
+    @DisplayName("Should parse multiple AET entries separated by semicolons")
     @Test
     void testParseAetConfiguration_MultipleEntries()
     {
@@ -81,6 +85,7 @@ class AetInitializationServiceTest
         assertEquals(8104, aets.get(2).getPort());
     }
 
+    @DisplayName("Should handle whitespace in AET configuration")
     @Test
     void testParseAetConfiguration_WithWhitespace()
     {
@@ -93,6 +98,7 @@ class AetInitializationServiceTest
         assertEquals(104, aets.get(0).getPort());
     }
 
+    @DisplayName("Should return empty list for empty or null configuration")
     @Test
     void testParseAetConfiguration_EmptyString()
     {
@@ -106,6 +112,7 @@ class AetInitializationServiceTest
         assertTrue(aets.isEmpty());
     }
 
+    @DisplayName("Should skip invalid entries and parse valid ones")
     @Test
     void testParseAetConfiguration_InvalidEntries()
     {
@@ -119,6 +126,7 @@ class AetInitializationServiceTest
         assertEquals("ANOTHER", aets.get(1).getAet());
     }
 
+    @DisplayName("Should return empty list when @ symbol is missing")
     @Test
     void testParseAetConfiguration_MissingAtSymbol()
     {
@@ -127,6 +135,7 @@ class AetInitializationServiceTest
         assertTrue(aets.isEmpty());
     }
 
+    @DisplayName("Should return empty list when port colon is missing")
     @Test
     void testParseAetConfiguration_MissingColon()
     {
@@ -135,6 +144,7 @@ class AetInitializationServiceTest
         assertTrue(aets.isEmpty());
     }
 
+    @DisplayName("Should return empty list when port is not a number")
     @Test
     void testParseAetConfiguration_InvalidPort()
     {
@@ -143,6 +153,7 @@ class AetInitializationServiceTest
         assertTrue(aets.isEmpty());
     }
 
+    @DisplayName("Should return empty list when AET name is empty")
     @Test
     void testParseAetConfiguration_EmptyAet()
     {
@@ -151,6 +162,7 @@ class AetInitializationServiceTest
         assertTrue(aets.isEmpty());
     }
 
+    @DisplayName("Should return empty list when host is empty")
     @Test
     void testParseAetConfiguration_EmptyHost()
     {
@@ -159,6 +171,7 @@ class AetInitializationServiceTest
         assertTrue(aets.isEmpty());
     }
 
+    @DisplayName("Should not save any AETs when configuration is empty")
     @Test
     void testInitializeAets_EmptyConfiguration()
     {
@@ -169,6 +182,7 @@ class AetInitializationServiceTest
         verify(mockAetRepository, never()).save(any(AetEty.class));
     }
 
+    @DisplayName("Should not save any AETs when configuration is null")
     @Test
     void testInitializeAets_NullConfiguration()
     {
@@ -179,6 +193,7 @@ class AetInitializationServiceTest
         verify(mockAetRepository, never()).save(any(AetEty.class));
     }
 
+    @DisplayName("Should create and save new AETs from configuration")
     @Test
     void testInitializeAets_CreatesNewAets()
     {
@@ -196,6 +211,7 @@ class AetInitializationServiceTest
         assertEquals("PACS2", savedAets.get(1).getAet());
     }
 
+    @DisplayName("Should skip existing AETs and only save new ones")
     @Test
     void testInitializeAets_SkipsExistingAets()
     {
@@ -212,6 +228,7 @@ class AetInitializationServiceTest
         assertEquals("NEW", captor.getValue().getAet());
     }
 
+    @DisplayName("Should handle database exceptions gracefully")
     @Test
     void testInitializeAets_HandlesException()
     {
@@ -224,6 +241,7 @@ class AetInitializationServiceTest
         assertDoesNotThrow(() -> service.initializeAets());
     }
 
+    @DisplayName("Should parse IPv6 address correctly")
     @Test
     void testParseAetConfiguration_IPv6Address()
     {
@@ -236,6 +254,7 @@ class AetInitializationServiceTest
         assertEquals(104, aets.get(0).getPort());
     }
 
+    @DisplayName("Should parse domain names with subdomains correctly")
     @Test
     void testParseAetConfiguration_DomainWithMultipleColons()
     {
@@ -248,4 +267,3 @@ class AetInitializationServiceTest
         assertEquals(11112, aets.get(0).getPort());
     }
 }
-
