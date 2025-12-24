@@ -76,11 +76,56 @@ public class DcmImageQueryTask extends BasicQueryTask
 
         InstanceEty instanceEty = currentInstances.get(currentIndex);
 
+        // Instance/Image level attributes
         nextMatch.setString(Tag.SOPInstanceUID, VR.UI, instanceEty.getInstanceUID());
 
         if (instanceEty.getInstanceNumber() != null)
         {
             nextMatch.setInt(Tag.InstanceNumber, VR.IS, instanceEty.getInstanceNumber());
+        }
+        if (instanceEty.getContentDate() != null)
+        {
+            nextMatch.setDate(Tag.ContentDate, VR.DA,
+                java.sql.Date.valueOf(instanceEty.getContentDate()));
+        }
+        if (instanceEty.getContentTime() != null)
+        {
+            nextMatch.setDate(Tag.ContentTime, VR.TM,
+                java.sql.Time.valueOf(instanceEty.getContentTime()));
+        }
+        if (instanceEty.getImageType() != null)
+        {
+            nextMatch.setString(Tag.ImageType, VR.CS, instanceEty.getImageType());
+        }
+        if (instanceEty.getAcquisitionNumber() != null)
+        {
+            nextMatch.setInt(Tag.AcquisitionNumber, VR.IS, instanceEty.getAcquisitionNumber());
+        }
+        if (instanceEty.getAcquisitionDate() != null)
+        {
+            nextMatch.setDate(Tag.AcquisitionDate, VR.DA,
+                java.sql.Date.valueOf(instanceEty.getAcquisitionDate()));
+        }
+        if (instanceEty.getAcquisitionTime() != null)
+        {
+            nextMatch.setDate(Tag.AcquisitionTime, VR.TM,
+                java.sql.Time.valueOf(instanceEty.getAcquisitionTime()));
+        }
+        if (instanceEty.getRows() != null)
+        {
+            nextMatch.setInt(Tag.Rows, VR.US, instanceEty.getRows());
+        }
+        if (instanceEty.getColumns() != null)
+        {
+            nextMatch.setInt(Tag.Columns, VR.US, instanceEty.getColumns());
+        }
+        if (instanceEty.getBitsAllocated() != null)
+        {
+            nextMatch.setInt(Tag.BitsAllocated, VR.US, instanceEty.getBitsAllocated());
+        }
+        if (instanceEty.getBitsStored() != null)
+        {
+            nextMatch.setInt(Tag.BitsStored, VR.US, instanceEty.getBitsStored());
         }
 
         currentIndex = currentIndex + 1;
@@ -90,4 +135,3 @@ public class DcmImageQueryTask extends BasicQueryTask
         return nextMatch;
     }
 }
-

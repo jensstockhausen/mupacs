@@ -44,8 +44,21 @@ public class DcmSeriesQueryTask extends BasicQueryTask
     @PostConstruct
     public void postConstructor()
     {
-        List<SeriesEty> seriesEtyList = patientStudyFinder.findSeries(keys);
-        currentSeries = seriesEtyList;
+        String queryLevel = keys.getString(Tag.QueryRetrieveLevel);
+        LOG.info("Query level [{}]", queryLevel);
+
+        currentSeries = patientStudyFinder.findSeries(keys);
+
+        if (currentSeries == null)
+        {
+            LOG.warn("No series found matching query criteria");
+            currentSeries = List.of();
+        }
+        else
+        {
+            LOG.info("Found [{}] series matching query criteria", currentSeries.size());
+        }
+
         currentIndex = 0;
     }
 
@@ -64,9 +77,55 @@ public class DcmSeriesQueryTask extends BasicQueryTask
 
         SeriesEty seriesEty = currentSeries.get(currentIndex);
 
+        // Series level attributes
         nextMatch.setString(Tag.SeriesInstanceUID, VR.UI, seriesEty.getSeriesInstanceUID());
-        nextMatch.setString(Tag.Modality, VR.CS, "US");
-        nextMatch.setInt(Tag.SeriesNumber, VR.IS, 0);
+
+        if (seriesEty.getModality() != null)
+        {
+            nextMatch.setString(Tag.Modality, VR.CS, seriesEty.getModality());
+        }
+        if (seriesEty.getSeriesNumber() != null)
+        {
+            nextMatch.setInt(Tag.SeriesNumber, VR.IS, seriesEty.getSeriesNumber());
+        }
+        if (seriesEty.getSeriesDescription() != null)
+        {
+            nextMatch.setString(Tag.SeriesDescription, VR.LO, seriesEty.getSeriesDescription());
+        }
+        if (seriesEty.getSeriesDate() != null)
+        {
+            nextMatch.setDate(Tag.SeriesDate, VR.DA,
+                java.sql.Date.valueOf(seriesEty.getSeriesDate()));
+        }
+        if (seriesEty.getSeriesTime() != null)
+        {
+            nextMatch.setDate(Tag.SeriesTime, VR.TM,
+                java.sql.Time.valueOf(seriesEty.getSeriesTime()));
+        }
+        if (seriesEty.getPerformingPhysicianName() != null)
+        {
+            nextMatch.setString(Tag.PerformingPhysicianName, VR.PN, seriesEty.getPerformingPhysicianName());
+        }
+        if (seriesEty.getProtocolName() != null)
+        {
+            nextMatch.setString(Tag.ProtocolName, VR.LO, seriesEty.getProtocolName());
+        }
+        if (seriesEty.getBodyPartExamined() != null)
+        {
+            nextMatch.setString(Tag.BodyPartExamined, VR.CS, seriesEty.getBodyPartExamined());
+        }
+        if (seriesEty.getPatientPosition() != null)
+        {
+            nextMatch.setString(Tag.PatientPosition, VR.CS, seriesEty.getPatientPosition());
+        }
+        if (seriesEty.getLaterality() != null)
+        {
+            nextMatch.setString(Tag.Laterality, VR.CS, seriesEty.getLaterality());
+        }
+        if (seriesEty.getOperatorsName() != null)
+        {
+            nextMatch.setString(Tag.OperatorsName, VR.PN, seriesEty.getOperatorsName());
+        }
 
         currentIndex = currentIndex + 1;
 

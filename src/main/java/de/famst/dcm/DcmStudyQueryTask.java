@@ -51,8 +51,18 @@ public class DcmStudyQueryTask extends BasicQueryTask
 
         LOG.info("Query level [{}]", queryLevel);
 
-        List<PatientEty> patientEtyList = patientStudyFinder.findPatients(keys);
-        currentStudies = patientStudyFinder.getStudiesForPatient(patientEtyList);
+        currentStudies = patientStudyFinder.findStudies(keys);
+
+        if (currentStudies == null)
+        {
+            LOG.warn("No studies found matching query criteria");
+            currentStudies = List.of();
+        }
+        else
+        {
+            LOG.info("Found [{}] study(ies) matching query criteria", currentStudies.size());
+        }
+
         currentIndex = 0;
     }
 
@@ -73,8 +83,55 @@ public class DcmStudyQueryTask extends BasicQueryTask
         StudyEty studyEty = currentStudies.get(currentIndex);
         PatientEty patientEty = studyEty.getPatient();
 
-        nextMatch.setString(Tag.PatientName, VR.PN, patientEty.getPatientName());
+        // Patient level attributes
+        if (patientEty != null)
+        {
+            nextMatch.setString(Tag.PatientName, VR.PN, patientEty.getPatientName());
+            nextMatch.setString(Tag.PatientID, VR.LO, patientEty.getPatientId());
+            if (patientEty.getPatientBirthDate() != null)
+            {
+                nextMatch.setDate(Tag.PatientBirthDate, VR.DA,
+                    java.sql.Date.valueOf(patientEty.getPatientBirthDate()));
+            }
+            if (patientEty.getPatientSex() != null)
+            {
+                nextMatch.setString(Tag.PatientSex, VR.CS, patientEty.getPatientSex());
+            }
+        }
+
+        // Study level attributes
         nextMatch.setString(Tag.StudyInstanceUID, VR.UI, studyEty.getStudyInstanceUID());
+
+        if (studyEty.getStudyId() != null)
+        {
+            nextMatch.setString(Tag.StudyID, VR.SH, studyEty.getStudyId());
+        }
+        if (studyEty.getStudyDate() != null)
+        {
+            nextMatch.setDate(Tag.StudyDate, VR.DA,
+                java.sql.Date.valueOf(studyEty.getStudyDate()));
+        }
+        if (studyEty.getStudyTime() != null)
+        {
+            nextMatch.setDate(Tag.StudyTime, VR.TM,
+                java.sql.Time.valueOf(studyEty.getStudyTime()));
+        }
+        if (studyEty.getStudyDescription() != null)
+        {
+            nextMatch.setString(Tag.StudyDescription, VR.LO, studyEty.getStudyDescription());
+        }
+        if (studyEty.getAccessionNumber() != null)
+        {
+            nextMatch.setString(Tag.AccessionNumber, VR.SH, studyEty.getAccessionNumber());
+        }
+        if (studyEty.getModalitiesInStudy() != null)
+        {
+            nextMatch.setString(Tag.ModalitiesInStudy, VR.CS, studyEty.getModalitiesInStudy());
+        }
+        if (studyEty.getReferringPhysicianName() != null)
+        {
+            nextMatch.setString(Tag.ReferringPhysicianName, VR.PN, studyEty.getReferringPhysicianName());
+        }
 
         currentIndex = currentIndex + 1;
 
