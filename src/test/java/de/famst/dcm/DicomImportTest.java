@@ -6,6 +6,7 @@ import de.famst.data.SeriesEty;
 import de.famst.data.StudyEty;
 import org.dcm4che3.data.Attributes;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -16,6 +17,7 @@ import static org.hamcrest.Matchers.notNullValue;
 /**
  * Created by jens on 08/10/2016.
  */
+@DisplayName("DICOM Import Tests")
 public class DicomImportTest
 {
     private DicomReader dicomReader;
@@ -31,6 +33,7 @@ public class DicomImportTest
     }
 
     @Test
+    @DisplayName("Should create PatientEty from DICOM attributes")
     public void canCreatePatientEtyFromDicom() throws Exception
     {
         PatientEty patientEty = dicomReader.readPatient(dcm);
@@ -40,6 +43,7 @@ public class DicomImportTest
     }
 
     @Test
+    @DisplayName("Should create StudyEty from DICOM attributes")
     public void canCreateStudyEtyFromDicom() throws Exception
     {
         StudyEty studyEty = dicomReader.readStudy(dcm);
@@ -50,6 +54,7 @@ public class DicomImportTest
     }
 
     @Test
+    @DisplayName("Should create SeriesEty from DICOM attributes")
     public void canCreateSeriesEtyFromDicom() throws Exception
     {
         SeriesEty seriesEty = dicomReader.readSeries(dcm);
@@ -60,6 +65,7 @@ public class DicomImportTest
     }
 
     @Test
+    @DisplayName("Should create InstanceEty from DICOM attributes")
     public void canCreateInstanceEtyFromDicom() throws Exception
     {
         InstanceEty instanceEty = dicomReader.readInstance(dcm);
