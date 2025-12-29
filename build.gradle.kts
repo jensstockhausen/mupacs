@@ -27,7 +27,7 @@ repositories {
 }
 
 
-val dcm4cheVersion = "5.34.1"
+val dcm4cheVersion = "5.34.2"
 val cliVersion = "1.11.0"
 
 dependencies {
