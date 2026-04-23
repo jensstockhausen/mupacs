@@ -2,9 +2,9 @@
 
 **MuPACS** (Minimal Picture Archiving and Communication System) is a lightweight, Java-based DICOM archive system designed for storing, managing, and retrieving medical imaging data.
 
-[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-4.0.0-brightgreen.svg)](https://spring.io/projects/spring-boot)
+[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-4.0.5-brightgreen.svg)](https://spring.io/projects/spring-boot)
 [![Java](https://img.shields.io/badge/Java-17-orange.svg)](https://www.oracle.com/java/)
-[![dcm4che](https://img.shields.io/badge/dcm4che-5.34.1-blue.svg)](https://www.dcm4che.org/)
+[![dcm4che](https://img.shields.io/badge/dcm4che-5.34.2-blue.svg)](https://www.dcm4che.org/)
 
 ---
 
