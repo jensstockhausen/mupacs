@@ -43,6 +43,8 @@ The system follows the DICOM hierarchy: **Patient → Study → Series → Insta
 - **C-STORE SCP**: Automatic reception and archival of DICOM images
 - **C-ECHO SCP/SCU**: Connectivity verification with remote DICOM nodes
 - **C-FIND SCP**: Query/Retrieve support at Patient, Study, and Series levels
+- **WADO-RS**: RESTful web service for image retrieval with range request support
+- **QIDO-RS**: RESTful web service for querying studies, series, and instances
 - **Application Entity (AET) Management**: Configure and test remote DICOM nodes
 
 ### Data Management
@@ -289,6 +291,71 @@ Supports DICOM queries at:
 
 **Implementation**: `DcmFindSCP.java`
 
+### WADO-RS (Web Access to DICOM Objects)
+RESTful web service for retrieving DICOM objects over HTTP.
+
+**Endpoints**:
+- `GET /wado-rs/studies/{studyUID}/series/{seriesUID}/instances/{instanceUID}/bulkdata` - Retrieve DICOM instance
+- `HEAD /wado-rs/studies/{studyUID}/series/{seriesUID}/instances/{instanceUID}/bulkdata` - Get file size metadata
+
+**Features**:
+- ✅ Full file retrieval (HTTP 200)
+- ✅ HTTP 1.1 Range requests for partial content (HTTP 206)
+- ✅ HEAD requests for file size without downloading
+- ✅ Resumable downloads
+- ✅ Efficient streaming for large files
+
+**Implementation**: `DicomWebBulkDataController.java`, `DicomBulkDataService.java`
+
+**Usage Example**:
+```bash
+# Get file size
+curl -I http://localhost:8080/wado-rs/studies/{studyUID}/series/{seriesUID}/instances/{instanceUID}/bulkdata
+
+# Download full instance
+curl http://localhost:8080/wado-rs/studies/{studyUID}/series/{seriesUID}/instances/{instanceUID}/bulkdata -o image.dcm
+
+# Download first 1024 bytes (range request)
+curl -H "Range: bytes=0-1023" \
+  http://localhost:8080/wado-rs/studies/{studyUID}/series/{seriesUID}/instances/{instanceUID}/bulkdata
+```
+
+📖 **See [WADO-RS.md](WADO-RS.md) for complete WADO-RS documentation**
+
+### QIDO-RS (Query based on ID for DICOM Objects)
+RESTful web service for searching DICOM objects using query parameters.
+
+**Endpoints**:
+- `GET /qido-rs/studies` - Search for studies
+- `GET /qido-rs/series` - Search for series
+- `GET /qido-rs/instances` - Search for instances
+
+**Supported Query Parameters** (matching C-FIND SCP fields):
+- **Studies**: PatientID, PatientName, PatientBirthDate, PatientSex, StudyInstanceUID, StudyID, StudyDate, StudyDescription, AccessionNumber, ModalitiesInStudy, ReferringPhysicianName
+- **Series**: StudyInstanceUID, SeriesInstanceUID, Modality, SeriesNumber, SeriesDescription, SeriesDate, PerformingPhysicianName, BodyPartExamined
+- **Instances**: SeriesInstanceUID, SOPInstanceUID, InstanceNumber, ContentDate, AcquisitionNumber, AcquisitionDate, ImageType, Rows, Columns
+
+**Features**:
+- ✅ Query using same fields as C-FIND SCP
+- ✅ Wildcard support (* and ?) in string fields
+- ✅ JSON response format
+- ✅ RESTful HTTP interface
+- ✅ Compatible with DICOM PS3.18 Section 10.6
+
+**Implementation**: `DicomWebQidoController.java`
+
+**Usage Example**:
+```bash
+# Search for studies by patient name
+curl "http://localhost:8080/qido-rs/studies?PatientName=Doe*"
+
+# Search for series in a specific study
+curl "http://localhost:8080/qido-rs/series?StudyInstanceUID=1.2.3.4.5"
+
+# Search for instances with specific modality
+curl "http://localhost:8080/qido-rs/series?Modality=CT"
+```
+
 ---
 
 ## 🌐 Web Interface
@@ -489,8 +556,14 @@ This error occurs when accessing the server with `https://` instead of `http://`
 
 ## 🔮 Roadmap
 
+### Recently Completed ✅
+- [x] WADO-RS BulkData endpoint with HTTP Range request support
+- [x] HEAD endpoint for file size metadata
+
+### Planned Features
 - [ ] C-MOVE SCP/SCU implementation
-- [ ] WADO (Web Access to DICOM Objects) support
+- [ ] WADO-RS metadata endpoint (DICOM JSON)
+- [ ] WADO-RS rendered image endpoint (JPEG, PNG)
 - [ ] Image thumbnail generation
 - [ ] DICOM viewer integration (Weasis, OHIF)
 - [ ] Advanced query filters
@@ -504,6 +577,8 @@ This error occurs when accessing the server with `https://` instead of `http://`
 
 ## 📚 Additional Documentation
 
+- [WADO-RS Documentation](WADO-RS.md) - Complete WADO-RS API specification and examples
+- [WADO-RS Quick Start](WADO-RS-QUICKSTART.md) - Get started with WADO-RS in 5 minutes
 - [Docker Deployment Guide](DOCKER.md) - Complete guide for Docker deployment
 - [Troubleshooting Guide](TROUBLESHOOTING.md) - Detailed troubleshooting steps
 - [Property Dump Feature](Property_Dump_Feature.md) - Configuration verification on startup
