@@ -53,6 +53,16 @@
                                   th:title="${instance.instanceUID}"
                                   th:text="${iterStat.index + 1}">1</span>
                             <span th:text="' - ' + (${instance.instanceUID ?: 'N/A'})"> - N/A</span>
+                            <br/>
+                            <small class="text-muted">
+                                WADO-RS:
+                                <a th:href="@{/wado-rs/studies/{studyUID}/series/{seriesUID}/instances/{instanceUID}/bulkdata(studyUID=${study.ety().studyInstanceUID}, seriesUID=${series.seriesInstanceUID}, instanceUID=${instance.instanceUID})}"
+                                   th:text="@{/wado-rs/studies/{studyUID}/series/{seriesUID}/instances/{instanceUID}/bulkdata(studyUID=${study.ety().studyInstanceUID}, seriesUID=${series.seriesInstanceUID}, instanceUID=${instance.instanceUID})}"
+                                   target="_blank"
+                                   class="wado-rs-link">
+                                    /wado-rs/...
+                                </a>
+                            </small>
                         </li>
                     </ul>
                 </div>
