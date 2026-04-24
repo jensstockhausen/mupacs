@@ -122,8 +122,7 @@ class DicomWebQidoControllerTest
         when(patientStudyFinder.findSeries(any())).thenReturn(List.of(series));
 
         // When/Then
-        mockMvc.perform(get("/qido-rs/series")
-                        .param("StudyInstanceUID", "1.2.3.4.5"))
+        mockMvc.perform(get("/qido-rs/studies/1.2.3.4.5/series"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$").isArray())
@@ -139,7 +138,7 @@ class DicomWebQidoControllerTest
         when(patientStudyFinder.findSeries(any())).thenReturn(List.of(series));
 
         // When/Then
-        mockMvc.perform(get("/qido-rs/series")
+        mockMvc.perform(get("/qido-rs/studies/1.2.3.4.5/series")
                         .param("Modality", "CT"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].00080060.Value[0]").value("CT"));
@@ -153,8 +152,7 @@ class DicomWebQidoControllerTest
         when(patientStudyFinder.findInstances(any())).thenReturn(List.of(instance));
 
         // When/Then
-        mockMvc.perform(get("/qido-rs/instances")
-                        .param("SeriesInstanceUID", "1.2.3.4.5.6"))
+        mockMvc.perform(get("/qido-rs/studies/1.2.3.4.5/series/1.2.3.4.5.6/instances"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$").isArray())
@@ -184,8 +182,7 @@ class DicomWebQidoControllerTest
         when(patientStudyFinder.findSeries(any())).thenReturn(List.of());
 
         // When/Then
-        mockMvc.perform(get("/qido-rs/series")
-                        .param("StudyInstanceUID", "NONEXISTENT"))
+        mockMvc.perform(get("/qido-rs/studies/NONEXISTENT/series"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$").isEmpty());
@@ -199,8 +196,7 @@ class DicomWebQidoControllerTest
         when(patientStudyFinder.findInstances(any())).thenReturn(List.of());
 
         // When/Then
-        mockMvc.perform(get("/qido-rs/instances")
-                        .param("SeriesInstanceUID", "NONEXISTENT"))
+        mockMvc.perform(get("/qido-rs/studies/NONEXISTENT/series/NONEXISTENT/instances"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$").isEmpty());

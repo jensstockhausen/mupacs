@@ -35,17 +35,17 @@ import java.util.Map;
  * <p>Supported endpoints:
  * <ul>
  *   <li>GET /qido-rs/studies - Search for studies</li>
- *   <li>GET /qido-rs/series - Search for series</li>
- *   <li>GET /qido-rs/instances - Search for instances</li>
+ *   <li>GET /qido-rs/studies/{study}/series - Search for series in a study</li>
+ *   <li>GET /qido-rs/studies/{study}/series/{series}/instances - Search for instances in a series</li>
  * </ul>
  *
  * <p>Supported query parameters (matching C-FIND SCP fields):
  * <ul>
  *   <li>Studies: PatientID, PatientName, PatientBirthDate, PatientSex, StudyInstanceUID, StudyID,
  *       StudyDate, StudyDescription, AccessionNumber, ModalitiesInStudy, ReferringPhysicianName</li>
- *   <li>Series: StudyInstanceUID, SeriesInstanceUID, Modality, SeriesNumber, SeriesDescription,
+ *   <li>Series: SeriesInstanceUID, Modality, SeriesNumber, SeriesDescription,
  *       SeriesDate, PerformingPhysicianName, BodyPartExamined</li>
- *   <li>Instances: SeriesInstanceUID, SOPInstanceUID, InstanceNumber, ContentDate, AcquisitionNumber,
+ *   <li>Instances: SOPInstanceUID, InstanceNumber, ContentDate, AcquisitionNumber,
  *       AcquisitionDate, ImageType, Rows, Columns</li>
  * </ul>
  *
@@ -146,7 +146,7 @@ public class DicomWebQidoController
     /**
      * Search for DICOM series.
      *
-     * @param studyInstanceUID Study Instance UID (recommended)
+     * @param studyInstanceUID Study Instance UID from path (required)
      * @param seriesInstanceUID Series Instance UID
      * @param modality Modality (e.g., CT, MR, US)
      * @param seriesNumber Series Number
@@ -156,9 +156,9 @@ public class DicomWebQidoController
      * @param bodyPartExamined Body Part Examined (supports wildcards)
      * @return JSON array of matching series
      */
-    @GetMapping(value = "/series", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/studies/{study}/series", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<Map<String, Object>>> searchSeries(
-            @RequestParam(value = "StudyInstanceUID", required = false) String studyInstanceUID,
+            @org.springframework.web.bind.annotation.PathVariable("study") String studyInstanceUID,
             @RequestParam(value = "SeriesInstanceUID", required = false) String seriesInstanceUID,
             @RequestParam(value = "Modality", required = false) String modality,
             @RequestParam(value = "SeriesNumber", required = false) Integer seriesNumber,
@@ -209,7 +209,8 @@ public class DicomWebQidoController
     /**
      * Search for DICOM instances.
      *
-     * @param seriesInstanceUID Series Instance UID (recommended)
+     * @param studyInstanceUID Study Instance UID from path (required)
+     * @param seriesInstanceUID Series Instance UID from path (required)
      * @param sopInstanceUID SOP Instance UID
      * @param instanceNumber Instance Number
      * @param contentDate Content Date (YYYYMMDD format)
@@ -220,9 +221,10 @@ public class DicomWebQidoController
      * @param columns Image Columns
      * @return JSON array of matching instances
      */
-    @GetMapping(value = "/instances", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/studies/{study}/series/{series}/instances", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<Map<String, Object>>> searchInstances(
-            @RequestParam(value = "SeriesInstanceUID", required = false) String seriesInstanceUID,
+            @org.springframework.web.bind.annotation.PathVariable("study") String studyInstanceUID,
+            @org.springframework.web.bind.annotation.PathVariable("series") String seriesInstanceUID,
             @RequestParam(value = "SOPInstanceUID", required = false) String sopInstanceUID,
             @RequestParam(value = "InstanceNumber", required = false) Integer instanceNumber,
             @RequestParam(value = "ContentDate", required = false) String contentDate,
