@@ -25,6 +25,7 @@ import java.nio.file.Path;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.head;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -36,6 +37,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * <ul>
  *   <li>Full file retrieval</li>
  *   <li>HTTP Range request handling</li>
+ *   <li>HEAD request for metadata/file size</li>
  *   <li>Error cases (not found, invalid ranges, etc.)</li>
  * </ul>
  *
@@ -308,6 +310,76 @@ class DicomWebBulkDataControllerTest
                     .andExpect(status().isPartialContent())
                     .andExpect(header().string(HttpHeaders.CONTENT_RANGE, "bytes 25-25/" + testData.length))
                     .andExpect(header().string(HttpHeaders.CONTENT_LENGTH, "1"));
+        }
+    }
+
+    @Nested
+    @DisplayName("HEAD request tests")
+    class HeadRequestTests
+    {
+        @Test
+        @DisplayName("Should return file size in Content-Length header for HEAD request")
+        void shouldReturnFileSizeForHeadRequest() throws Exception
+        {
+            // Given
+            when(instanceRepository.findByInstanceUID("1.2.3.4.5.6.7")).thenReturn(instance);
+            when(bulkDataService.getFileSize(testFilePath)).thenReturn((long) testData.length);
+
+            // When/Then
+            mockMvc.perform(head("/wado-rs/studies/1.2.3.4.5/series/1.2.3.4.5.6/instances/1.2.3.4.5.6.7/bulkdata"))
+                    .andExpect(status().isOk())
+                    .andExpect(header().string(HttpHeaders.CONTENT_TYPE, "application/octet-stream"))
+                    .andExpect(header().string(HttpHeaders.ACCEPT_RANGES, "bytes"))
+                    .andExpect(header().string(HttpHeaders.CONTENT_LENGTH, String.valueOf(testData.length)));
+        }
+
+        @Test
+        @DisplayName("Should return 404 for HEAD request when instance not found")
+        void shouldReturn404ForHeadRequestWhenInstanceNotFound() throws Exception
+        {
+            // Given
+            when(instanceRepository.findByInstanceUID("1.2.3.4.5.6.7")).thenReturn(null);
+
+            // When/Then
+            mockMvc.perform(head("/wado-rs/studies/1.2.3.4.5/series/1.2.3.4.5.6/instances/1.2.3.4.5.6.7/bulkdata"))
+                    .andExpect(status().isNotFound());
+        }
+
+        @Test
+        @DisplayName("Should return 404 for HEAD request when instance belongs to different series")
+        void shouldReturn404ForHeadRequestWhenInstanceBelongsToDifferentSeries() throws Exception
+        {
+            // Given
+            when(instanceRepository.findByInstanceUID("1.2.3.4.5.6.7")).thenReturn(instance);
+
+            // When/Then
+            mockMvc.perform(head("/wado-rs/studies/1.2.3.4.5/series/9.9.9.9.9.9/instances/1.2.3.4.5.6.7/bulkdata"))
+                    .andExpect(status().isNotFound());
+        }
+
+        @Test
+        @DisplayName("Should return 404 for HEAD request when instance belongs to different study")
+        void shouldReturn404ForHeadRequestWhenInstanceBelongsToDifferentStudy() throws Exception
+        {
+            // Given
+            when(instanceRepository.findByInstanceUID("1.2.3.4.5.6.7")).thenReturn(instance);
+
+            // When/Then
+            mockMvc.perform(head("/wado-rs/studies/9.9.9.9.9/series/1.2.3.4.5.6/instances/1.2.3.4.5.6.7/bulkdata"))
+                    .andExpect(status().isNotFound());
+        }
+
+        @Test
+        @DisplayName("Should return 500 for HEAD request when file size cannot be retrieved")
+        void shouldReturn500ForHeadRequestWhenFileSizeCannotBeRetrieved() throws Exception
+        {
+            // Given
+            when(instanceRepository.findByInstanceUID("1.2.3.4.5.6.7")).thenReturn(instance);
+            when(bulkDataService.getFileSize(testFilePath)).thenThrow(new IOException("File not accessible"));
+
+            // When/Then
+            mockMvc.perform(head("/wado-rs/studies/1.2.3.4.5/series/1.2.3.4.5.6/instances/1.2.3.4.5.6.7/bulkdata"))
+                    .andExpect(status().isInternalServerError());
         }
     }
 }

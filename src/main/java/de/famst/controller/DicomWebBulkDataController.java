@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
@@ -32,6 +33,7 @@ import java.util.List;
  * <p>Supported endpoints:
  * <ul>
  *   <li>GET /wado-rs/studies/{studyUID}/series/{seriesUID}/instances/{instanceUID}/bulkdata - Retrieve pixel data</li>
+ *   <li>HEAD /wado-rs/studies/{studyUID}/series/{seriesUID}/instances/{instanceUID}/bulkdata - Get file size</li>
  * </ul>
  *
  * <p>Features:
@@ -89,26 +91,10 @@ public class DicomWebBulkDataController
         LOG.info("WADO-RS BulkData request: Study={}, Series={}, Instance={}, Range={}",
                 studyUID, seriesUID, instanceUID, rangeHeader);
 
-        // Find the instance by UID
-        InstanceEty instance = instanceRepository.findByInstanceUID(instanceUID);
+        // Validate and retrieve instance
+        InstanceEty instance = validateAndRetrieveInstance(studyUID, seriesUID, instanceUID);
         if (instance == null)
         {
-            LOG.warn("Instance not found: {}", instanceUID);
-            return ResponseEntity.notFound().build();
-        }
-
-        // Verify the instance belongs to the specified study and series
-        if (instance.getSeries() == null ||
-            !seriesUID.equals(instance.getSeries().getSeriesInstanceUID()))
-        {
-            LOG.warn("Instance {} does not belong to series {}", instanceUID, seriesUID);
-            return ResponseEntity.notFound().build();
-        }
-
-        if (instance.getSeries().getStudy() == null ||
-            !studyUID.equals(instance.getSeries().getStudy().getStudyInstanceUID()))
-        {
-            LOG.warn("Instance {} does not belong to study {}", instanceUID, studyUID);
             return ResponseEntity.notFound().build();
         }
 
@@ -131,6 +117,90 @@ public class DicomWebBulkDataController
             LOG.error("Error reading bulk data for instance {}: {}", instanceUID, e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
+    }
+
+    /**
+     * Retrieves metadata (file size) for a specific DICOM instance without transferring the actual data.
+     * This HEAD request is useful for clients to determine the file size before downloading.
+     *
+     * @param studyUID the Study Instance UID
+     * @param seriesUID the Series Instance UID
+     * @param instanceUID the SOP Instance UID
+     * @return ResponseEntity with headers containing file size in Content-Length
+     */
+    @RequestMapping(
+            value = "/studies/{studyUID}/series/{seriesUID}/instances/{instanceUID}/bulkdata",
+            method = RequestMethod.HEAD)
+    public ResponseEntity<Void> getBulkDataMetadata(
+            @PathVariable String studyUID,
+            @PathVariable String seriesUID,
+            @PathVariable String instanceUID)
+    {
+        LOG.info("WADO-RS BulkData HEAD request: Study={}, Series={}, Instance={}",
+                studyUID, seriesUID, instanceUID);
+
+        // Validate and retrieve instance
+        InstanceEty instance = validateAndRetrieveInstance(studyUID, seriesUID, instanceUID);
+        if (instance == null)
+        {
+            return ResponseEntity.notFound().build();
+        }
+
+        try
+        {
+            // Get file size
+            long fileSize = bulkDataService.getFileSize(instance.getPath());
+
+            LOG.debug("Serving HEAD request for instance {}: size={} bytes",
+                    instance.getInstanceUID(), fileSize);
+
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_OCTET_STREAM_VALUE)
+                    .header(HttpHeaders.ACCEPT_RANGES, "bytes")
+                    .header(HttpHeaders.CONTENT_LENGTH, String.valueOf(fileSize))
+                    .build();
+        }
+        catch (IOException e)
+        {
+            LOG.error("Error getting file size for instance {}: {}", instanceUID, e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    /**
+     * Validates and retrieves a DICOM instance, ensuring it belongs to the specified study and series.
+     *
+     * @param studyUID the Study Instance UID
+     * @param seriesUID the Series Instance UID
+     * @param instanceUID the SOP Instance UID
+     * @return the validated InstanceEty or null if not found or validation fails
+     */
+    private InstanceEty validateAndRetrieveInstance(String studyUID, String seriesUID, String instanceUID)
+    {
+        // Find the instance by UID
+        InstanceEty instance = instanceRepository.findByInstanceUID(instanceUID);
+        if (instance == null)
+        {
+            LOG.warn("Instance not found: {}", instanceUID);
+            return null;
+        }
+
+        // Verify the instance belongs to the specified study and series
+        if (instance.getSeries() == null ||
+            !seriesUID.equals(instance.getSeries().getSeriesInstanceUID()))
+        {
+            LOG.warn("Instance {} does not belong to series {}", instanceUID, seriesUID);
+            return null;
+        }
+
+        if (instance.getSeries().getStudy() == null ||
+            !studyUID.equals(instance.getSeries().getStudy().getStudyInstanceUID()))
+        {
+            LOG.warn("Instance {} does not belong to study {}", instanceUID, studyUID);
+            return null;
+        }
+
+        return instance;
     }
 
     /**
