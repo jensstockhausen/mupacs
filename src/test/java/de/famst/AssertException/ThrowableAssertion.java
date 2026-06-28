@@ -28,7 +28,7 @@ public class ThrowableAssertion
 
     public ThrowableAssertion isInstanceOf(Class<? extends Throwable> exceptionClass)
     {
-        MatcherAssert.assertThat(caught, Matchers.isA((Class<Throwable>) exceptionClass));
+        MatcherAssert.assertThat(caught, Matchers.isA(exceptionClass));
         return this;
     }
 
@@ -47,7 +47,7 @@ public class ThrowableAssertion
     public ThrowableAssertion hasCauseInstanceOf(Class<? extends Throwable> exceptionClass)
     {
         MatcherAssert.assertThat(caught.getCause(), Matchers.notNullValue());
-        MatcherAssert.assertThat(caught.getCause(), Matchers.isA((Class<Throwable>) exceptionClass));
+        MatcherAssert.assertThat(caught.getCause(), Matchers.isA(exceptionClass));
         return this;
     }
 }
