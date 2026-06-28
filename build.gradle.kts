@@ -55,7 +55,7 @@ dependencies {
     implementation("org.dcm4che:dcm4che-json:${dcm4cheVersion}")
 
     implementation("jakarta.json:jakarta.json-api:2.1.3")
-    implementation("org.eclipse.parsson:parsson:1.1.7")
+    implementation("org.eclipse.parsson:parsson:1.1.9")
 
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("org.springframework.boot:spring-boot-test-autoconfigure")
